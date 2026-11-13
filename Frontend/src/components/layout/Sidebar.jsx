@@ -5,7 +5,7 @@ import Logo from '../auth/Logo.jsx'
 const navigation = [
   ['Dashboard', LayoutDashboard, '/dashboard'], ['Employees', UsersRound, '/employees'],
   ['Activity Details', Activity, '/activity-details'], ['Application Usage', LayoutGrid, '/application-usage'],
-  ['Departments', Building2, '/dashboard#departments'], ['Reports & Analytics', FileBarChart, '/dashboard#activity'],
+  ['Departments', Building2, '/departments'], ['Reports & Analytics', FileBarChart, '/reports'],
 ]
 export default function Sidebar({ open, onClose, onNotice }) {
   const { pathname, hash } = useLocation()

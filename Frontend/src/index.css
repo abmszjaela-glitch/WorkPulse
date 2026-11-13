@@ -7,6 +7,7 @@
 @import './pages/DashboardPage.css' layer(components);
 @import './pages/EmployeesPage.css' layer(components);
 @import './pages/ActivityDetailsPage.css' layer(components);
+@import './pages/ReportsPage.css' layer(components);
 
 @theme {
   --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
