@@ -1,16 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ArrowRight, Bell, Building2, CalendarDays, Check, ChevronDown, CloudOff, Code2, FileBarChart, Globe, Hourglass, LayoutDashboard, LayoutGrid, LogOut, Menu, MessageSquare, Palette, Search, Settings, Sheet, UserRound, UsersRound, X, Zap } from 'lucide-react'
+import { ArrowRight, Bell, CalendarDays, Check, ChevronDown, CloudOff, Code2, Globe, Hourglass, Menu, MessageSquare, Palette, Search, Sheet, UserRound, UsersRound, X, Zap } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import Logo from '../components/auth/Logo.jsx'
+import Sidebar from '../components/layout/Sidebar.jsx'
 import { applications, departments, employees, weeklyActivity } from '../data/dashboard.js'
-import './DashboardPage.css'
 
-const navigation = [
-  ['Dashboard', LayoutDashboard, 'overview'], ['Employees', UsersRound, 'employees'],
-  ['Activity Details', Activity, 'activity'], ['Application Usage', LayoutGrid, 'applications'],
-  ['Departments', Building2, 'departments'], ['Reports & Analytics', FileBarChart, 'activity'],
-]
 const categories = [
   { name: 'Productive', value: 62, color: '#00652b', time: '4h 46m' },
   { name: 'Neutral', value: 24, color: '#2563eb', time: '1h 51m' },
@@ -27,22 +21,13 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState('This week')
   const [menuOpen, setMenuOpen] = useState(false)
   const [notice, setNotice] = useState('')
-  const [activeNav, setActiveNav] = useState('Dashboard')
   const [status, setStatus] = useState('All')
   const filtered = employees.filter((employee) => `${employee.name} ${employee.email} ${employee.department}`.toLowerCase().includes(search.toLowerCase()) && (status === 'All' || employee.status === status))
   const chartData = period === 'This week' ? weeklyActivity : weeklyActivity.map((day) => ({ ...day, active: +(day.active * 0.88).toFixed(1), idle: +(day.idle * 1.2).toFixed(1) }))
 
   return (
     <div className="dashboard-shell">
-      {menuOpen && <button className="sidebar-overlay" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
-      <aside className={`dashboard-sidebar ${menuOpen ? 'is-open' : ''}`}>
-        <div className="sidebar-brand"><Logo /><button className="mobile-close icon-button" aria-label="Close navigation" onClick={() => setMenuOpen(false)}><X size={20} /></button></div>
-        <nav aria-label="Main navigation">
-          {navigation.map(([label, Icon, target]) => <a key={label} href={`#${target}`} className={activeNav === label ? 'selected' : ''} aria-current={activeNav === label ? 'location' : undefined} onClick={() => { setActiveNav(label); setMenuOpen(false) }}><Icon size={19} />{label}</a>)}
-          <button onClick={() => setNotice('Settings will be available when your organization is connected.')}><Settings size={19} />Settings</button>
-        </nav>
-        <div className="sidebar-account"><span className="account-avatar"><UserRound size={17} /></span><div><strong>Admin preview</strong><small>Administrator</small></div><Link to="/login" aria-label="Go to login" title="Go to login"><LogOut size={18} /></Link></div>
-      </aside>
+      <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} onNotice={setNotice} />
 
       <div className="dashboard-workspace" id="overview">
         <header className="dashboard-header">

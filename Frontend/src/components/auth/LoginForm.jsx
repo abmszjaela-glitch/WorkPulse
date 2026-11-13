@@ -36,7 +36,7 @@ export default function LoginForm({ onSubmit }) {
   }
 
   return (
-    <div className="w-full max-w-[420px] rounded-2xl bg-white p-8 shadow-[0_8px_30px_rgba(23,37,84,0.08)] sm:p-10">
+    <div className="w-full max-w-[420px] rounded-2xl border border-line/60 bg-white p-8 shadow-card sm:p-10">
       <h2 className="text-2xl font-bold tracking-tight text-primary-dark">Welcome back</h2>
       <p className="mt-1 text-sm text-primary-dark/60">Sign in to your WorkPulse account</p>
 
@@ -79,7 +79,7 @@ export default function LoginForm({ onSubmit }) {
               type="checkbox"
               checked={remember}
               onChange={(e) => setRemember(e.target.checked)}
-              className="h-4 w-4 rounded border-primary-dark/30 text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-line accent-primary focus:ring-primary"
             />
             Remember me
           </label>
@@ -99,7 +99,7 @@ export default function LoginForm({ onSubmit }) {
         </button>
       </form>
 
-      <div className="mt-6 flex items-start gap-2.5 border-t border-background pt-5 text-xs leading-relaxed text-primary-dark/60">
+      <div className="mt-6 flex items-start gap-2.5 border-t border-line pt-5 text-xs leading-relaxed text-muted">
         <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
         <p>Your activity data is monitored in line with company policy.</p>
       </div>

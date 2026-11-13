@@ -19,8 +19,8 @@ export default function InputField({
         {label}
       </label>
       <div
-        className={`flex h-11 items-center gap-3 rounded-lg border bg-white px-3.5 transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 ${
-          error ? 'border-error/40' : 'border-background'
+        className={`flex h-11 items-center gap-3 rounded-lg border bg-slate-50/50 px-3.5 transition focus-within:border-primary/50 focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/10 ${
+          error ? 'border-error/60' : 'border-line'
         }`}
       >
         {Icon && <Icon className="h-4 w-4 shrink-0 text-primary-dark/50" aria-hidden="true" />}

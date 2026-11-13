@@ -1,0 +1,512 @@
+/* Tailwind component styles; loaded in the components layer by index.css. */
+.management-header .employee-search input {
+  @apply w-[265px];
+}
+.management-header .header-actions {
+  @apply flex-initial;
+}
+.management-content {
+  @apply pt-0;
+}
+.em-breadcrumb {
+  @apply flex gap-[7px] items-center text-xs p-[13px_0_7px] text-[#53649b];
+}
+.em-breadcrumb span {
+  @apply text-[#0750ca];
+}
+.management-title {
+  @apply flex justify-between gap-6;
+  align-items: flex-end;
+  @apply mb-2.5;
+}
+.management-title h1 {
+  @apply text-[26px] leading-[1.3] font-bold tracking-[-.7px];
+}
+.management-title p {
+  @apply text-[#646b7c] text-[13px] max-w-[470px] mt-1.5 leading-[1.6];
+}
+.management-actions {
+  @apply flex gap-2 shrink-0;
+}
+.em-button {
+  @apply inline-flex items-center justify-center gap-[5px] p-[9px_13px] bg-white text-sidebar rounded-lg shadow-[0_1px_2px_#1725540b] text-[13px] font-medium whitespace-nowrap cursor-pointer;
+}
+.em-button:hover {
+  @apply bg-[#eaf1ff];
+}
+.em-button.primary {
+  @apply bg-primary text-white;
+}
+.em-button.primary:hover {
+  @apply bg-[#1d4ed8];
+}
+.em-button.danger {
+  @apply bg-[#ffdbd8] text-[#a60707];
+}
+.em-button.danger:hover {
+  @apply bg-[#ffc4c0];
+}
+.em-preview-label {
+  @apply text-[10px] text-[#8a91a2] m-[10px_0_22px];
+}
+.management-stats {
+  @apply grid grid-cols-[repeat(4,minmax(0,1fr))] gap-6;
+}
+.management-stat {
+  @apply bg-white rounded-[13px] p-[24px_20px] flex justify-between items-center min-h-[138px] shadow-[0_1px_1px_#17255409];
+}
+.management-stat h2 {
+  @apply text-xs font-normal text-[#4b5e9b];
+}
+.management-stat strong {
+  @apply text-3xl block font-bold tracking-[-.7px] mt-1.5 leading-[1.3];
+}
+.management-stat p {
+  @apply text-[#4b5e9b] text-[10px] mt-[3px] flex gap-[5px] items-center;
+}
+.management-stat p i {
+  @apply w-[7px] h-[7px] rounded-full bg-primary shrink-0;
+}
+.management-stat-icon {
+  @apply w-[46px] h-[46px] rounded-full flex items-center justify-center shrink-0 bg-[#dce2ff] text-primary;
+}
+.management-stat.green .management-stat-icon {
+  @apply bg-soft text-[#008a3e];
+}
+.management-stat.green p i {
+  @apply bg-[#008a3e];
+}
+.management-stat.red .management-stat-icon {
+  @apply bg-[#fff0f1] text-error;
+}
+.management-stat.red p i {
+  @apply bg-error;
+}
+.management-stat.muted .management-stat-icon {
+  @apply bg-[#e7eff8] text-[#53649b];
+}
+.management-stat.muted p i {
+  @apply bg-[#b4c0ff];
+}
+.management-stat strong {
+  @apply text-sidebar;
+}
+.management-filters {
+  @apply mt-6 bg-white p-4 rounded-[13px] flex gap-3 items-center shadow-[0_1px_1px_#17255409];
+}
+.management-search {
+  @apply flex items-center gap-2.5 p-[10px_12px] bg-canvas rounded-lg text-muted flex-1 min-w-[160px];
+}
+.management-search input {
+  @apply outline-none w-full min-w-0 text-xs;
+}
+.management-search:focus-within {
+  outline: 2px solid #2563eb;
+}
+.management-select select {
+  @apply bg-canvas rounded-lg p-2.5 text-ink text-xs max-w-[155px];
+}
+.reset-filters {
+  @apply text-primary text-xs p-2 whitespace-nowrap;
+}
+.bulk-toolbar {
+  @apply flex justify-between items-center gap-4 p-[12px_16px] bg-soft rounded-[9px] mt-6;
+}
+.bulk-toolbar > div {
+  @apply flex items-center gap-2;
+}
+.bulk-toolbar strong {
+  @apply font-medium text-[13px];
+}
+.employee-management input[type=checkbox] {
+  accent-color: #2563eb;
+  @apply w-4 h-4 cursor-pointer shrink-0;
+}
+.management-table-panel {
+  @apply bg-white rounded-[13px] overflow-hidden mt-6 shadow-[0_1px_1px_#17255409];
+}
+.management-table-scroll {
+  @apply overflow-x-auto;
+}
+.management-table-panel table {
+  @apply w-full border-collapse text-left whitespace-nowrap;
+}
+.management-table-panel thead {
+  @apply bg-soft;
+}
+.management-table-panel th {
+  @apply text-[10px] uppercase tracking-[.45px] font-semibold text-[#53649b] p-[17px_12px];
+}
+.management-table-panel td {
+  @apply p-[16px_12px];
+  border-bottom: 1px solid #f0f4fc;
+  @apply text-ink text-xs;
+}
+.management-table-panel th:first-child, .management-table-panel td:first-child {
+  @apply pl-4;
+}
+.management-table-panel tr.row-selected {
+  @apply bg-[#f7faff];
+}
+.management-table-panel tbody tr:hover {
+  @apply bg-[#f4f8ff];
+}
+.management-identity {
+  @apply flex gap-3 items-center;
+}
+.management-identity > span {
+  @apply flex items-center justify-center rounded-full bg-[#dce2ff] text-[#53649b] w-9 h-9 font-semibold text-sm shrink-0;
+}
+.management-identity strong {
+  @apply font-medium block text-[13px];
+}
+.management-identity small {
+  @apply text-[#53649b] block text-[11px] mt-0.5;
+}
+.employee-id {
+  font-family: ui-monospace, monospace;
+  font-size: 11px !important;
+}
+.role-badge {
+  @apply rounded-xl p-[3px_8px] bg-[#e7eff8] text-[11px];
+}
+.role-badge.admin {
+  @apply bg-sidebar text-white;
+}
+.role-badge.manager {
+  @apply bg-[#dce2ff] text-[#0750ca];
+}
+.agent-status {
+  @apply inline-flex items-center gap-1.5;
+}
+.agent-status i, .management-status i {
+  @apply w-[7px] h-[7px] bg-[currentColor] rounded-full shrink-0;
+}
+.agent-status.connected i {
+  @apply bg-[#008a3e];
+}
+.agent-status.offline, .agent-status.not-installed {
+  @apply text-[#53649b];
+}
+.agent-status.offline i {
+  @apply bg-muted;
+}
+.agent-status.not-installed i {
+  @apply bg-[#b4c0ff];
+}
+.management-table-panel .last-active {
+  @apply text-[#53649b];
+}
+.management-status {
+  @apply inline-flex items-center gap-1 p-[3px_9px] rounded-xl text-[11px];
+}
+.management-status.active {
+  @apply bg-[#ccf5db] text-[#00652b];
+}
+.management-status.deactivated {
+  @apply bg-[#ffdcd9] text-[#b20c0c];
+}
+.management-status i {
+  @apply w-[5px] h-[5px];
+}
+.row-actions {
+  @apply flex items-center gap-2 text-[#53649b];
+}
+.row-actions button {
+  @apply p-1 rounded-sm;
+}
+.row-actions button:hover {
+  @apply text-primary bg-soft;
+}
+.management-pagination {
+  @apply p-[20px_24px] flex items-center justify-between gap-4 text-[#53649b] text-xs;
+}
+.management-pagination strong {
+  @apply text-ink font-medium;
+}
+.management-pagination > div, .management-pagination nav {
+  @apply flex items-center gap-3;
+}
+.management-pagination label {
+  @apply whitespace-nowrap;
+}
+.management-pagination select {
+  @apply bg-canvas rounded-[5px] ml-1.5 p-[5px];
+}
+.management-pagination nav {
+  @apply gap-1;
+}
+.management-pagination nav button {
+  @apply flex items-center justify-center min-w-7 h-7 rounded-md;
+}
+.management-pagination .current {
+  @apply bg-primary text-white;
+}
+.management-pagination button:disabled {
+  @apply opacity-[.35] cursor-default;
+}
+.management-table-panel .empty-state {
+  @apply grid justify-items-center gap-2.5;
+}
+.employee-dialog {
+  @apply m-auto w-[min(520px,calc(100%_-_32px))] max-h-[calc(100svh_-_40px)] overflow-y-auto p-6;
+  border: 0;
+  @apply rounded-2xl bg-white text-primary-dark shadow-[0_22px_70px_#03174730] text-[13px];
+}
+.employee-dialog::backdrop {
+  @apply bg-[#14264c78];
+  backdrop-filter: blur(4px);
+}
+.dialog-heading {
+  @apply flex items-center justify-between gap-4;
+}
+.dialog-heading h2 {
+  @apply text-xl;
+  font-weight: 650;
+  @apply tracking-[-.6px];
+}
+.dialog-heading .icon-button {
+  @apply text-[#525a6c];
+}
+.dialog-description {
+  @apply text-muted-strong text-xs leading-[1.6] m-[4px_0_16px] max-w-[250px];
+}
+.employee-form-grid {
+  @apply grid grid-cols-[1fr_1fr] gap-4;
+}
+.em-field {
+  @apply flex flex-col gap-1.5 text-[11px] font-medium text-[#384966];
+}
+.em-field input, .em-field select {
+  border: 1px solid #f0f2f6;
+  @apply shadow-[0_1px_1px_#17255405] rounded-lg p-[10px_11px] w-full min-w-0 text-[13px] font-normal text-ink bg-white outline-none;
+}
+.em-field input:focus, .em-field select:focus {
+  border-color: #2563eb;
+}
+.em-field input[aria-invalid=true] {
+  border-color: #dc2626;
+}
+.dialog-actions {
+  @apply flex justify-end gap-3 mt-6;
+}
+.dialog-actions .em-button {
+  @apply text-sm;
+}
+.em-form-error {
+  @apply text-error text-[11px] flex items-center gap-[5px] mt-[5px];
+}
+.employee-details {
+  @apply m-[20px_0];
+}
+.employee-details > div {
+  @apply p-[10px_0];
+  border-bottom: 1px solid #edf4ff;
+  @apply grid grid-cols-[120px_1fr] gap-2;
+}
+.employee-details dt {
+  @apply text-muted;
+}
+.employee-details dd {
+  overflow-wrap: anywhere;
+}
+@media(max-width: 1200px) {
+.management-stats {
+  @apply gap-4;
+}
+.management-stat {
+  @apply p-[20px_16px];
+}
+.management-stat-icon {
+  @apply w-[38px] h-[38px];
+}
+.management-filters {
+  @apply flex-wrap;
+}
+.management-search {
+  flex-basis: 100%;
+}
+.management-select {
+  @apply flex-1;
+}
+.management-select select {
+  @apply w-full max-w-[none];
+} }
+@media(max-width: 760px) {
+.management-header {
+  @apply flex-nowrap;
+}
+.management-header .employee-search {
+  @apply flex-1 min-w-0;
+}
+.management-header .employee-search input {
+  @apply w-full;
+}
+.management-header .header-actions {
+  @apply w-auto m-0 flex-initial;
+}
+.management-title {
+  @apply flex-col items-start gap-3.5;
+}
+.management-title h1 {
+  @apply text-[25px];
+}
+.management-stats {
+  @apply grid-cols-[repeat(2,minmax(0,1fr))] gap-3;
+}
+.management-stat {
+  @apply p-4 min-h-[125px] gap-1;
+}
+.management-stat h2 {
+  @apply text-[10px];
+}
+.management-stat p {
+  @apply text-[9px];
+}
+.management-stat strong {
+  @apply text-[27px];
+}
+.management-stat-icon {
+  @apply w-8 h-8;
+}
+.management-stat-icon svg {
+  @apply w-[19px];
+}
+.bulk-toolbar, .management-pagination {
+  @apply flex-wrap;
+}
+.management-pagination {
+  @apply p-4;
+}
+.management-pagination > div {
+  @apply w-full justify-between gap-2;
+}
+.management-select {
+  @apply min-w-[100px];
+}
+.employee-form-grid {
+  @apply gap-3;
+} }
+@media(max-width: 440px) {
+.employee-form-grid {
+  @apply grid-cols-[1fr];
+}
+.employee-dialog {
+  @apply p-5;
+}
+.bulk-toolbar > div:last-child {
+  @apply flex-wrap;
+} }
+.temporary-password {
+  @apply mt-4;
+}
+.temporary-password > div:first-child {
+  @apply flex justify-between items-center text-[11px] font-medium text-[#384966];
+}
+.temporary-password > div:first-child button {
+  @apply flex items-center gap-1 text-primary;
+}
+.temporary-password-input {
+  @apply flex items-center;
+  border: 1px solid #f0f2f6;
+  @apply rounded-lg mt-1.5;
+}
+.temporary-password-input:focus-within {
+  outline: 1px solid #2563eb;
+}
+.temporary-password-input input {
+  @apply min-w-0 w-full outline-none;
+  font-family: ui-monospace, monospace;
+  @apply p-[10px_11px] text-ink text-xs;
+}
+.temporary-password-input button {
+  @apply p-[10px_12px] text-muted-strong;
+}
+.temporary-password small {
+  @apply block text-[10px] text-[#646b7c] mt-[5px] leading-[1.5];
+}
+.account-status-control {
+  @apply mt-4 p-[13px_12px] rounded-xl bg-[#f7faff] flex items-center gap-2.5;
+}
+.account-status-control > div {
+  @apply mr-auto;
+}
+.account-status-control strong {
+  @apply text-[11px] font-medium text-[#384966];
+}
+.account-status-control p {
+  @apply text-[10px] text-muted-strong mt-0.5;
+}
+.account-status-control > span {
+  @apply text-[11px] text-[#00652b];
+}
+.status-switch {
+  @apply h-6 w-11 rounded-[20px] bg-[#99a4b8] p-1 flex shrink-0;
+}
+.status-switch.on {
+  @apply bg-[#00652b];
+}
+.status-switch > span {
+  @apply h-4 w-4 rounded-full bg-white;
+  transition: transform .15s;
+}
+.status-switch.on > span {
+  transform: translateX(20px);
+}
+.agent-install-note {
+  @apply bg-soft rounded-xl flex items-start gap-2.5 p-3.5 mt-4 text-muted-strong text-xs leading-[1.7];
+}
+.agent-install-note svg {
+  @apply text-[#27376e] shrink-0 mt-[3px];
+}
+.deactivate-dialog {
+  @apply w-[min(440px,calc(100%_-_32px))] p-7 rounded-xl fixed;
+}
+.deactivate-dialog .dialog-close {
+  @apply absolute right-4 top-4;
+}
+.deactivate-symbol {
+  @apply w-12 h-12 rounded-full bg-[#ffe3e5] text-[#ed252d] flex items-center justify-center mb-4;
+}
+.deactivate-dialog .dialog-heading h2 {
+  @apply text-xl;
+}
+.deactivate-dialog .dialog-description {
+  @apply m-0;
+}
+.deactivate-targets {
+  @apply mt-3.5 grid gap-[5px] max-h-[130px] overflow-y-auto;
+}
+.deactivate-targets > div {
+  @apply flex items-center gap-[5px] bg-soft rounded-lg p-[6px_10px] text-[11px] text-muted-strong;
+}
+.deactivate-targets > div > span {
+  @apply w-[21px] h-[21px] rounded-full flex items-center justify-center text-[#53649b] bg-[#bdcaff] text-[9px] shrink-0;
+}
+.deactivate-targets strong {
+  @apply text-ink font-normal;
+}
+.deactivate-explanation {
+  @apply text-muted-strong text-[13px] leading-[1.6] mt-3.5;
+}
+.deactivate-agent-warning {
+  @apply flex items-start gap-2 text-[#dc0808] bg-[#fff0f1] rounded-lg p-[10px_12px] mt-3.5 text-xs leading-[1.5];
+}
+.deactivate-agent-warning svg {
+  @apply shrink-0 mt-0.5;
+}
+.dialog-preview-note {
+  @apply mt-2.5 text-[10px] text-[#8a91a2];
+}
+.deactivate-dialog .dialog-actions {
+  @apply mt-6;
+}
+.deactivate-dialog .dialog-actions .em-button:not(.danger-solid) {
+  @apply bg-soft text-ink;
+}
+.em-button.danger-solid {
+  @apply bg-[#e32229] text-white;
+}
+.em-button.danger-solid:hover {
+  @apply bg-[#c5161d];
+}

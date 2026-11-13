@@ -1,0 +1,576 @@
+/* Tailwind component styles; loaded in the components layer by index.css. */
+.activity-admin {
+  @apply flex gap-[9px] items-center text-ink text-[13px];
+}
+.activity-details .management-header .employee-search input {
+  @apply w-[min(440px,36vw)];
+}
+.activity-content .management-title p {
+  @apply max-w-[none] text-xs;
+}
+.activity-details .management-title h1 {
+  @apply text-[25px];
+}
+.activity-date {
+  @apply cursor-default;
+}
+.activity-profile {
+  @apply mt-5.5;
+}
+.profile-identity {
+  @apply flex items-center gap-4;
+}
+.profile-avatar {
+  @apply bg-[#dce2ff] text-[#0750ca] w-14 h-14 flex items-center justify-center rounded-full relative text-base font-semibold shrink-0;
+}
+.profile-avatar i {
+  @apply absolute right-0 bottom-0 w-[17px] h-[17px] rounded-full bg-[#008a3e];
+  border: 2px solid white;
+}
+.profile-name {
+  @apply flex gap-[9px] items-center flex-wrap;
+}
+.profile-name h2 {
+  @apply text-base font-semibold;
+}
+.profile-name small {
+  @apply text-[11px] text-muted-strong;
+}
+.profile-identity p {
+  @apply text-muted-strong text-[13px] mt-[5px] flex items-center gap-1.5 flex-wrap;
+}
+.profile-identity p i {
+  @apply w-1 h-1 rounded-full bg-[#c8cee0];
+}
+.profile-identity a {
+  @apply text-[#0750ca] text-[13px] block mt-1;
+}
+.workstation-strip {
+  @apply inline-flex bg-soft rounded-lg p-[9px_16px] mt-6 gap-5;
+}
+.workstation-strip > div {
+  @apply flex gap-1.5 items-center pr-5;
+  border-right: 1px solid #dce5f2;
+}
+.workstation-strip > div:last-child {
+  border: none;
+  @apply pr-0;
+}
+.workstation-strip svg {
+  @apply text-[#53649b];
+}
+.workstation-strip small {
+  @apply block text-[10px] text-muted-strong tracking-[.5px] font-medium;
+}
+.workstation-strip strong {
+  @apply block text-[13px] text-ink font-medium;
+}
+.workstation-strip .connected-text {
+  @apply text-[#00652b];
+}
+.activity-stat-grid {
+  @apply grid grid-cols-[repeat(5,minmax(0,1fr))] gap-4 mt-6;
+}
+.activity-stat {
+  @apply p-[17px_16px];
+}
+.activity-stat > div {
+  @apply flex items-center justify-between gap-2;
+}
+.activity-stat h2 {
+  @apply text-[13px] font-medium text-muted-strong;
+}
+.metric-icon {
+  @apply bg-soft w-8 h-8 rounded-[9px] flex justify-center items-center text-[#53649b] shrink-0;
+}
+.metric-icon.blue {
+  @apply text-primary;
+}
+.metric-icon.green {
+  @apply text-[#008a3e] bg-[#dcfce7];
+}
+.metric-icon.orange {
+  @apply text-[#e68a00] bg-[#fffbeb];
+}
+.activity-stat > strong {
+  @apply text-[29px] font-bold tracking-[-1px] mt-[13px] leading-[1.2] block;
+}
+.activity-stat > p {
+  @apply flex gap-[3px] items-center text-[11px] mt-1.5 leading-[1.4];
+}
+.input-stat > strong {
+  @apply text-[15px] tracking-[-.4px] flex flex-wrap items-center gap-1.5;
+}
+.input-stat strong small {
+  @apply text-[9px] tracking-[.5px] text-muted-strong font-medium;
+}
+.input-stat strong i {
+  @apply h-[15px];
+  border-left: 1px solid #c8cee0;
+  transform: rotate(12deg);
+}
+.input-stat p {
+  @apply text-[#53649b];
+}
+.activity-top-grid {
+  @apply grid grid-cols-[minmax(0,2.08fr)_minmax(0,1fr)] gap-6 mt-6;
+}
+.activity-heading {
+  @apply flex items-center justify-between gap-3;
+}
+.activity-heading h2 {
+  @apply text-base font-semibold tracking-[-.3px];
+}
+.activity-heading p {
+  @apply text-[11px] text-muted-strong mt-[3px] leading-[1.5];
+}
+.timeline-legend {
+  @apply flex gap-3.5 text-[11px] text-muted-strong;
+}
+.timeline-legend span {
+  @apply flex items-center gap-1.5;
+}
+.timeline-legend i {
+  @apply h-2.5 w-2.5 rounded-full bg-primary;
+}
+.timeline-legend span:nth-child(2) i {
+  @apply bg-warning;
+}
+.timeline-legend span:nth-child(3) i {
+  @apply bg-[#e1e9f4];
+}
+.interval-readout {
+  @apply m-[26px_auto_10px] flex items-center gap-2 p-[7px_12px] rounded-lg w-fit bg-sidebar text-white text-[10px] shadow-[0_2px_4px_#03174725];
+}
+.interval-readout span:last-child {
+  @apply text-[#ffd03f];
+}
+.hourly-timeline {
+  @apply grid grid-cols-[repeat(10,minmax(0,1fr))] gap-4 p-[0_6px];
+}
+.hour-column {
+  @apply flex flex-col items-stretch gap-2 min-w-0;
+}
+.hour-stack {
+  @apply h-[164px] flex flex-col gap-0 overflow-hidden rounded-[2px];
+}
+.hour-stack span {
+  @apply block w-full;
+}
+.hour-stack span + span {
+  border-top: 1px solid white;
+}
+.hour-active {
+  @apply bg-primary;
+}
+.hour-idle {
+  @apply bg-warning;
+}
+.hour-offline {
+  @apply bg-[#e1e9f4];
+}
+.hour-column.selected .hour-stack {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+.hour-column small {
+  @apply text-[10px] text-muted-strong whitespace-nowrap;
+}
+.hour-column.selected small {
+  @apply text-[#0750ca] font-semibold;
+}
+.timeline-insights {
+  @apply flex items-center justify-between gap-3 bg-soft rounded-lg p-[11px_14px] mt-[34px] text-[10px] text-muted-strong;
+}
+.timeline-insights span {
+  @apply flex items-center gap-1;
+}
+.timeline-insights svg {
+  @apply text-[#008a3e] shrink-0;
+}
+.distribution-chart {
+  @apply relative w-[180px] h-[180px] m-[30px_auto];
+}
+.distribution-chart > div:last-child {
+  @apply absolute inset-0 flex items-center justify-center flex-col pointer-events-none;
+}
+.distribution-chart strong {
+  @apply text-2xl tracking-[-.8px] font-bold;
+}
+.distribution-chart small {
+  @apply text-[10px] tracking-[.4px] text-muted-strong;
+}
+.distribution-legend {
+  @apply grid gap-2.5;
+}
+.distribution-legend > div {
+  @apply flex items-center gap-2 text-xs text-ink;
+}
+.distribution-legend i {
+  @apply w-[11px] h-[11px] rounded-full;
+}
+.distribution-legend strong {
+  @apply ml-auto text-xs font-semibold;
+}
+.distribution-legend small {
+  @apply text-[11px] w-[30px] text-right text-muted-strong;
+}
+.activity-middle-grid {
+  @apply grid grid-cols-[repeat(2,minmax(0,1fr))] gap-6 mt-6;
+}
+.activity-app-list {
+  @apply grid gap-3.5 mt-5;
+}
+.activity-app-info {
+  @apply flex items-center gap-[9px];
+}
+.activity-app-info strong {
+  @apply text-xs font-medium text-ink;
+}
+.activity-app-info b {
+  @apply text-xs ml-auto whitespace-nowrap font-semibold;
+}
+.classification {
+  @apply p-[2px_7px] text-[9px] rounded-xl whitespace-nowrap tracking-[.2px];
+}
+.classification.productive {
+  @apply bg-[#dcfce7] text-[#00652b];
+}
+.classification.neutral {
+  @apply bg-[#f1f3ff] text-[#53649b];
+}
+.classification.unproductive {
+  @apply bg-[#ffdbd8] text-[#b20c0c];
+}
+.activity-app-list .progress-track {
+  @apply mt-1.5 h-2;
+}
+.weekly-activity {
+  @apply flex flex-col;
+}
+.weekly-activity select {
+  @apply text-[11px] p-[5px_8px] bg-soft rounded-lg;
+}
+.activity-trend-chart {
+  @apply h-[260px] w-full mt-[25px];
+}
+.weekly-trend-footer {
+  @apply flex items-center gap-[15px];
+  border-top: 1px solid #dce5f6;
+  @apply pt-4 mt-auto text-muted-strong text-[10px];
+}
+.weekly-trend-footer > span {
+  @apply flex items-center gap-1.5 flex-1;
+}
+.weekly-trend-footer i {
+  @apply w-3 h-[3px] rounded-[3px] bg-primary shrink-0;
+}
+.weekly-trend-footer span:nth-child(2) i {
+  @apply bg-warning;
+}
+.weekly-trend-footer strong {
+  @apply flex items-center gap-[5px] font-medium text-[#00652b] max-w-[110px];
+}
+.activity-log-panel {
+  @apply mt-6;
+}
+.log-filters {
+  @apply flex items-center gap-2;
+}
+.log-filters label {
+  @apply flex items-center gap-2 bg-soft rounded-lg p-[8px_12px] text-muted;
+}
+.log-filters input {
+  @apply text-xs outline-none w-[150px] min-w-0;
+}
+.log-filters select {
+  @apply bg-soft p-2 rounded-lg text-[11px];
+}
+.activity-log-scroll {
+  @apply overflow-x-auto mt-4;
+}
+.activity-log-scroll table {
+  @apply w-full border-collapse text-left min-w-[770px];
+}
+.activity-log-scroll th {
+  @apply bg-soft text-muted-strong text-[9px] font-semibold uppercase tracking-[.45px] p-[14px_16px];
+}
+.activity-log-scroll td {
+  @apply p-[22px_16px] text-ink text-xs;
+  border-bottom: 1px solid #edf4ff;
+}
+.activity-log-scroll td:first-child {
+  font-family: ui-monospace, monospace;
+  @apply text-[10px] max-w-[110px] text-muted-strong;
+}
+.activity-log-scroll td:nth-child(4) {
+  @apply text-muted-strong;
+}
+.activity-log-scroll th:nth-child(n+5), .activity-log-scroll td:nth-child(n+5) {
+  @apply text-right whitespace-nowrap;
+}
+.log-status {
+  @apply inline-flex items-center gap-[5px] text-[10px] p-[3px_8px] rounded-[10px] whitespace-nowrap;
+}
+.log-status i {
+  @apply w-[5px] h-[5px] rounded-full bg-[currentColor];
+}
+.log-status.active {
+  @apply bg-[#dcfce7] text-[#00652b];
+}
+.log-status.neutral {
+  @apply bg-[#f1f3ff] text-[#53649b];
+}
+.log-status.idle {
+  @apply bg-[#fef3c7] text-[#d98a00];
+}
+.log-app {
+  @apply flex items-center gap-[7px] min-w-[115px];
+}
+.log-app svg {
+  @apply shrink-0 text-primary;
+}
+.idle-log {
+  @apply bg-[#fffaf2];
+}
+.idle-log td {
+  @apply text-[#8a91a2];
+}
+.idle-log .log-app {
+  @apply italic;
+}
+.activity-log-panel .management-pagination {
+  @apply p-[24px_0_0];
+}
+.activity-log-panel .management-pagination nav button {
+  @apply min-w-[30px] p-[0_5px];
+}
+.activity-privacy {
+  @apply bg-soft flex items-center gap-4 rounded-[10px] p-[17px] mt-6 text-muted-strong text-xs leading-[1.6];
+}
+.activity-privacy > svg {
+  @apply text-[#e68a00] shrink-0;
+}
+.activity-privacy strong {
+  @apply text-ink font-semibold;
+}
+.activity-privacy button {
+  @apply flex gap-1 items-center shrink-0 text-primary text-[11px] ml-auto;
+}
+.privacy-details {
+  @apply mt-3 flex gap-2.5 items-start text-xs text-muted-strong leading-[1.6];
+}
+.privacy-details svg {
+  @apply shrink-0;
+}
+@media(max-width: 1250px) {
+.activity-stat-grid {
+  @apply grid-cols-[repeat(3,minmax(0,1fr))];
+}
+.activity-top-grid {
+  @apply grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)] gap-4.5;
+}
+.activity-heading {
+  @apply flex-wrap;
+}
+.timeline-legend {
+  @apply mt-[5px];
+}
+.hourly-timeline {
+  @apply gap-2.5;
+}
+.timeline-insights {
+  @apply flex-wrap;
+}
+.activity-middle-grid {
+  @apply gap-4.5;
+}
+.classification {
+  @apply hidden;
+}
+.activity-content .management-title {
+  @apply items-start flex-wrap;
+}
+.activity-trend-chart {
+  @apply h-[290px];
+}
+.distribution-chart {
+  @apply w-[160px] h-[160px];
+} }
+@media(max-width: 1000px) {
+.activity-top-grid, .activity-middle-grid {
+  @apply grid-cols-[minmax(0,1fr)];
+}
+.activity-stat-grid {
+  @apply gap-3;
+}
+.activity-stat {
+  @apply p-4;
+}
+.activity-stat > strong {
+  @apply text-[26px];
+}
+.input-stat > strong {
+  @apply text-[15px];
+}
+.distribution-panel {
+  @apply flex flex-wrap items-center gap-4;
+}
+.distribution-panel .activity-heading {
+  @apply w-full;
+}
+.distribution-chart {
+  @apply m-[10px_auto];
+}
+.distribution-legend {
+  @apply flex-1 min-w-[210px];
+}
+.classification {
+  @apply inline-block;
+}
+.weekly-trend-footer {
+  @apply mt-5;
+}
+.workstation-strip {
+  @apply flex-wrap gap-3;
+}
+.workstation-strip > div {
+  border: 0;
+  @apply pr-0;
+} }
+@media(max-width: 760px) {
+.activity-stat-grid {
+  @apply grid-cols-[repeat(2,minmax(0,1fr))];
+}
+.input-stat {
+  @apply col-[1_/_-1];
+}
+.activity-details .management-header .employee-search input {
+  @apply w-full;
+}
+.activity-admin {
+  @apply text-[0];
+}
+.activity-content .management-title h1 {
+  @apply text-[23px];
+}
+.activity-details .management-actions {
+  @apply flex-wrap gap-1.5;
+}
+.activity-details .management-actions .em-button {
+  @apply text-[11px] p-[8px_10px];
+}
+.profile-identity {
+  @apply items-start gap-3;
+}
+.profile-name small {
+  @apply w-full;
+}
+.profile-identity p {
+  @apply text-[11px];
+}
+.workstation-strip {
+  @apply flex p-3 flex-col;
+}
+.hourly-timeline {
+  @apply gap-2 p-0;
+}
+.hour-stack {
+  @apply h-[145px];
+}
+.hour-column small {
+  @apply text-[8px];
+}
+.timeline-insights {
+  @apply mt-6 p-2.5;
+}
+.activity-app-info {
+  @apply gap-1.5;
+}
+.activity-app-info strong {
+  @apply text-[11px];
+}
+.activity-app-info .classification {
+  @apply text-[8px];
+}
+.activity-privacy {
+  @apply flex-wrap gap-2.5;
+}
+.activity-privacy p {
+  @apply flex-1 min-w-[200px];
+}
+.activity-privacy button {
+  @apply ml-8;
+}
+.log-filters {
+  @apply w-full;
+}
+.log-filters label {
+  @apply flex-1 min-w-0;
+}
+.log-filters input {
+  @apply w-full;
+}
+.activity-log-panel .management-pagination > div {
+  @apply flex-wrap;
+}
+.weekly-trend-footer {
+  @apply gap-2;
+}
+.weekly-trend-footer strong {
+  @apply max-w-[90px];
+} }
+@media print { @page { @apply m-[12mm]; }
+.activity-details {
+  @apply bg-white text-[10px];
+}
+.activity-details .dashboard-sidebar, .activity-details .dashboard-header, .activity-details .management-actions, .activity-details .sidebar-overlay, .activity-details .dashboard-notice, .activity-details .log-filters, .activity-details .management-pagination, .activity-details .activity-privacy button {
+  display: none !important;
+}
+.activity-details .dashboard-workspace {
+  @apply ml-0;
+}
+.activity-details .dashboard-content {
+  @apply p-0 max-w-[none];
+}
+.activity-details .dashboard-panel {
+  border: 1px solid #dce5f6;
+  break-inside: avoid;
+  box-shadow: none;
+}
+.activity-details .activity-log-panel {
+  break-inside: auto;
+}
+.activity-details .activity-log-scroll {
+  @apply overflow-visible;
+}
+.activity-details .activity-log-scroll table {
+  @apply min-w-0;
+}
+.activity-details .activity-log-scroll td, .activity-details .activity-log-scroll th {
+  @apply p-[10px_6px] text-[9px];
+}
+.activity-details .activity-stat-grid {
+  @apply grid-cols-[repeat(5,minmax(0,1fr))];
+}
+.activity-details .input-stat {
+  @apply col-[auto];
+}
+.activity-details .activity-stat > strong {
+  @apply text-[22px];
+}
+.activity-details .input-stat > strong {
+  @apply text-xs;
+}
+.activity-details .activity-top-grid, .activity-details .activity-middle-grid {
+  @apply grid-cols-[minmax(0,1fr)];
+}
+.activity-details .activity-log-scroll tr {
+  break-inside: avoid;
+}
+.activity-details .hour-stack span, .activity-details .progress-track, .activity-details .progress-track > span {
+  print-color-adjust: exact;
+}
+.activity-details .activity-heading {
+  @apply flex-nowrap;
+} }

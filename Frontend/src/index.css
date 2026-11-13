@@ -4,6 +4,9 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css' layer(utilities);
+@import './pages/DashboardPage.css' layer(components);
+@import './pages/EmployeesPage.css' layer(components);
+@import './pages/ActivityDetailsPage.css' layer(components);
 
 @theme {
   --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -13,7 +16,17 @@
   --color-success: #16A34A;
   --color-warning: #F59E0B;
   --color-error: #DC2626;
+  --color-sidebar: #031747;
+  --color-canvas: #f5f8fe;
+  --color-soft: #edf4ff;
+  --color-muted: #73788d;
+  --color-muted-strong: #535b70;
+  --color-ink: #202938;
+  --color-line: #e2e8f0;
+  --shadow-card: 0 2px 4px -2px rgb(15 23 42 / 0.04), 0 8px 24px -16px rgb(15 23 42 / 0.12);
+  --shadow-floating: 0 24px 64px -16px rgb(15 23 42 / 0.25);
 }
+@layer base {
 :root {
   font-family: var(--font-sans);
   color: var(--color-primary-dark);
@@ -45,4 +58,89 @@ button,
 a,
 input {
   -webkit-tap-highlight-color: transparent;
+}
+}
+
+@layer base {
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+  }
+
+  button, a, input, select, textarea {
+    @apply transition-colors duration-150;
+  }
+
+  button:focus-visible, a:focus-visible, input:focus-visible,
+  select:focus-visible, textarea:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-primary-dark;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .dashboard-panel, .summary-card, .management-stat,
+  .management-filters, .management-table-panel {
+    @apply rounded-2xl border border-line/60 bg-white shadow-card;
+  }
+
+  .dashboard-header {
+    @apply border-line/80 bg-white/95;
+  }
+
+  .dashboard-sidebar nav a, .dashboard-sidebar nav button {
+    @apply rounded-xl font-medium;
+  }
+
+  .dashboard-sidebar nav a.selected {
+    @apply bg-primary shadow-lg shadow-primary/20;
+  }
+
+  .employee-search, .management-search, .log-filters label {
+    @apply border border-line/70 bg-slate-50;
+  }
+
+  .employee-search:focus-within, .management-search:focus-within,
+  .log-filters label:focus-within {
+    @apply border-primary/40 ring-4 ring-primary/10 outline-none;
+  }
+
+  .em-button {
+    @apply rounded-lg border border-line px-4 py-2.5 font-medium shadow-sm;
+  }
+
+  .em-button.primary {
+    @apply border-primary bg-primary text-white shadow-sm shadow-primary/20;
+  }
+
+  .em-button.primary:hover {
+    @apply border-blue-700 bg-blue-700;
+  }
+
+  .employee-dialog {
+    @apply rounded-2xl border border-line/70 shadow-floating;
+  }
+
+  .em-field input, .em-field select, .temporary-password-input {
+    @apply border-line bg-white;
+  }
+
+  .em-field input:focus, .em-field select:focus,
+  .temporary-password-input:focus-within {
+    @apply border-primary/50 ring-4 ring-primary/10 outline-none;
+  }
+
+  .em-field input[aria-invalid=true] {
+    @apply border-error ring-error/10;
+  }
 }
