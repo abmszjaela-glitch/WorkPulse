@@ -21,7 +21,9 @@ export default function LoginForm({ onSubmit }) {
       return
     }
     if (!onSubmit) {
-      setError('Sign in is not available yet. Please contact your administrator.')
+      setError(
+        'Sign in is not available yet. Please contact your administrator.',
+      )
       return
     }
     setError('')
@@ -37,8 +39,12 @@ export default function LoginForm({ onSubmit }) {
 
   return (
     <div className="w-full max-w-[420px] rounded-2xl border border-line/60 bg-white p-8 shadow-card sm:p-10">
-      <h2 className="text-2xl font-bold tracking-tight text-primary-dark">Welcome back</h2>
-      <p className="mt-1 text-sm text-primary-dark/60">Sign in to your WorkPulse account</p>
+      <h2 className="text-2xl font-bold tracking-tight text-primary-dark">
+        Welcome back
+      </h2>
+      <p className="mt-1 text-sm text-primary-dark/60">
+        Sign in to your WorkPulse account
+      </p>
 
       <form onSubmit={handleSubmit} noValidate className="mt-7">
         <InputField
@@ -67,7 +73,10 @@ export default function LoginForm({ onSubmit }) {
         />
 
         {error && (
-          <p role="alert" className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-error">
+          <p
+            role="alert"
+            className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-error"
+          >
             <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" />
             {error}
           </p>
@@ -83,12 +92,20 @@ export default function LoginForm({ onSubmit }) {
             />
             Remember me
           </label>
-          <button type="button" onClick={() => setRecoveryNotice((value) => !value)} className="cursor-pointer text-sm font-medium text-primary hover:underline">
+          <button
+            type="button"
+            onClick={() => setRecoveryNotice((value) => !value)}
+            className="cursor-pointer text-sm font-medium text-primary hover:underline"
+          >
             Forgot password?
           </button>
         </div>
 
-        {recoveryNotice && <p role="status" className="mt-3 text-xs text-primary-dark/60">Contact your administrator to reset your password.</p>}
+        {recoveryNotice && (
+          <p role="status" className="mt-3 text-xs text-primary-dark/60">
+            Contact your administrator to reset your password.
+          </p>
+        )}
 
         <button
           type="submit"
@@ -100,7 +117,10 @@ export default function LoginForm({ onSubmit }) {
       </form>
 
       <div className="mt-6 flex items-start gap-2.5 border-t border-line pt-5 text-xs leading-relaxed text-muted">
-        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
+        <ShieldAlert
+          className="mt-0.5 h-4 w-4 shrink-0 text-warning"
+          aria-hidden="true"
+        />
         <p>Your activity data is monitored in line with company policy.</p>
       </div>
     </div>

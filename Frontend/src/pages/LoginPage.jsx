@@ -7,7 +7,11 @@ export default function LoginPage() {
     <div className="flex min-h-svh bg-background">
       <BrandPanel />
 
-      <main className="flex w-full flex-col items-center justify-center gap-8 px-6 py-12 md:w-1/2 lg:px-12">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex w-full flex-col items-center justify-center gap-8 px-6 py-12 md:w-1/2 lg:px-12"
+      >
         {/* Logo shown only when the brand panel is hidden (tablet / mobile) */}
         <Logo className="md:hidden" />
         <LoginForm />

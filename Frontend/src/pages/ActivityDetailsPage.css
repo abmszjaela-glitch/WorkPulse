@@ -306,7 +306,8 @@
 .activity-log-scroll td:nth-child(4) {
   @apply text-muted-strong;
 }
-.activity-log-scroll th:nth-child(n+5), .activity-log-scroll td:nth-child(n+5) {
+.activity-log-scroll th:nth-child(n + 5),
+.activity-log-scroll td:nth-child(n + 5) {
   @apply text-right whitespace-nowrap;
 }
 .log-status {
@@ -363,214 +364,233 @@
 .privacy-details svg {
   @apply shrink-0;
 }
-@media(max-width: 1250px) {
-.activity-stat-grid {
-  @apply grid-cols-[repeat(3,minmax(0,1fr))];
+@media (max-width: 1250px) {
+  .activity-stat-grid {
+    @apply grid-cols-[repeat(3,minmax(0,1fr))];
+  }
+  .activity-top-grid {
+    @apply grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)] gap-4.5;
+  }
+  .activity-heading {
+    @apply flex-wrap;
+  }
+  .timeline-legend {
+    @apply mt-[5px];
+  }
+  .hourly-timeline {
+    @apply gap-2.5;
+  }
+  .timeline-insights {
+    @apply flex-wrap;
+  }
+  .activity-middle-grid {
+    @apply gap-4.5;
+  }
+  .classification {
+    @apply hidden;
+  }
+  .activity-content .management-title {
+    @apply items-start flex-wrap;
+  }
+  .activity-trend-chart {
+    @apply h-[290px];
+  }
+  .distribution-chart {
+    @apply w-[160px] h-[160px];
+  }
+}
+@media (max-width: 1000px) {
+  .activity-top-grid,
+  .activity-middle-grid {
+    @apply grid-cols-[minmax(0,1fr)];
+  }
+  .activity-stat-grid {
+    @apply gap-3;
+  }
+  .activity-stat {
+    @apply p-4;
+  }
+  .activity-stat > strong {
+    @apply text-[26px];
+  }
+  .input-stat > strong {
+    @apply text-[15px];
+  }
+  .distribution-panel {
+    @apply flex flex-wrap items-center gap-4;
+  }
+  .distribution-panel .activity-heading {
+    @apply w-full;
+  }
+  .distribution-chart {
+    @apply m-[10px_auto];
+  }
+  .distribution-legend {
+    @apply flex-1 min-w-[210px];
+  }
+  .classification {
+    @apply inline-block;
+  }
+  .weekly-trend-footer {
+    @apply mt-5;
+  }
+  .workstation-strip {
+    @apply flex-wrap gap-3;
+  }
+  .workstation-strip > div {
+    border: 0;
+    @apply pr-0;
+  }
+}
+@media (max-width: 760px) {
+  .activity-stat-grid {
+    @apply grid-cols-[repeat(2,minmax(0,1fr))];
+  }
+  .input-stat {
+    @apply col-[1_/_-1];
+  }
+  .activity-details .management-header .employee-search input {
+    @apply w-full;
+  }
+  .activity-admin {
+    @apply text-[0];
+  }
+  .activity-content .management-title h1 {
+    @apply text-[23px];
+  }
+  .activity-details .management-actions {
+    @apply flex-wrap gap-1.5;
+  }
+  .activity-details .management-actions .em-button {
+    @apply text-[11px] p-[8px_10px];
+  }
+  .profile-identity {
+    @apply items-start gap-3;
+  }
+  .profile-name small {
+    @apply w-full;
+  }
+  .profile-identity p {
+    @apply text-[11px];
+  }
+  .workstation-strip {
+    @apply flex p-3 flex-col;
+  }
+  .hourly-timeline {
+    @apply gap-2 p-0;
+  }
+  .hour-stack {
+    @apply h-[145px];
+  }
+  .hour-column small {
+    @apply text-[8px];
+  }
+  .timeline-insights {
+    @apply mt-6 p-2.5;
+  }
+  .activity-app-info {
+    @apply gap-1.5;
+  }
+  .activity-app-info strong {
+    @apply text-[11px];
+  }
+  .activity-app-info .classification {
+    @apply text-[8px];
+  }
+  .activity-privacy {
+    @apply flex-wrap gap-2.5;
+  }
+  .activity-privacy p {
+    @apply flex-1 min-w-[200px];
+  }
+  .activity-privacy button {
+    @apply ml-8;
+  }
+  .log-filters {
+    @apply w-full;
+  }
+  .log-filters label {
+    @apply flex-1 min-w-0;
+  }
+  .log-filters input {
+    @apply w-full;
+  }
+  .activity-log-panel .management-pagination > div {
+    @apply flex-wrap;
+  }
+  .weekly-trend-footer {
+    @apply gap-2;
+  }
+  .weekly-trend-footer strong {
+    @apply max-w-[90px];
+  }
+}
+@media print {
+  @page {
+    @apply m-[12mm];
+  }
+  .activity-details {
+    @apply bg-white text-[10px];
+  }
+  .activity-details .dashboard-sidebar,
+  .activity-details .dashboard-header,
+  .activity-details .management-actions,
+  .activity-details .sidebar-overlay,
+  .activity-details .dashboard-notice,
+  .activity-details .log-filters,
+  .activity-details .management-pagination,
+  .activity-details .activity-privacy button {
+    display: none !important;
+  }
+  .activity-details .dashboard-workspace {
+    @apply ml-0;
+  }
+  .activity-details .dashboard-content {
+    @apply p-0 max-w-[none];
+  }
+  .activity-details .dashboard-panel {
+    border: 1px solid #dce5f6;
+    break-inside: avoid;
+    box-shadow: none;
+  }
+  .activity-details .activity-log-panel {
+    break-inside: auto;
+  }
+  .activity-details .activity-log-scroll {
+    @apply overflow-visible;
+  }
+  .activity-details .activity-log-scroll table {
+    @apply min-w-0;
+  }
+  .activity-details .activity-log-scroll td,
+  .activity-details .activity-log-scroll th {
+    @apply p-[10px_6px] text-[9px];
+  }
+  .activity-details .activity-stat-grid {
+    @apply grid-cols-[repeat(5,minmax(0,1fr))];
+  }
+  .activity-details .input-stat {
+    @apply col-[auto];
+  }
+  .activity-details .activity-stat > strong {
+    @apply text-[22px];
+  }
+  .activity-details .input-stat > strong {
+    @apply text-xs;
+  }
+  .activity-details .activity-top-grid,
+  .activity-details .activity-middle-grid {
+    @apply grid-cols-[minmax(0,1fr)];
+  }
+  .activity-details .activity-log-scroll tr {
+    break-inside: avoid;
+  }
+  .activity-details .hour-stack span,
+  .activity-details .progress-track,
+  .activity-details .progress-track > span {
+    print-color-adjust: exact;
+  }
+  .activity-details .activity-heading {
+    @apply flex-nowrap;
+  }
 }
-.activity-top-grid {
-  @apply grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)] gap-4.5;
-}
-.activity-heading {
-  @apply flex-wrap;
-}
-.timeline-legend {
-  @apply mt-[5px];
-}
-.hourly-timeline {
-  @apply gap-2.5;
-}
-.timeline-insights {
-  @apply flex-wrap;
-}
-.activity-middle-grid {
-  @apply gap-4.5;
-}
-.classification {
-  @apply hidden;
-}
-.activity-content .management-title {
-  @apply items-start flex-wrap;
-}
-.activity-trend-chart {
-  @apply h-[290px];
-}
-.distribution-chart {
-  @apply w-[160px] h-[160px];
-} }
-@media(max-width: 1000px) {
-.activity-top-grid, .activity-middle-grid {
-  @apply grid-cols-[minmax(0,1fr)];
-}
-.activity-stat-grid {
-  @apply gap-3;
-}
-.activity-stat {
-  @apply p-4;
-}
-.activity-stat > strong {
-  @apply text-[26px];
-}
-.input-stat > strong {
-  @apply text-[15px];
-}
-.distribution-panel {
-  @apply flex flex-wrap items-center gap-4;
-}
-.distribution-panel .activity-heading {
-  @apply w-full;
-}
-.distribution-chart {
-  @apply m-[10px_auto];
-}
-.distribution-legend {
-  @apply flex-1 min-w-[210px];
-}
-.classification {
-  @apply inline-block;
-}
-.weekly-trend-footer {
-  @apply mt-5;
-}
-.workstation-strip {
-  @apply flex-wrap gap-3;
-}
-.workstation-strip > div {
-  border: 0;
-  @apply pr-0;
-} }
-@media(max-width: 760px) {
-.activity-stat-grid {
-  @apply grid-cols-[repeat(2,minmax(0,1fr))];
-}
-.input-stat {
-  @apply col-[1_/_-1];
-}
-.activity-details .management-header .employee-search input {
-  @apply w-full;
-}
-.activity-admin {
-  @apply text-[0];
-}
-.activity-content .management-title h1 {
-  @apply text-[23px];
-}
-.activity-details .management-actions {
-  @apply flex-wrap gap-1.5;
-}
-.activity-details .management-actions .em-button {
-  @apply text-[11px] p-[8px_10px];
-}
-.profile-identity {
-  @apply items-start gap-3;
-}
-.profile-name small {
-  @apply w-full;
-}
-.profile-identity p {
-  @apply text-[11px];
-}
-.workstation-strip {
-  @apply flex p-3 flex-col;
-}
-.hourly-timeline {
-  @apply gap-2 p-0;
-}
-.hour-stack {
-  @apply h-[145px];
-}
-.hour-column small {
-  @apply text-[8px];
-}
-.timeline-insights {
-  @apply mt-6 p-2.5;
-}
-.activity-app-info {
-  @apply gap-1.5;
-}
-.activity-app-info strong {
-  @apply text-[11px];
-}
-.activity-app-info .classification {
-  @apply text-[8px];
-}
-.activity-privacy {
-  @apply flex-wrap gap-2.5;
-}
-.activity-privacy p {
-  @apply flex-1 min-w-[200px];
-}
-.activity-privacy button {
-  @apply ml-8;
-}
-.log-filters {
-  @apply w-full;
-}
-.log-filters label {
-  @apply flex-1 min-w-0;
-}
-.log-filters input {
-  @apply w-full;
-}
-.activity-log-panel .management-pagination > div {
-  @apply flex-wrap;
-}
-.weekly-trend-footer {
-  @apply gap-2;
-}
-.weekly-trend-footer strong {
-  @apply max-w-[90px];
-} }
-@media print { @page { @apply m-[12mm]; }
-.activity-details {
-  @apply bg-white text-[10px];
-}
-.activity-details .dashboard-sidebar, .activity-details .dashboard-header, .activity-details .management-actions, .activity-details .sidebar-overlay, .activity-details .dashboard-notice, .activity-details .log-filters, .activity-details .management-pagination, .activity-details .activity-privacy button {
-  display: none !important;
-}
-.activity-details .dashboard-workspace {
-  @apply ml-0;
-}
-.activity-details .dashboard-content {
-  @apply p-0 max-w-[none];
-}
-.activity-details .dashboard-panel {
-  border: 1px solid #dce5f6;
-  break-inside: avoid;
-  box-shadow: none;
-}
-.activity-details .activity-log-panel {
-  break-inside: auto;
-}
-.activity-details .activity-log-scroll {
-  @apply overflow-visible;
-}
-.activity-details .activity-log-scroll table {
-  @apply min-w-0;
-}
-.activity-details .activity-log-scroll td, .activity-details .activity-log-scroll th {
-  @apply p-[10px_6px] text-[9px];
-}
-.activity-details .activity-stat-grid {
-  @apply grid-cols-[repeat(5,minmax(0,1fr))];
-}
-.activity-details .input-stat {
-  @apply col-[auto];
-}
-.activity-details .activity-stat > strong {
-  @apply text-[22px];
-}
-.activity-details .input-stat > strong {
-  @apply text-xs;
-}
-.activity-details .activity-top-grid, .activity-details .activity-middle-grid {
-  @apply grid-cols-[minmax(0,1fr)];
-}
-.activity-details .activity-log-scroll tr {
-  break-inside: avoid;
-}
-.activity-details .hour-stack span, .activity-details .progress-track, .activity-details .progress-track > span {
-  print-color-adjust: exact;
-}
-.activity-details .activity-heading {
-  @apply flex-nowrap;
-} }

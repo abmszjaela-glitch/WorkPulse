@@ -12,11 +12,12 @@
 @theme {
   --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   --color-primary-dark: #172554;
-  --color-primary: #2563EB;
-  --color-background: #EFF6FF;
-  --color-success: #16A34A;
-  --color-warning: #F59E0B;
-  --color-error: #DC2626;
+  --color-primary: #2563eb;
+  --color-background: #eff6ff;
+  --color-success: #16a34a;
+  --color-success-strong: #00652b;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
   --color-sidebar: #031747;
   --color-canvas: #f5f8fe;
   --color-soft: #edf4ff;
@@ -24,42 +25,43 @@
   --color-muted-strong: #535b70;
   --color-ink: #202938;
   --color-line: #e2e8f0;
-  --shadow-card: 0 2px 4px -2px rgb(15 23 42 / 0.04), 0 8px 24px -16px rgb(15 23 42 / 0.12);
+  --shadow-card:
+    0 2px 4px -2px rgb(15 23 42 / 0.04), 0 8px 24px -16px rgb(15 23 42 / 0.12);
   --shadow-floating: 0 24px 64px -16px rgb(15 23 42 / 0.25);
 }
 @layer base {
-:root {
-  font-family: var(--font-sans);
-  color: var(--color-primary-dark);
-  background: var(--color-background);
-  color-scheme: light;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  :root {
+    font-family: var(--font-sans);
+    color: var(--color-primary-dark);
+    background: var(--color-background);
+    color-scheme: light;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  margin: 0;
-  min-width: 320px;
-}
+  body {
+    margin: 0;
+    min-width: 320px;
+  }
 
-#root {
-  min-height: 100svh;
-}
+  #root {
+    min-height: 100svh;
+  }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
 
-button,
-a,
-input {
-  -webkit-tap-highlight-color: transparent;
-}
+  button,
+  a,
+  input {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer base {
@@ -67,12 +69,19 @@ input {
     @apply bg-canvas font-sans text-ink antialiased;
   }
 
-  button, a, input, select, textarea {
+  button,
+  a,
+  input,
+  select,
+  textarea {
     @apply transition-colors duration-150;
   }
 
-  button:focus-visible, a:focus-visible, input:focus-visible,
-  select:focus-visible, textarea:focus-visible {
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;
   }
 
@@ -81,7 +90,9 @@ input {
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       transition-duration: 0.01ms !important;
       animation-duration: 0.01ms !important;
       scroll-behavior: auto !important;
@@ -90,8 +101,35 @@ input {
 }
 
 @layer components {
-  .dashboard-panel, .summary-card, .management-stat,
-  .management-filters, .management-table-panel {
+  .dashboard-workspace,
+  .dashboard-content {
+    @apply min-w-0;
+  }
+
+  .sidebar-account > a:first-child {
+    @apply ml-0 p-0;
+  }
+
+  .dashboard-shell main {
+    @apply outline-none;
+  }
+
+  .panel-heading {
+    @apply flex-wrap;
+  }
+
+  .em-button.danger-solid {
+    @apply border-error bg-error text-white;
+  }
+
+  .em-button.danger-solid:hover {
+    @apply bg-red-700;
+  }
+  .dashboard-panel,
+  .summary-card,
+  .management-stat,
+  .management-filters,
+  .management-table-panel {
     @apply rounded-2xl border border-line/60 bg-white shadow-card;
   }
 
@@ -99,7 +137,8 @@ input {
     @apply border-line/80 bg-white/95;
   }
 
-  .dashboard-sidebar nav a, .dashboard-sidebar nav button {
+  .dashboard-sidebar nav a,
+  .dashboard-sidebar nav button {
     @apply rounded-xl font-medium;
   }
 
@@ -107,11 +146,14 @@ input {
     @apply bg-primary shadow-lg shadow-primary/20;
   }
 
-  .employee-search, .management-search, .log-filters label {
+  .employee-search,
+  .management-search,
+  .log-filters label {
     @apply border border-line/70 bg-slate-50;
   }
 
-  .employee-search:focus-within, .management-search:focus-within,
+  .employee-search:focus-within,
+  .management-search:focus-within,
   .log-filters label:focus-within {
     @apply border-primary/40 ring-4 ring-primary/10 outline-none;
   }
@@ -132,16 +174,19 @@ input {
     @apply rounded-2xl border border-line/70 shadow-floating;
   }
 
-  .em-field input, .em-field select, .temporary-password-input {
+  .em-field input,
+  .em-field select,
+  .temporary-password-input {
     @apply border-line bg-white;
   }
 
-  .em-field input:focus, .em-field select:focus,
+  .em-field input:focus,
+  .em-field select:focus,
   .temporary-password-input:focus-within {
     @apply border-primary/50 ring-4 ring-primary/10 outline-none;
   }
 
-  .em-field input[aria-invalid=true] {
+  .em-field input[aria-invalid='true'] {
     @apply border-error ring-error/10;
   }
 }

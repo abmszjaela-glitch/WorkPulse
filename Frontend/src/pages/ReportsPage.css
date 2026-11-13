@@ -1,20 +1,45 @@
 /* Keep report exports readable when using the browser's Save as PDF option. */
 @media print {
-  @page { size: landscape; margin: 12mm; }
-  .reports-page { @apply bg-white text-ink; }
+  @page {
+    size: landscape;
+    margin: 12mm;
+  }
+  .reports-page {
+    @apply bg-white text-ink;
+  }
   .reports-page .dashboard-sidebar,
   .reports-page .dashboard-header,
   .reports-page .sidebar-overlay,
   .reports-page .dashboard-notice,
   .reports-page button,
   .reports-page select,
-  .reports-page input { display: none !important; }
-  .reports-page .dashboard-workspace { @apply ml-0; }
-  .reports-page .dashboard-content { @apply max-w-none p-0; }
-  .reports-page section { box-shadow: none; break-inside: avoid; }
-  .reports-page table { min-width: 0; width: 100%; }
-  .reports-page table tr { break-inside: avoid; }
-  .reports-page .overflow-x-auto { overflow: visible; }
-  .reports-page section:has(table) { break-inside: auto; }
-  .reports-page thead { display: table-header-group; }
+  .reports-page input {
+    display: none !important;
+  }
+  .reports-page .dashboard-workspace {
+    @apply ml-0;
+  }
+  .reports-page .dashboard-content {
+    @apply max-w-none p-0;
+  }
+  .reports-page section {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .reports-page table {
+    min-width: 0;
+    width: 100%;
+  }
+  .reports-page table tr {
+    break-inside: avoid;
+  }
+  .reports-page .overflow-x-auto {
+    overflow: visible;
+  }
+  .reports-page section:has(table) {
+    break-inside: auto;
+  }
+  .reports-page thead {
+    display: table-header-group;
+  }
 }

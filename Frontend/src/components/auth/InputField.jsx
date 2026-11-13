@@ -15,7 +15,10 @@ export default function InputField({
 
   return (
     <div className={className}>
-      <label htmlFor={id} className="mb-2 block text-sm font-semibold text-primary-dark">
+      <label
+        htmlFor={id}
+        className="mb-2 block text-sm font-semibold text-primary-dark"
+      >
         {label}
       </label>
       <div
@@ -23,7 +26,12 @@ export default function InputField({
           error ? 'border-error/60' : 'border-line'
         }`}
       >
-        {Icon && <Icon className="h-4 w-4 shrink-0 text-primary-dark/50" aria-hidden="true" />}
+        {Icon && (
+          <Icon
+            className="h-4 w-4 shrink-0 text-primary-dark/50"
+            aria-hidden="true"
+          />
+        )}
         <input
           id={id}
           type={isPassword && visible ? 'text' : type}
@@ -38,7 +46,11 @@ export default function InputField({
             aria-label={visible ? 'Hide password' : 'Show password'}
             className="shrink-0 rounded text-primary-dark/50 transition hover:text-primary-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
           >
-            {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {visible ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </button>
         )}
       </div>

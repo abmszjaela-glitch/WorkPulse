@@ -118,7 +118,7 @@
 .bulk-toolbar strong {
   @apply font-medium text-[13px];
 }
-.employee-management input[type=checkbox] {
+.employee-management input[type='checkbox'] {
   accent-color: #2563eb;
   @apply w-4 h-4 cursor-pointer shrink-0;
 }
@@ -142,7 +142,8 @@
   border-bottom: 1px solid #f0f4fc;
   @apply text-ink text-xs;
 }
-.management-table-panel th:first-child, .management-table-panel td:first-child {
+.management-table-panel th:first-child,
+.management-table-panel td:first-child {
   @apply pl-4;
 }
 .management-table-panel tr.row-selected {
@@ -179,13 +180,15 @@
 .agent-status {
   @apply inline-flex items-center gap-1.5;
 }
-.agent-status i, .management-status i {
+.agent-status i,
+.management-status i {
   @apply w-[7px] h-[7px] bg-[currentColor] rounded-full shrink-0;
 }
 .agent-status.connected i {
   @apply bg-[#008a3e];
 }
-.agent-status.offline, .agent-status.not-installed {
+.agent-status.offline,
+.agent-status.not-installed {
   @apply text-[#53649b];
 }
 .agent-status.offline i {
@@ -224,7 +227,8 @@
 .management-pagination strong {
   @apply text-ink font-medium;
 }
-.management-pagination > div, .management-pagination nav {
+.management-pagination > div,
+.management-pagination nav {
   @apply flex items-center gap-3;
 }
 .management-pagination label {
@@ -277,14 +281,16 @@
 .em-field {
   @apply flex flex-col gap-1.5 text-[11px] font-medium text-[#384966];
 }
-.em-field input, .em-field select {
+.em-field input,
+.em-field select {
   border: 1px solid #f0f2f6;
   @apply shadow-[0_1px_1px_#17255405] rounded-lg p-[10px_11px] w-full min-w-0 text-[13px] font-normal text-ink bg-white outline-none;
 }
-.em-field input:focus, .em-field select:focus {
+.em-field input:focus,
+.em-field select:focus {
   border-color: #2563eb;
 }
-.em-field input[aria-invalid=true] {
+.em-field input[aria-invalid='true'] {
   border-color: #dc2626;
 }
 .dialog-actions {
@@ -310,93 +316,97 @@
 .employee-details dd {
   overflow-wrap: anywhere;
 }
-@media(max-width: 1200px) {
-.management-stats {
-  @apply gap-4;
+@media (max-width: 1200px) {
+  .management-stats {
+    @apply gap-4;
+  }
+  .management-stat {
+    @apply p-[20px_16px];
+  }
+  .management-stat-icon {
+    @apply w-[38px] h-[38px];
+  }
+  .management-filters {
+    @apply flex-wrap;
+  }
+  .management-search {
+    flex-basis: 100%;
+  }
+  .management-select {
+    @apply flex-1;
+  }
+  .management-select select {
+    @apply w-full max-w-[none];
+  }
 }
-.management-stat {
-  @apply p-[20px_16px];
+@media (max-width: 760px) {
+  .management-header {
+    @apply flex-nowrap;
+  }
+  .management-header .employee-search {
+    @apply flex-1 min-w-0;
+  }
+  .management-header .employee-search input {
+    @apply w-full;
+  }
+  .management-header .header-actions {
+    @apply w-auto m-0 flex-initial;
+  }
+  .management-title {
+    @apply flex-col items-start gap-3.5;
+  }
+  .management-title h1 {
+    @apply text-[25px];
+  }
+  .management-stats {
+    @apply grid-cols-[repeat(2,minmax(0,1fr))] gap-3;
+  }
+  .management-stat {
+    @apply p-4 min-h-[125px] gap-1;
+  }
+  .management-stat h2 {
+    @apply text-[10px];
+  }
+  .management-stat p {
+    @apply text-[9px];
+  }
+  .management-stat strong {
+    @apply text-[27px];
+  }
+  .management-stat-icon {
+    @apply w-8 h-8;
+  }
+  .management-stat-icon svg {
+    @apply w-[19px];
+  }
+  .bulk-toolbar,
+  .management-pagination {
+    @apply flex-wrap;
+  }
+  .management-pagination {
+    @apply p-4;
+  }
+  .management-pagination > div {
+    @apply w-full justify-between gap-2;
+  }
+  .management-select {
+    @apply min-w-[100px];
+  }
+  .employee-form-grid {
+    @apply gap-3;
+  }
 }
-.management-stat-icon {
-  @apply w-[38px] h-[38px];
+@media (max-width: 440px) {
+  .employee-form-grid {
+    @apply grid-cols-[1fr];
+  }
+  .employee-dialog {
+    @apply p-5;
+  }
+  .bulk-toolbar > div:last-child {
+    @apply flex-wrap;
+  }
 }
-.management-filters {
-  @apply flex-wrap;
-}
-.management-search {
-  flex-basis: 100%;
-}
-.management-select {
-  @apply flex-1;
-}
-.management-select select {
-  @apply w-full max-w-[none];
-} }
-@media(max-width: 760px) {
-.management-header {
-  @apply flex-nowrap;
-}
-.management-header .employee-search {
-  @apply flex-1 min-w-0;
-}
-.management-header .employee-search input {
-  @apply w-full;
-}
-.management-header .header-actions {
-  @apply w-auto m-0 flex-initial;
-}
-.management-title {
-  @apply flex-col items-start gap-3.5;
-}
-.management-title h1 {
-  @apply text-[25px];
-}
-.management-stats {
-  @apply grid-cols-[repeat(2,minmax(0,1fr))] gap-3;
-}
-.management-stat {
-  @apply p-4 min-h-[125px] gap-1;
-}
-.management-stat h2 {
-  @apply text-[10px];
-}
-.management-stat p {
-  @apply text-[9px];
-}
-.management-stat strong {
-  @apply text-[27px];
-}
-.management-stat-icon {
-  @apply w-8 h-8;
-}
-.management-stat-icon svg {
-  @apply w-[19px];
-}
-.bulk-toolbar, .management-pagination {
-  @apply flex-wrap;
-}
-.management-pagination {
-  @apply p-4;
-}
-.management-pagination > div {
-  @apply w-full justify-between gap-2;
-}
-.management-select {
-  @apply min-w-[100px];
-}
-.employee-form-grid {
-  @apply gap-3;
-} }
-@media(max-width: 440px) {
-.employee-form-grid {
-  @apply grid-cols-[1fr];
-}
-.employee-dialog {
-  @apply p-5;
-}
-.bulk-toolbar > div:last-child {
-  @apply flex-wrap;
-} }
 .temporary-password {
   @apply mt-4;
 }
@@ -448,7 +458,7 @@
 }
 .status-switch > span {
   @apply h-4 w-4 rounded-full bg-white;
-  transition: transform .15s;
+  transition: transform 0.15s;
 }
 .status-switch.on > span {
   transform: translateX(20px);

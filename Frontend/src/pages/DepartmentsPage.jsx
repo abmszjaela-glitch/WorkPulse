@@ -1,22 +1,111 @@
+import { downloadCsv } from '../utils/download.js'
+import Button from '../components/ui/Button.jsx'
+import Notice from '../components/ui/Notice.jsx'
+import PageHeader from '../components/layout/PageHeader.jsx'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, Building2, CalendarDays, ChevronLeft, ChevronRight, Download, LayoutGrid, Menu, MoreVertical, Pencil, Plus, Search, SlidersHorizontal, Table2, Trash2, TrendingUp, UserRound, UsersRound, X } from 'lucide-react'
+import {
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  LayoutGrid,
+  MoreVertical,
+  Pencil,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Table2,
+  Trash2,
+  TrendingUp,
+  UserRound,
+  UsersRound,
+} from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar.jsx'
-import ProfileLink from '../components/layout/ProfileLink.jsx'
 import DepartmentDialog from '../components/departments/DepartmentDialog.jsx'
 import DeleteDepartmentDialog from '../components/departments/DeleteDepartmentDialog.jsx'
 import { managementEmployees } from '../data/employees.js'
-import { departmentCsv, departmentSummary, filterDepartments, initialDepartments, removeDepartment, validateDepartment } from '../data/departments.js'
+import {
+  departmentCsv,
+  departmentSummary,
+  filterDepartments,
+  initialDepartments,
+  removeDepartment,
+  validateDepartment,
+} from '../data/departments.js'
 
 const panel = 'rounded-2xl border border-line/60 bg-white shadow-card'
-const control = 'rounded-lg border border-transparent bg-soft px-3 py-2 text-xs text-ink outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10'
+const control =
+  'rounded-lg border border-transparent bg-soft px-3 py-2 text-xs text-ink outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10'
 const managers = managementEmployees
 function Manager({ department, compact = false }) {
   const manager = managers.find((person) => person.id === department.managerId)
-  return <div className={`flex items-center gap-2 ${compact ? '' : 'rounded-xl bg-soft p-2'}`}><span className={`flex shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-white ${compact ? 'size-7' : 'size-8'}`}>{manager ? manager.name.split(' ').map((part) => part[0]).join('') : <UserRound size={15} />}</span><div className="min-w-0"><strong className={`block truncate font-medium text-sidebar ${compact ? 'text-xs' : 'text-[13px]'}`}>{manager?.name || 'Unassigned'}</strong>{!compact && <small className="mt-0.5 block truncate text-[10px] tracking-wide text-muted">{department.managerTitle || 'Department manager'}</small>}</div>{!compact && <span className="ml-auto rounded-full bg-slate-200 px-2 py-0.5 text-[9px] font-medium text-ink">Manager</span>}</div>
+  return (
+    <div
+      className={`flex items-center gap-2 ${compact ? '' : 'rounded-xl bg-soft p-2'}`}
+    >
+      <span
+        className={`flex shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-white ${compact ? 'size-7' : 'size-8'}`}
+      >
+        {manager ? (
+          manager.name
+            .split(' ')
+            .map((part) => part[0])
+            .join('')
+        ) : (
+          <UserRound size={15} />
+        )}
+      </span>
+      <div className="min-w-0">
+        <strong
+          className={`block truncate font-medium text-sidebar ${compact ? 'text-xs' : 'text-[13px]'}`}
+        >
+          {manager?.name || 'Unassigned'}
+        </strong>
+        {!compact && (
+          <small className="mt-0.5 block truncate text-[10px] tracking-wide text-muted">
+            {department.managerTitle || 'Department manager'}
+          </small>
+        )}
+      </div>
+      {!compact && (
+        <span className="ml-auto rounded-full bg-slate-200 px-2 py-0.5 text-[9px] font-medium text-ink">
+          Manager
+        </span>
+      )}
+    </div>
+  )
 }
 function Productivity({ value, compact = false }) {
-  return <div className={compact ? 'flex items-center gap-2' : ''}>{!compact && <div className="mb-1 flex items-center justify-between text-[10px] font-medium tracking-wide"><span className="text-muted">Efficiency Score</span><strong className={value >= 80 ? 'text-green-800' : 'text-primary'}>{value}%</strong></div>}<div className={`h-1.5 overflow-hidden rounded-full bg-slate-200 ${compact ? 'w-16' : 'w-full'}`}><div className={`h-full rounded-full ${value >= 80 ? 'bg-green-800' : 'bg-primary'}`} style={{ width: `${value}%` }} /></div>{compact && <strong className={`text-[10px] font-semibold ${value >= 80 ? 'text-green-800' : 'text-primary'}`}>{value}%</strong>}</div>
+  return (
+    <div className={compact ? 'flex items-center gap-2' : ''}>
+      {!compact && (
+        <div className="mb-1 flex items-center justify-between text-[10px] font-medium tracking-wide">
+          <span className="text-muted">Efficiency Score</span>
+          <strong
+            className={value >= 80 ? 'text-success-strong' : 'text-primary'}
+          >
+            {value}%
+          </strong>
+        </div>
+      )}
+      <div
+        className={`h-1.5 overflow-hidden rounded-full bg-slate-200 ${compact ? 'w-16' : 'w-full'}`}
+      >
+        <div
+          className={`h-full rounded-full ${value >= 80 ? 'bg-success-strong' : 'bg-primary'}`}
+          style={{ width: `${value}%` }}
+        />
+      </div>
+      {compact && (
+        <strong
+          className={`text-[10px] font-semibold ${value >= 80 ? 'text-success-strong' : 'text-primary'}`}
+        >
+          {value}%
+        </strong>
+      )}
+    </div>
+  )
 }
 
 export default function DepartmentsPage() {
@@ -31,15 +120,51 @@ export default function DepartmentsPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [notice, setNotice] = useState('')
   const summary = departmentSummary(departments)
-  const filtered = filterDepartments(departments, search, status, managers).sort((a, b) => sort === 'name' ? a.name.localeCompare(b.name) : sort === 'productivity' ? b.productivity - a.productivity : sort === 'employees' ? b.employees - a.employees : 0)
+  const filtered = filterDepartments(
+    departments,
+    search,
+    status,
+    managers,
+  ).sort((a, b) =>
+    sort === 'name'
+      ? a.name.localeCompare(b.name)
+      : sort === 'productivity'
+        ? b.productivity - a.productivity
+        : sort === 'employees'
+          ? b.employees - a.employees
+          : 0,
+  )
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize))
   const currentPage = Math.min(page, pages)
-  const visible = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const visible = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  )
   const saveDepartment = (data, id) => {
     const error = validateDepartment(data, departments, id)
     if (error) return error
-    setDepartments((previous) => id ? previous.map((department) => department.id === id ? { ...department, ...data } : department) : [...previous, { ...data, id: crypto.randomUUID(), employees: 0, active: 0, productivity: 0, avgMinutes: 0 }])
-    setNotice(id ? 'Department updated in this preview.' : 'Department created in this preview. No employees have been assigned yet.')
+    setDepartments((previous) =>
+      id
+        ? previous.map((department) =>
+            department.id === id ? { ...department, ...data } : department,
+          )
+        : [
+            ...previous,
+            {
+              ...data,
+              id: crypto.randomUUID(),
+              employees: 0,
+              active: 0,
+              productivity: 0,
+              avgMinutes: 0,
+            },
+          ],
+    )
+    setNotice(
+      id
+        ? 'Department updated in this preview.'
+        : 'Department created in this preview. No employees have been assigned yet.',
+    )
     return null
   }
   const deleteDepartment = (id, targetId) => {
@@ -47,40 +172,520 @@ export default function DepartmentsPage() {
       const next = removeDepartment(departments, id, targetId)
       const source = departments.find((department) => department.id === id)
       setDepartments(next)
-      setNotice(`${source.name} deleted from this preview.${source.employees ? ` ${source.employees} employees reassigned to ${next.find((department) => department.id === targetId).name}.` : ''}`)
+      setNotice(
+        `${source.name} deleted from this preview.${source.employees ? ` ${source.employees} employees reassigned to ${next.find((department) => department.id === targetId).name}.` : ''}`,
+      )
       return null
     } catch (error) {
       return error.message
     }
   }
   const exportCsv = () => {
-    const url = URL.createObjectURL(new Blob(['\uFEFF', departmentCsv(filtered, managers)], { type: 'text/csv;charset=utf-8;' }))
-    const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'departments-preview.csv'; anchor.click()
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    downloadCsv(departmentCsv(filtered, managers), 'departments-preview.csv')
     setNotice(`Exported ${filtered.length} departments matching your filters.`)
   }
-  const changeSearch = (value) => { setSearch(value); setPage(1) }
-  return <div className="dashboard-shell">
-    <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} onNotice={setNotice} />
-    <div className="dashboard-workspace">
-      <header className="dashboard-header"><button className="mobile-menu icon-button" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu /></button><div className="page-title"><h1>Departments</h1><p>Overview and operational metrics across organizational departments</p></div><div className="header-actions"><label className="employee-search"><Search size={17} /><input aria-label="Search departments or managers" placeholder="Search departments…" value={search} onChange={(event) => changeSearch(event.target.value)} /></label><span className="date-badge"><CalendarDays size={16} />Today</span><button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('No new notifications in this preview.')}><Bell size={19} /><span /></button><ProfileLink /></div></header>
-      <main className="dashboard-content"><nav className="em-breadcrumb" aria-label="Breadcrumb"><Link to="/dashboard">Dashboard</Link><ChevronRight size={12} /><span aria-current="page">Departments</span></nav><div className="management-title"><div><h1>Department Management</h1><p>Organize employees into departments and assign managers</p></div><div className="management-actions"><button className="em-button" onClick={exportCsv}><Download size={15} />Export CSV</button><button className="em-button primary" onClick={() => setModal({ department: null })}><Plus size={16} />Add Department</button></div></div><p className="em-preview-label">Sample department aggregates · Changes are temporary and reset on reload · Backend not connected</p>
-        {notice && <div className="dashboard-notice" role="status">{notice}<button aria-label="Dismiss message" onClick={() => setNotice('')}><X size={17} /></button></div>}
-        <section className="my-6 grid gap-4 sm:grid-cols-3 xl:gap-6" aria-label="Department summary">{[
-          { label: 'Total Departments', value: summary.departments, Icon: Building2, detail: `${departments.filter((department) => department.status === 'Active').length} active departments`, extra: 'in this preview' },
-          { label: 'Total Employees', value: summary.employees, Icon: UsersRound, detail: `${summary.active} active now`, extra: `${summary.employees ? (summary.active / summary.employees * 100).toFixed(1) : 0}% online` },
-          { label: 'Avg Productivity', value: `${summary.productivity}%`, Icon: TrendingUp, detail: 'Employee-weighted average', extra: 'sample metrics', green: true },
-        ].map(({ label, value, Icon, detail, extra, green }) => <article className={`${panel} p-6`} key={label}><div className="flex items-start justify-between gap-3"><div><h2 className="text-xs font-medium text-muted">{label}</h2><strong className={`mt-2 block text-3xl font-bold tracking-tight ${green ? 'text-green-800' : 'text-sidebar'}`}>{value}</strong></div><span className={`flex size-11 shrink-0 items-center justify-center rounded-xl bg-soft ${green ? 'text-green-800' : ''}`}><Icon size={23} /></span></div><div className="mt-6 flex flex-wrap items-center gap-1.5 text-[10px]"><span className="rounded-full bg-soft px-2 py-1 font-medium text-green-800">{detail}</span><span className="text-muted">{extra}</span></div></article>)}</section>
-        <section aria-labelledby="department-overview-title"><div className="mb-4 flex flex-wrap items-center justify-between gap-4"><div className="flex items-center gap-2"><h2 id="department-overview-title" className="text-base font-semibold tracking-tight">Department Overview</h2><span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-medium text-muted-strong">{filtered.length} Groups</span></div><div className="flex rounded-lg bg-slate-200/80 p-1" role="group" aria-label="Department view">{[['grid', LayoutGrid, 'Grid'], ['table', Table2, 'Table']].map(([value, Icon, label]) => <button key={value} aria-pressed={view === value} className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs ${view === value ? 'bg-white text-primary shadow-sm' : 'text-muted hover:text-sidebar'}`} onClick={() => setView(value)}><Icon size={14} />{label}</button>)}</div></div>
-          {view === 'grid' && <div className="grid gap-6 md:grid-cols-2 2xl:grid-cols-3 xl:grid-cols-2 min-[1280px]:grid-cols-3">{visible.map((department) => <article key={department.id} className={`${panel} min-w-0 p-6`}><div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="truncate text-base font-semibold tracking-tight" title={department.name}>{department.name}</h3><p className="mt-1 truncate text-[11px] text-muted-strong" title={department.description}>{department.description || 'No description provided'}</p></div><details className="relative shrink-0"><summary aria-label={`Actions for ${department.name}`} className="cursor-pointer list-none rounded-lg p-1 text-muted hover:bg-soft [&::-webkit-details-marker]:hidden"><MoreVertical size={17} /></summary><div className="absolute right-0 z-10 mt-1 w-40 rounded-xl border border-line bg-white p-1 shadow-lg"><button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs hover:bg-soft" onClick={(event) => { event.currentTarget.closest('details').open = false; setModal({ department }) }}><Pencil size={14} />Edit department</button><button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-error hover:bg-red-50" onClick={(event) => { event.currentTarget.closest('details').open = false; setModal({ type: 'delete', department }) }}><Trash2 size={14} />Delete department</button></div></details></div><div className="mt-4"><Manager department={department} /></div><div className="my-6 grid grid-cols-3 divide-x divide-line/80"><div className="pr-2"><small className="text-[9px] font-medium tracking-wide text-muted">Employees</small><strong className="mt-1 block text-sm font-semibold">{department.employees}</strong></div><div className="px-2"><small className="text-[9px] font-medium tracking-wide text-muted">Active Now</small><strong className="mt-1 flex items-center gap-1 text-sm font-semibold"><i className="size-1.5 rounded-full bg-green-800" />{department.status === 'Active' ? department.active : 0}</strong></div><div className="pl-2"><small className="text-[9px] font-medium tracking-wide text-muted">Productivity</small><strong className={`mt-1 block text-sm font-semibold ${department.productivity >= 80 ? 'text-green-800' : 'text-primary'}`}>{department.productivity}%</strong></div></div><Productivity value={department.productivity} />{department.status === 'Inactive' && <span className="mt-3 inline-block rounded-full bg-slate-100 px-2 py-1 text-[10px] text-muted">Inactive</span>}</article>)}<button className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-primary/15 bg-soft/50 p-6 text-center transition-colors hover:border-primary/40 hover:bg-soft" onClick={() => setModal({ department: null })}><span className="mb-1 flex size-12 items-center justify-center rounded-full bg-white text-primary shadow-sm"><Plus size={23} /></span><strong className="text-sm font-semibold">+ Add new department</strong><span className="max-w-48 text-xs leading-relaxed text-muted">Create a department to group staff and metrics</span></button></div>}
-        </section>
-        <section className={`${panel} mt-6 overflow-hidden`} aria-label="All department details"><div className="flex flex-wrap items-center justify-between gap-4 p-6"><div><h2 className="text-base font-semibold tracking-tight">All Department Details</h2><p className="mt-1 text-xs text-muted">Sample organizational telemetry and workforce status</p></div><div className="flex w-full flex-wrap items-center gap-2 lg:w-auto"><label className="flex min-w-40 flex-1 items-center gap-2 rounded-lg border border-line/60 bg-slate-50 px-3 py-2 text-muted focus-within:ring-4 focus-within:ring-primary/10"><Search size={16} /><input className="w-full min-w-0 bg-transparent text-xs outline-none" placeholder="Filter departments…" aria-label="Filter departments by name, manager or description" value={search} onChange={(event) => changeSearch(event.target.value)} /></label><select className={control} value={status} aria-label="Department status" onChange={(event) => { setStatus(event.target.value); setPage(1) }}><option value="">Status: All</option><option>Active</option><option>Inactive</option></select><label className="flex items-center gap-1 rounded-lg bg-soft px-2"><SlidersHorizontal size={15} className="text-muted" /><span className="sr-only">Sort departments</span><select className={`${control} max-w-32 !px-1`} value={sort} onChange={(event) => { setSort(event.target.value); setPage(1) }}><option value="default">Sort: Default</option><option value="name">Name A–Z</option><option value="employees">Employees</option><option value="productivity">Productivity</option></select></label></div></div>
-          <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left text-xs"><thead className="bg-soft text-[10px] uppercase tracking-wide text-muted"><tr>{['Department', 'Department Manager', 'Employees', 'Active Now', 'Avg Active Time', 'Productivity', 'Status', 'Action'].map((label) => <th key={label} className="px-6 py-4 font-semibold">{label}</th>)}</tr></thead><tbody className="divide-y divide-line/40">{visible.map((department) => <tr key={department.id} className="transition-colors hover:bg-slate-50/70"><td className="px-6 py-5"><strong className="font-medium">{department.name}</strong><small className="mt-1 block max-w-60 truncate text-[10px] text-muted" title={department.description}>{department.description || 'No description provided'}</small></td><td className="px-6 py-5"><Manager compact department={department} /></td><td className="px-6 py-5 text-center font-medium tabular-nums">{department.employees}</td><td className="px-6 py-5"><span className="flex items-center gap-2"><i className="size-1.5 rounded-full bg-green-800" />{department.status === 'Active' ? department.active : 0}</span></td><td className="whitespace-nowrap px-6 py-5 text-muted-strong">{Math.floor(department.avgMinutes / 60)}h {String(department.avgMinutes % 60).padStart(2, '0')}m</td><td className="px-6 py-5"><Productivity compact value={department.productivity} /></td><td className="px-6 py-5"><span className={`rounded-full px-2 py-1 text-[10px] font-medium ${department.status === 'Active' ? 'bg-soft text-green-800' : 'bg-slate-100 text-muted'}`}>{department.status}</span></td><td className="px-6 py-5"><div className="flex items-center gap-3"><button className="flex items-center gap-1 text-primary hover:text-blue-800" onClick={() => setModal({ department })} aria-label={`Edit ${department.name}`}><Pencil size={14} />Edit</button><button className="rounded-lg p-1 text-error hover:bg-red-50" aria-label={`Delete ${department.name}`} onClick={() => setModal({ type: 'delete', department })}><Trash2 size={15} /></button></div></td></tr>)}</tbody></table>{!visible.length && <div className="grid justify-items-center gap-2 px-6 py-14 text-center"><Building2 size={28} className="text-muted" /><h3 className="font-semibold">No departments found</h3><p className="text-xs text-muted">Try another search or reset the filters.</p><button className="mt-1 text-xs font-medium text-primary" onClick={() => { setSearch(''); setStatus(''); setPage(1) }}>Reset filters</button></div>}</div>
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-50/60 px-6 py-5 text-xs text-muted"><p>Showing <strong className="font-medium text-ink">{filtered.length ? (currentPage - 1) * pageSize + 1 : 0}</strong> to <strong className="font-medium text-ink">{Math.min(currentPage * pageSize, filtered.length)}</strong> of {filtered.length} departments</p><label className="flex items-center gap-2">Rows per page:<select className={control} aria-label="Departments per page" value={pageSize} onChange={(event) => { setPageSize(Number(event.target.value)); setPage(1) }}>{[3, 6, 12].map((size) => <option key={size}>{size}</option>)}</select></label><nav className="flex items-center gap-1" aria-label="Department pages"><button className="rounded-lg p-2 hover:bg-soft disabled:cursor-default disabled:opacity-35" disabled={currentPage === 1} aria-label="Previous department page" onClick={() => setPage(currentPage - 1)}><ChevronLeft size={16} /></button>{Array.from({ length: pages }, (_, index) => <button key={index} className={`size-8 rounded-lg ${currentPage === index + 1 ? 'bg-primary text-white' : 'hover:bg-soft'}`} aria-current={currentPage === index + 1 ? 'page' : undefined} onClick={() => setPage(index + 1)}>{index + 1}</button>)}<button className="rounded-lg p-2 hover:bg-soft disabled:cursor-default disabled:opacity-35" disabled={currentPage === pages} aria-label="Next department page" onClick={() => setPage(currentPage + 1)}><ChevronRight size={16} /></button></nav></div>
-        </section>
-      </main>
+  const changeSearch = (value) => {
+    setSearch(value)
+    setPage(1)
+  }
+  return (
+    <div className="dashboard-shell">
+      <Sidebar
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onNotice={setNotice}
+      />
+      <div className="dashboard-workspace">
+        <PageHeader
+          title="Departments"
+          subtitle="Organizational departments and operational metrics"
+          search={{
+            label: 'Search departments or managers',
+            value: search,
+            onChange: changeSearch,
+          }}
+          date="Today"
+          onMenuOpen={() => setMenuOpen(true)}
+        />
+        <main id="main-content" tabIndex={-1} className="dashboard-content">
+          <nav className="em-breadcrumb" aria-label="Breadcrumb">
+            <Link to="/dashboard">Dashboard</Link>
+            <ChevronRight size={12} />
+            <span aria-current="page">Departments</span>
+          </nav>
+          <div className="management-title">
+            <div>
+              <h1>Department Management</h1>
+              <p>Organize employees into departments and assign managers</p>
+            </div>
+            <div className="management-actions">
+              <Button type="button" variant="secondary" onClick={exportCsv}>
+                <Download size={15} />
+                Export CSV
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => setModal({ department: null })}
+              >
+                <Plus size={16} />
+                Add Department
+              </Button>
+            </div>
+          </div>
+          <p className="em-preview-label">
+            Sample department aggregates · Changes are temporary and reset on
+            reload · Backend not connected
+          </p>
+          <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
+          <section
+            className="my-6 grid gap-4 sm:grid-cols-3 xl:gap-6"
+            aria-label="Department summary"
+          >
+            {[
+              {
+                label: 'Total Departments',
+                value: summary.departments,
+                Icon: Building2,
+                detail: `${departments.filter((department) => department.status === 'Active').length} active departments`,
+                extra: 'in this preview',
+              },
+              {
+                label: 'Total Employees',
+                value: summary.employees,
+                Icon: UsersRound,
+                detail: `${summary.active} active now`,
+                extra: `${summary.employees ? ((summary.active / summary.employees) * 100).toFixed(1) : 0}% online`,
+              },
+              {
+                label: 'Avg Productivity',
+                value: `${summary.productivity}%`,
+                Icon: TrendingUp,
+                detail: 'Employee-weighted average',
+                extra: 'sample metrics',
+                green: true,
+              },
+            ].map(({ label, value, Icon, detail, extra, green }) => (
+              <article className={`${panel} p-6`} key={label}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-xs font-medium text-muted">{label}</h2>
+                    <strong
+                      className={`mt-2 block text-3xl font-bold tracking-tight ${green ? 'text-success-strong' : 'text-sidebar'}`}
+                    >
+                      {value}
+                    </strong>
+                  </div>
+                  <span
+                    className={`flex size-11 shrink-0 items-center justify-center rounded-xl bg-soft ${green ? 'text-success-strong' : ''}`}
+                  >
+                    <Icon size={23} />
+                  </span>
+                </div>
+                <div className="mt-6 flex flex-wrap items-center gap-1.5 text-[10px]">
+                  <span className="rounded-full bg-soft px-2 py-1 font-medium text-success-strong">
+                    {detail}
+                  </span>
+                  <span className="text-muted">{extra}</span>
+                </div>
+              </article>
+            ))}
+          </section>
+          <section aria-labelledby="department-overview-title">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <h2
+                  id="department-overview-title"
+                  className="text-base font-semibold tracking-tight"
+                >
+                  Department Overview
+                </h2>
+                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-medium text-muted-strong">
+                  {filtered.length} Groups
+                </span>
+              </div>
+              <div
+                className="flex rounded-lg bg-slate-200/80 p-1"
+                role="group"
+                aria-label="Department view"
+              >
+                {[
+                  ['grid', LayoutGrid, 'Grid'],
+                  ['table', Table2, 'Table'],
+                ].map(([value, Icon, label]) => (
+                  <button
+                    key={value}
+                    aria-pressed={view === value}
+                    className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs ${view === value ? 'bg-white text-primary shadow-sm' : 'text-muted hover:text-sidebar'}`}
+                    onClick={() => setView(value)}
+                  >
+                    <Icon size={14} />
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {view === 'grid' && (
+              <div className="grid gap-6 md:grid-cols-2 2xl:grid-cols-3 xl:grid-cols-2 min-[1280px]:grid-cols-3">
+                {visible.map((department) => (
+                  <article
+                    key={department.id}
+                    className={`${panel} min-w-0 p-6`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3
+                          className="truncate text-base font-semibold tracking-tight"
+                          title={department.name}
+                        >
+                          {department.name}
+                        </h3>
+                        <p
+                          className="mt-1 truncate text-[11px] text-muted-strong"
+                          title={department.description}
+                        >
+                          {department.description || 'No description provided'}
+                        </p>
+                      </div>
+                      <details className="relative shrink-0">
+                        <summary
+                          aria-label={`Actions for ${department.name}`}
+                          className="cursor-pointer list-none rounded-lg p-1 text-muted hover:bg-soft [&::-webkit-details-marker]:hidden"
+                        >
+                          <MoreVertical size={17} />
+                        </summary>
+                        <div className="absolute right-0 z-10 mt-1 w-40 rounded-xl border border-line bg-white p-1 shadow-lg">
+                          <button
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs hover:bg-soft"
+                            onClick={(event) => {
+                              event.currentTarget.closest('details').open =
+                                false
+                              setModal({ department })
+                            }}
+                          >
+                            <Pencil size={14} />
+                            Edit department
+                          </button>
+                          <button
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-error hover:bg-red-50"
+                            onClick={(event) => {
+                              event.currentTarget.closest('details').open =
+                                false
+                              setModal({ type: 'delete', department })
+                            }}
+                          >
+                            <Trash2 size={14} />
+                            Delete department
+                          </button>
+                        </div>
+                      </details>
+                    </div>
+                    <div className="mt-4">
+                      <Manager department={department} />
+                    </div>
+                    <div className="my-6 grid grid-cols-3 divide-x divide-line/80">
+                      <div className="pr-2">
+                        <small className="text-[9px] font-medium tracking-wide text-muted">
+                          Employees
+                        </small>
+                        <strong className="mt-1 block text-sm font-semibold">
+                          {department.employees}
+                        </strong>
+                      </div>
+                      <div className="px-2">
+                        <small className="text-[9px] font-medium tracking-wide text-muted">
+                          Active Now
+                        </small>
+                        <strong className="mt-1 flex items-center gap-1 text-sm font-semibold">
+                          <i className="size-1.5 rounded-full bg-success-strong" />
+                          {department.status === 'Active'
+                            ? department.active
+                            : 0}
+                        </strong>
+                      </div>
+                      <div className="pl-2">
+                        <small className="text-[9px] font-medium tracking-wide text-muted">
+                          Productivity
+                        </small>
+                        <strong
+                          className={`mt-1 block text-sm font-semibold ${department.productivity >= 80 ? 'text-success-strong' : 'text-primary'}`}
+                        >
+                          {department.productivity}%
+                        </strong>
+                      </div>
+                    </div>
+                    <Productivity value={department.productivity} />
+                    {department.status === 'Inactive' && (
+                      <span className="mt-3 inline-block rounded-full bg-slate-100 px-2 py-1 text-[10px] text-muted">
+                        Inactive
+                      </span>
+                    )}
+                  </article>
+                ))}
+                <button
+                  className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-primary/15 bg-soft/50 p-6 text-center transition-colors hover:border-primary/40 hover:bg-soft"
+                  onClick={() => setModal({ department: null })}
+                >
+                  <span className="mb-1 flex size-12 items-center justify-center rounded-full bg-white text-primary shadow-sm">
+                    <Plus size={23} />
+                  </span>
+                  <strong className="text-sm font-semibold">
+                    + Add new department
+                  </strong>
+                  <span className="max-w-48 text-xs leading-relaxed text-muted">
+                    Create a department to group staff and metrics
+                  </span>
+                </button>
+              </div>
+            )}
+          </section>
+          <section
+            className={`${panel} mt-6 overflow-hidden`}
+            aria-label="All department details"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-4 p-6">
+              <div>
+                <h2 className="text-base font-semibold tracking-tight">
+                  All Department Details
+                </h2>
+                <p className="mt-1 text-xs text-muted">
+                  Sample organizational telemetry and workforce status
+                </p>
+              </div>
+              <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto">
+                <label className="flex min-w-40 flex-1 items-center gap-2 rounded-lg border border-line/60 bg-slate-50 px-3 py-2 text-muted focus-within:ring-4 focus-within:ring-primary/10">
+                  <Search size={16} />
+                  <input
+                    className="w-full min-w-0 bg-transparent text-xs outline-none"
+                    placeholder="Filter departments…"
+                    aria-label="Filter departments by name, manager or description"
+                    value={search}
+                    onChange={(event) => changeSearch(event.target.value)}
+                  />
+                </label>
+                <select
+                  className={control}
+                  value={status}
+                  aria-label="Department status"
+                  onChange={(event) => {
+                    setStatus(event.target.value)
+                    setPage(1)
+                  }}
+                >
+                  <option value="">Status: All</option>
+                  <option>Active</option>
+                  <option>Inactive</option>
+                </select>
+                <label className="flex items-center gap-1 rounded-lg bg-soft px-2">
+                  <SlidersHorizontal size={15} className="text-muted" />
+                  <span className="sr-only">Sort departments</span>
+                  <select
+                    className={`${control} max-w-32 !px-1`}
+                    value={sort}
+                    onChange={(event) => {
+                      setSort(event.target.value)
+                      setPage(1)
+                    }}
+                  >
+                    <option value="default">Sort: Default</option>
+                    <option value="name">Name A–Z</option>
+                    <option value="employees">Employees</option>
+                    <option value="productivity">Productivity</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[820px] text-left text-xs">
+                <thead className="bg-soft text-[10px] uppercase tracking-wide text-muted">
+                  <tr>
+                    {[
+                      'Department',
+                      'Department Manager',
+                      'Employees',
+                      'Active Now',
+                      'Avg Active Time',
+                      'Productivity',
+                      'Status',
+                      'Action',
+                    ].map((label) => (
+                      <th key={label} className="px-6 py-4 font-semibold">
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line/40">
+                  {visible.map((department) => (
+                    <tr
+                      key={department.id}
+                      className="transition-colors hover:bg-slate-50/70"
+                    >
+                      <td className="px-6 py-5">
+                        <strong className="font-medium">
+                          {department.name}
+                        </strong>
+                        <small
+                          className="mt-1 block max-w-60 truncate text-[10px] text-muted"
+                          title={department.description}
+                        >
+                          {department.description || 'No description provided'}
+                        </small>
+                      </td>
+                      <td className="px-6 py-5">
+                        <Manager compact department={department} />
+                      </td>
+                      <td className="px-6 py-5 text-center font-medium tabular-nums">
+                        {department.employees}
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className="flex items-center gap-2">
+                          <i className="size-1.5 rounded-full bg-success-strong" />
+                          {department.status === 'Active'
+                            ? department.active
+                            : 0}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-6 py-5 text-muted-strong">
+                        {Math.floor(department.avgMinutes / 60)}h{' '}
+                        {String(department.avgMinutes % 60).padStart(2, '0')}m
+                      </td>
+                      <td className="px-6 py-5">
+                        <Productivity compact value={department.productivity} />
+                      </td>
+                      <td className="px-6 py-5">
+                        <span
+                          className={`rounded-full px-2 py-1 text-[10px] font-medium ${department.status === 'Active' ? 'bg-soft text-success-strong' : 'bg-slate-100 text-muted'}`}
+                        >
+                          {department.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <button
+                            className="flex items-center gap-1 text-primary hover:text-blue-800"
+                            onClick={() => setModal({ department })}
+                            aria-label={`Edit ${department.name}`}
+                          >
+                            <Pencil size={14} />
+                            Edit
+                          </button>
+                          <button
+                            className="rounded-lg p-1 text-error hover:bg-red-50"
+                            aria-label={`Delete ${department.name}`}
+                            onClick={() =>
+                              setModal({ type: 'delete', department })
+                            }
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {!visible.length && (
+                <div className="grid justify-items-center gap-2 px-6 py-14 text-center">
+                  <Building2 size={28} className="text-muted" />
+                  <h3 className="font-semibold">No departments found</h3>
+                  <p className="text-xs text-muted">
+                    Try another search or reset the filters.
+                  </p>
+                  <button
+                    className="mt-1 text-xs font-medium text-primary"
+                    onClick={() => {
+                      setSearch('')
+                      setStatus('')
+                      setPage(1)
+                    }}
+                  >
+                    Reset filters
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-50/60 px-6 py-5 text-xs text-muted">
+              <p>
+                Showing{' '}
+                <strong className="font-medium text-ink">
+                  {filtered.length ? (currentPage - 1) * pageSize + 1 : 0}
+                </strong>{' '}
+                to{' '}
+                <strong className="font-medium text-ink">
+                  {Math.min(currentPage * pageSize, filtered.length)}
+                </strong>{' '}
+                of {filtered.length} departments
+              </p>
+              <label className="flex items-center gap-2">
+                Rows per page:
+                <select
+                  className={control}
+                  aria-label="Departments per page"
+                  value={pageSize}
+                  onChange={(event) => {
+                    setPageSize(Number(event.target.value))
+                    setPage(1)
+                  }}
+                >
+                  {[3, 6, 12].map((size) => (
+                    <option key={size}>{size}</option>
+                  ))}
+                </select>
+              </label>
+              <nav
+                className="flex items-center gap-1"
+                aria-label="Department pages"
+              >
+                <button
+                  className="rounded-lg p-2 hover:bg-soft disabled:cursor-default disabled:opacity-35"
+                  disabled={currentPage === 1}
+                  aria-label="Previous department page"
+                  onClick={() => setPage(currentPage - 1)}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                {Array.from({ length: pages }, (_, index) => (
+                  <button
+                    key={index}
+                    className={`size-8 rounded-lg ${currentPage === index + 1 ? 'bg-primary text-white' : 'hover:bg-soft'}`}
+                    aria-current={
+                      currentPage === index + 1 ? 'page' : undefined
+                    }
+                    onClick={() => setPage(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                <button
+                  className="rounded-lg p-2 hover:bg-soft disabled:cursor-default disabled:opacity-35"
+                  disabled={currentPage === pages}
+                  aria-label="Next department page"
+                  onClick={() => setPage(currentPage + 1)}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </nav>
+            </div>
+          </section>
+        </main>
+      </div>
+      {modal && modal.type !== 'delete' && (
+        <DepartmentDialog
+          department={modal.department}
+          managers={managers}
+          onClose={() => setModal(null)}
+          onSave={saveDepartment}
+        />
+      )}
+      {modal?.type === 'delete' && (
+        <DeleteDepartmentDialog
+          department={modal.department}
+          departments={departments}
+          onClose={() => setModal(null)}
+          onDelete={deleteDepartment}
+        />
+      )}
     </div>
-    {modal && modal.type !== 'delete' && <DepartmentDialog department={modal.department} managers={managers} onClose={() => setModal(null)} onSave={saveDepartment} />}
-    {modal?.type === 'delete' && <DeleteDepartmentDialog department={modal.department} departments={departments} onClose={() => setModal(null)} onDelete={deleteDepartment} />}
-  </div>
+  )
 }
