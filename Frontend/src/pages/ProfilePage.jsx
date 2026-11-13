@@ -53,6 +53,7 @@ function PasswordField({ id, label, value, onChange, error }) {
       <div className="relative">
         <input
           id={id}
+          aria-label={label}
           type={visible ? 'text' : 'password'}
           autoComplete={
             id === 'current-password' ? 'current-password' : 'new-password'

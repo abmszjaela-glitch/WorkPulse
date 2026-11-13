@@ -213,7 +213,7 @@ export default function EmployeeDialog({
                 <label className="em-field">
                   Email address
                   <input
-                    name="email"
+                    name="email" aria-label="Email address"
                     type="email"
                     defaultValue={employee?.email}
                     required
@@ -253,7 +253,7 @@ export default function EmployeeDialog({
                 <label className="em-field">
                   Employee ID
                   <input
-                    name="id"
+                    name="id" aria-label="Employee ID"
                     defaultValue={employee?.id}
                     placeholder="WP-1129"
                     required

@@ -73,7 +73,7 @@ export default function DepartmentDialog({
               <input
                 ref={nameInput}
                 className={`${field} pr-10 ${nameError ? '!border-error focus:ring-error/10' : ''}`}
-                name="name"
+                name="name" aria-label="Department Name"
                 defaultValue={department?.name}
                 placeholder="e.g. Platform Infrastructure"
                 required
