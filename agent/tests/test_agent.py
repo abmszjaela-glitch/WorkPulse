@@ -1,16 +1,56 @@
 """Exercise orchestration with fake listeners; never capture real input."""
 
 import signal
+import json
 import unittest
 from threading import Event, Thread
+from time import monotonic
 from unittest.mock import Mock, patch
 
 from agent.core.agent import ActivityAgent, ActivitySummary, main
+from agent.tracker.active_window_tracker import ActiveApplication
 from test_mouse_tracker import FakeListener
+
+
+class FakeForegroundTracker:
+    """Avoid any real foreground-window queries in orchestration tests."""
+
+    def __init__(self):
+        self.is_running = False
+        self._snapshot = None
+        self._observers = set()
+
+    def start(self):
+        self.is_running = True
+        self._snapshot = ActiveApplication("test-app.exe", monotonic())
+        for observer in tuple(self._observers):
+            observer(self._snapshot)
+
+    def stop(self):
+        self.is_running = False
+        self._snapshot = None
+        for observer in tuple(self._observers):
+            observer(None)
+
+    def get_active_app(self):
+        return "test-app.exe" if self.is_running else None
+
+    def observe(self, observer):
+        self._observers.add(observer)
+        observer(self._snapshot)
+        return lambda: self._observers.discard(observer)
+
+    def read_with_snapshot(self, reader):
+        return reader(self._snapshot)
 
 
 class ActivityAgentTests(unittest.TestCase):
     def setUp(self):
+        foreground_patch = patch(
+            "agent.core.agent.ActiveWindowTracker", FakeForegroundTracker
+        )
+        foreground_patch.start()
+        self.addCleanup(foreground_patch.stop)
         for target in (
             "agent.tracker.mouse_tracker.mouse.Listener",
             "agent.tracker.keyboard_tracker.keyboard.Listener",
@@ -22,6 +62,8 @@ class ActivityAgentTests(unittest.TestCase):
         self.agent = ActivityAgent(output=self.messages.append)
         self.addCleanup(self.agent.mouse_tracker.stop)
         self.addCleanup(self.agent.keyboard_tracker.stop)
+        self.addCleanup(self.agent.active_window_tracker.stop)
+        self.addCleanup(self.agent.app_usage_tracker.stop)
 
     def test_all_modules_share_one_activity_state(self):
         for component in (
@@ -57,6 +99,27 @@ class ActivityAgentTests(unittest.TestCase):
         self.assertEqual(self.agent.get_summary().key_presses, 1)
         self.assertFalse(self.agent.mouse_tracker.is_running)
         self.assertFalse(self.agent.keyboard_tracker.is_running)
+
+    def test_agent_emits_due_json_interval_summary_without_resetting_totals(self):
+        now = [0.0]
+
+        def wait(_interval):
+            if self.agent._stop_event.is_set():
+                return True
+            now[0] = 60.0
+            self.agent.keyboard_tracker._listener.callbacks["on_press"](object())
+            self.agent.stop()
+            return False
+
+        with patch("agent.tracker.activity_calculator.monotonic", side_effect=lambda: now[0]):
+            with patch("agent.tracker.activity_state.monotonic", side_effect=lambda: now[0]):
+                with patch.object(self.agent._stop_event, "wait", side_effect=wait):
+                    self.assertEqual(self.agent.run(), 0)
+        intervals = [json.loads(message) for message in self.messages if message.startswith("{")]
+        self.assertEqual(intervals[0]["interval_seconds"], 60)
+        self.assertEqual(intervals[0]["counts"]["key_presses"], 1)
+        self.assertFalse(intervals[0]["score_is_productivity_or_performance"])
+        self.assertEqual(self.agent.keyboard_tracker.key_press_count, 1)
 
     def test_idle_status_is_reported(self):
         with patch.object(self.agent._stop_event, "wait", side_effect=[False, True]):
@@ -148,10 +211,25 @@ class ActivityAgentTests(unittest.TestCase):
         finally:
             self.agent._run_lock.release()
 
-    def test_summary_contains_only_status_and_numeric_counts(self):
+    def test_summary_contains_only_status_numeric_counts_and_app_name(self):
         summary = self.agent.get_summary()
         self.assertEqual(summary, ActivitySummary("ACTIVE", 0, 0, 0))
-        self.assertEqual(set(vars(summary)), {"status", "mouse_movements", "mouse_clicks", "key_presses"})
+        self.assertEqual(set(vars(summary)), {"status", "mouse_movements", "mouse_clicks", "key_presses", "active_app", "app_usage"})
+
+    def test_foreground_tracker_is_started_reported_and_stopped(self):
+        with patch.object(self.agent._stop_event, "wait", return_value=True):
+            self.assertEqual(self.agent.run(), 0)
+        self.assertTrue(any("Active app=test-app.exe" in message for message in self.messages))
+        self.assertFalse(self.agent.active_window_tracker.is_running)
+
+    def test_foreground_failure_still_stops_input_trackers(self):
+        with patch.object(
+            self.agent.active_window_tracker, "start", side_effect=RuntimeError("private")
+        ):
+            self.assertEqual(self.agent.run(), 1)
+        self.assertFalse(self.agent.mouse_tracker.is_running)
+        self.assertFalse(self.agent.keyboard_tracker.is_running)
+        self.assertNotIn("private", "\n".join(self.messages))
 
     def test_cli_installs_stop_signals_and_restores_handlers(self):
         fake_agent = Mock()

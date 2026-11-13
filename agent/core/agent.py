@@ -8,19 +8,26 @@ start tracking. No networking, file persistence, services or autostart are used.
 from __future__ import annotations
 
 import signal
+import json
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from threading import Event, Lock
 
 if __package__ == "core":
     from config import config
     from tracker.activity_state import ActivityState
+    from tracker.active_window_tracker import ActiveWindowTracker
+    from tracker.app_usage_tracker import AppUsageTracker
+    from tracker.activity_calculator import ActivityCalculator
     from tracker.idle_detector import IdleDetector
     from tracker.keyboard_tracker import KeyboardTracker
     from tracker.mouse_tracker import MouseTracker
 else:
     from ..config import config
     from ..tracker.activity_state import ActivityState
+    from ..tracker.active_window_tracker import ActiveWindowTracker
+    from ..tracker.app_usage_tracker import AppUsageTracker
+    from ..tracker.activity_calculator import ActivityCalculator
     from ..tracker.idle_detector import IdleDetector
     from ..tracker.keyboard_tracker import KeyboardTracker
     from ..tracker.mouse_tracker import MouseTracker
@@ -28,17 +35,24 @@ else:
 
 @dataclass(frozen=True)
 class ActivitySummary:
-    """Only anonymous aggregate counts and the current activity classification."""
+    """Anonymous counts, activity status and the foreground process name only."""
 
     status: str
     mouse_movements: int
     mouse_clicks: int
     key_presses: int
+    active_app: str | None = None
+    app_usage: dict[str, float] = field(default_factory=dict)
 
     def format(self) -> str:
+        usage = ", ".join(
+            f"{name}: {seconds:.1f}s" for name, seconds in sorted(self.app_usage.items())
+        ) or "None yet"
         return (
             f"Status={self.status} | Mouse movements={self.mouse_movements} | "
-            f"Mouse clicks={self.mouse_clicks} | Key presses={self.key_presses}"
+            f"Mouse clicks={self.mouse_clicks} | Key presses={self.key_presses} | "
+            f"Active app={self.active_app or 'Unavailable'} | "
+            f"App usage (active seconds)={usage}"
         )
 
 
@@ -67,9 +81,19 @@ class ActivityAgent:
         self.mouse_tracker = MouseTracker(self.activity_state)
         self.keyboard_tracker = KeyboardTracker(self.activity_state)
         self.idle_detector = IdleDetector(self.activity_state)
+        self.active_window_tracker = ActiveWindowTracker()
+        self.app_usage_tracker = AppUsageTracker(
+            self.active_window_tracker, self.idle_detector
+        )
+        self.activity_calculator = ActivityCalculator(
+            self.mouse_tracker, self.keyboard_tracker,
+            self.idle_detector, self.app_usage_tracker,
+        )
         self._trackers = (
             ("Mouse", self.mouse_tracker),
             ("Keyboard", self.keyboard_tracker),
+            ("Application usage", self.app_usage_tracker),
+            ("Foreground application", self.active_window_tracker),
         )
         self._output = output
         self._stop_event = Event()
@@ -88,6 +112,8 @@ class ActivityAgent:
             mouse_movements=mouse["movement_count"],
             mouse_clicks=mouse["click_count"],
             key_presses=keyboard["key_press_count"],
+            active_app=self.active_window_tracker.get_active_app(),
+            app_usage=self.app_usage_tracker.get_usage_summary(cumulative=True),
         )
 
     def _check_listeners(self) -> None:
@@ -136,13 +162,19 @@ class ActivityAgent:
         started = False
         failed = False
         cleanup_failures = []
+        final_interval = None
         try:
             if not self._stop_event.is_set():
                 self._output(
                     "WorkPulse foreground activity tracking is starting. "
-                    "Only mouse movement, mouse click and key press counts are collected. "
-                    "No coordinates, key contents, typed text or screenshots are stored. "
+                    "Mouse movement, mouse click and key press counts, plus the current "
+                    "foreground process name, are collected. No window titles, documents, "
+                    "URLs, coordinates, key contents, typed text or screenshots are stored. "
                     "Data stays in memory; nothing is uploaded. Press Ctrl+C to stop."
+                )
+                self._output(
+                    "Application duration totals exclude idle time. Activity scores "
+                    "measure input intensity only, not productivity or employee performance."
                 )
                 for _, tracker in self._trackers:
                     if self._stop_event.is_set():
@@ -152,18 +184,24 @@ class ActivityAgent:
                 if not self._stop_event.is_set():
                     self._check_listeners()
                     self.activity_state.touch()
+                    self.activity_calculator.start()
                     started = True
                     self._output(
                         "Activity tracking RUNNING. "
                         f"Cumulative summaries every {config.TRACKING_INTERVAL} seconds; "
-                        f"idle threshold {config.IDLE_THRESHOLD} seconds."
+                        f"idle threshold {config.IDLE_THRESHOLD} seconds; "
+                        f"foreground app polling every {config.ACTIVE_WINDOW_INTERVAL} seconds."
                     )
                     self._output(self.get_summary().format())
                     # Event.wait() allows immediate shutdown instead of waiting
-                    # out a blocking sleep. No polling/background thread is added.
+                    # out a blocking sleep. Foreground app sampling has its own
+                    # explicitly started, low-frequency poller.
                     while not self._stop_event.wait(config.TRACKING_INTERVAL):
                         self._check_listeners()
                         self._output(self.get_summary().format())
+                        interval_summary = self.activity_calculator.calculate_summary()
+                        if interval_summary is not None:
+                            self._output(json.dumps(interval_summary, allow_nan=False))
         except KeyboardInterrupt:
             self.stop()
         except Exception:
@@ -172,9 +210,18 @@ class ActivityAgent:
             self.stop()
             try:
                 cleanup_failures = self._stop_listeners()
+                try:
+                    final_interval = self.activity_calculator.stop()
+                except Exception:
+                    failed = True
             finally:
                 self._run_lock.release()
 
+        if final_interval is not None:
+            try:
+                self._output(json.dumps(final_interval, allow_nan=False))
+            except (Exception, KeyboardInterrupt):
+                failed = True
         reported = self._report_shutdown(
             started=started, failed=failed, cleanup_failures=cleanup_failures
         )

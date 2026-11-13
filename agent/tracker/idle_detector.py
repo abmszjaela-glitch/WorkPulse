@@ -30,3 +30,7 @@ class IdleDetector:
         if self.get_inactivity_duration() >= config.IDLE_THRESHOLD:
             return "IDLE"
         return "ACTIVE"
+
+    def get_active_elapsed(self) -> float:
+        """Monotonic active-time clock excluding gaps beyond IDLE_THRESHOLD."""
+        return self.activity_state.active_elapsed(config.IDLE_THRESHOLD)
