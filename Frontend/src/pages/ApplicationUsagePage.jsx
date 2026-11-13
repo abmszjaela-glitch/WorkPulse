@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Bell, CalendarDays, Check, ChevronRight, Code2, Download, Globe, Grid3X3, Info, Menu, MessageSquare, Pencil, PlaySquare, Search, Share2, ShieldCheck, Sheet, TrendingUp, TriangleAlert, UserRound, UsersRound, Video, X } from 'lucide-react'
+import { ArrowRight, Bell, CalendarDays, Check, ChevronRight, Code2, Download, Globe, Grid3X3, Info, Menu, MessageSquare, Pencil, PlaySquare, Search, Share2, ShieldCheck, Sheet, TrendingUp, TriangleAlert, UsersRound, Video, X } from 'lucide-react'
 import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import Sidebar from '../components/layout/Sidebar.jsx'
+import ProfileLink from '../components/layout/ProfileLink.jsx'
 import { applicationCategories, applicationColors, formatUsageTime, getCategoryTotals, getUsageTrend, summarizeApplications, trackedApplications, usageCsv, usageDepartments, usageEmployees } from '../data/applicationUsage.js'
 
 const iconMap = { vscode: Code2, chrome: Globe, slack: MessageSquare, teams: UsersRound, excel: Sheet, figma: Grid3X3, zoom: Video, notion: Grid3X3, youtube: PlaySquare, facebook: Share2 }
@@ -65,7 +66,7 @@ export default function ApplicationUsagePage() {
       <header className="dashboard-header">
         <button className="mobile-menu icon-button" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu /></button>
         <div className="page-title"><h1>Application Usage</h1><p>Monitor and analyze software utilization across teams</p></div>
-        <div className="header-actions"><label className="employee-search"><Search size={17} /><input aria-label="Search employee options" placeholder="Search employees…" value={employeeSearch} onChange={(event) => setEmployeeSearch(event.target.value)} /></label><span className="date-badge"><CalendarDays size={16} />{filters.period === 'today' ? 'Today' : 'Yesterday'}</span><button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('No new notifications in this preview.')}><Bell size={19} /><span /></button><button className="account-avatar" aria-label="Account information" onClick={() => setNotice('Admin preview · No live account is connected.')}><UserRound size={18} /></button></div>
+        <div className="header-actions"><label className="employee-search"><Search size={17} /><input aria-label="Search employee options" placeholder="Search employees…" value={employeeSearch} onChange={(event) => setEmployeeSearch(event.target.value)} /></label><span className="date-badge"><CalendarDays size={16} />{filters.period === 'today' ? 'Today' : 'Yesterday'}</span><button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('No new notifications in this preview.')}><Bell size={19} /><span /></button><ProfileLink /></div>
       </header>
       <main className="dashboard-content">
         <div className="flex flex-wrap items-center justify-between gap-2 py-3"><nav className="flex flex-wrap items-center gap-1 text-[11px] text-muted" aria-label="Breadcrumb"><Link to="/dashboard" className="hover:text-primary">Workforce Analytics</Link><ChevronRight size={12} /><Link to="/activity-details" className="hover:text-primary">Activity Details</Link><ChevronRight size={12} /><span className="text-ink" aria-current="page">Application Telemetry</span></nav><span className="flex items-center gap-1.5 text-[10px] text-muted"><i className="size-1.5 rounded-full bg-warning" />Preview data · {usageEmployees.length} sample employees</span></div>

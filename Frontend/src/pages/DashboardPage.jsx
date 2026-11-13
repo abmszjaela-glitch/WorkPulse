@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Bell, CalendarDays, Check, ChevronDown, CloudOff, Code2, Globe, Hourglass, Menu, MessageSquare, Palette, Search, Sheet, UserRound, UsersRound, X, Zap } from 'lucide-react'
+import { ArrowRight, Bell, CalendarDays, Check, ChevronDown, CloudOff, Code2, Globe, Hourglass, Menu, MessageSquare, Palette, Search, Sheet, UsersRound, X, Zap } from 'lucide-react'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import Sidebar from '../components/layout/Sidebar.jsx'
+import ProfileLink from '../components/layout/ProfileLink.jsx'
 import { applications, departments, employees, weeklyActivity } from '../data/dashboard.js'
 
 const categories = [
@@ -37,7 +38,7 @@ export default function DashboardPage() {
             <label className="employee-search"><Search size={17} /><input aria-label="Search employees" placeholder="Search employees…" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
             <span className="date-badge"><CalendarDays size={17} />Today</span>
             <button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('You’re all caught up. No new notifications in this preview.')}><Bell size={19} /><span /></button>
-            <button className="account-avatar" aria-label="View profile" onClick={() => setNotice('Admin preview · Administrator. Live account information is not connected.')}><UserRound size={18} /></button>
+            <ProfileLink />
           </div>
         </header>
 

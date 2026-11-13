@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Ban, Bell, ChevronLeft, ChevronRight, Download, Eye, Menu, Pencil, Plus, Search, ShieldCheck, TriangleAlert, UserRound, UsersRound, UserRoundX, X } from 'lucide-react'
+import { Ban, Bell, ChevronLeft, ChevronRight, Download, Eye, Menu, Pencil, Plus, Search, ShieldCheck, TriangleAlert, UsersRound, UserRoundX, X } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar.jsx'
+import ProfileLink from '../components/layout/ProfileLink.jsx'
 import EmployeeDialog from '../components/employees/EmployeeDialog.jsx'
 import { employeeCsv, employeeDepartments, employeeRoles, filterEmployees, managementEmployees } from '../data/employees.js'
 
@@ -55,7 +56,7 @@ export default function EmployeesPage() {
   return <div className="dashboard-shell employee-management">
     <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} onNotice={setNotice} />
     <div className="dashboard-workspace">
-      <header className="dashboard-header management-header"><button className="mobile-menu icon-button" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu /></button><label className="employee-search"><Search size={17} /><input aria-label="Search all employees" placeholder="Search employees, departments, accounts…" value={search} onChange={changeFilter(setSearch)} /></label><div className="header-actions"><button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('No new notifications in this preview.')}><Bell size={19} /><span /></button><button className="account-avatar" aria-label="Account information" onClick={() => setNotice('Admin preview · Live account information is not connected.')}><UserRound size={18} /></button></div></header>
+      <header className="dashboard-header management-header"><button className="mobile-menu icon-button" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu /></button><label className="employee-search"><Search size={17} /><input aria-label="Search all employees" placeholder="Search employees, departments, accounts…" value={search} onChange={changeFilter(setSearch)} /></label><div className="header-actions"><button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('No new notifications in this preview.')}><Bell size={19} /><span /></button><ProfileLink /></div></header>
       <main className="dashboard-content management-content">
         <nav className="em-breadcrumb" aria-label="Breadcrumb"><Link to="/dashboard">Dashboard</Link><ChevronRight size={12} /><span aria-current="page">Employees</span></nav>
         <div className="management-title"><div><h1>Employee Management</h1><p>Add, edit and manage employees and their access across the organization.</p></div><div className="management-actions"><button className="em-button" onClick={exportCsv}><Download size={16} />Export CSV</button><button className="em-button primary" onClick={() => setModal({ type: 'add' })}><Plus size={17} />Add Employee</button></div></div>

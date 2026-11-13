@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowDown, ArrowUp, Bell, CalendarDays, CheckCircle2, ChevronRight, Clock3, Code2, Download, FileText, Globe, Info, Menu, MessageSquare, Monitor, Moon, Mouse, Palette, PlayCircle, Radio, Search, Shield, Timer, TrendingUp, UserRound, UsersRound, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Bell, CalendarDays, CheckCircle2, ChevronRight, Clock3, Code2, Download, FileText, Globe, Info, Menu, MessageSquare, Monitor, Moon, Mouse, Palette, PlayCircle, Radio, Search, Shield, Timer, TrendingUp, UsersRound, X } from 'lucide-react'
 import { Area, CartesianGrid, Cell, Line, ComposedChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import Sidebar from '../components/layout/Sidebar.jsx'
+import ProfileLink from '../components/layout/ProfileLink.jsx'
 import { activityEmployee as employee, activityApps, activityLogs, activityLogsCsv, activityTrend, filterActivityLogs, formatMinutes, hourlyActivity, timeDistribution } from '../data/activity.js'
 
 const appIcons = [Code2, Globe, MessageSquare, UsersRound, Palette, PlayCircle]
@@ -33,7 +34,7 @@ export default function ActivityDetailsPage() {
   return <div className="dashboard-shell activity-details">
     <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} onNotice={setNotice} />
     <div className="dashboard-workspace">
-      <header className="dashboard-header management-header"><button className="mobile-menu icon-button" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu /></button><label className="employee-search"><Search size={17} /><input aria-label="Search activity logs" placeholder="Search employees, teams, activities…" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} /></label><div className="header-actions"><button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('No new notifications in this preview.')}><Bell size={19} /><span /></button><button className="activity-admin" onClick={() => setNotice('Admin preview · No live account is connected.')}><span className="account-avatar"><UserRound size={18} /></span>Admin</button></div></header>
+      <header className="dashboard-header management-header"><button className="mobile-menu icon-button" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu /></button><label className="employee-search"><Search size={17} /><input aria-label="Search activity logs" placeholder="Search employees, teams, activities…" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} /></label><div className="header-actions"><button className="icon-button notifications-button" aria-label="Notifications" onClick={() => setNotice('No new notifications in this preview.')}><Bell size={19} /><span /></button><ProfileLink /></div></header>
       <main className="dashboard-content activity-content">
         <nav className="em-breadcrumb" aria-label="Breadcrumb"><Link to="/employees">Employees</Link><ChevronRight size={12} /><span>{employee.name}</span><ChevronRight size={12} /><span aria-current="page">Activity Details</span></nav>
         <div className="management-title"><div><h1>Employee Activity Details</h1><p>Detailed telemetry and application workflow metrics for executive oversight.</p></div><div className="management-actions"><span className="em-button activity-date"><CalendarDays size={16} />Today</span><button className="em-button" onClick={() => window.print()}><FileText size={16} />Export PDF</button><button className="em-button" onClick={exportCsv}><Download size={16} />Export CSV</button></div></div>
