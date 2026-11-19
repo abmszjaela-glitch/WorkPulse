@@ -269,7 +269,7 @@ class ActivityAgentTests(unittest.TestCase):
 
         fake_agent.run.side_effect = run
         with patch("agent.core.agent.ActivityAgent", return_value=fake_agent):
-            with patch("agent.core.agent.signal.signal", side_effect=install) as signals:
+            with patch("agent.core.agent.signal.signal", side_effect=install) as signals, patch("agent.core.agent.configure_logging"):
                 self.assertEqual(main(), 0)
         fake_agent.stop.assert_called_once()
         self.assertEqual(signals.call_count, 4)

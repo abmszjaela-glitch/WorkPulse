@@ -1,6 +1,6 @@
 # WorkPulse Agent measured performance
 
-Run UTC: 2026-11-19T10:21:41.166009+00:00
+Run UTC: 2026-11-19T10:37:58.578870+00:00
 
 Controlled tracker benchmark; not a production certification. Only the current Python process was sampled.
 
@@ -8,9 +8,9 @@ CPU 100% = one logical CPU; MB = 1,000,000 bytes. Peaks are sampled. Sampler ove
 
 | Scenario | Status | Seconds | CPU avg % | CPU peak % | RSS avg MB | RSS peak MB |
 |---|---|---:|---:|---:|---:|---:|
-| paused | measured | 15.026 | 1.1439 | 1.8516 | 32.6242 | 32.6697 |
-| idle | measured | 15.0081 | 0.8329 | 2.018 | 32.3505 | 32.8253 |
-| active | measured | 15.0114 | 0.7286 | 3.87 | 32.4692 | 32.9236 |
+| paused | measured | 15.0122 | 0.9367 | 1.919 | 32.7791 | 32.8294 |
+| idle | measured | 15.0538 | 1.1417 | 2.0275 | 32.4827 | 32.9646 |
+| active | measured | 15.0131 | 0.8326 | 3.0716 | 33.0762 | 33.1162 |
 | backend_synchronization | not_measured | — | — | — | — | — |
 
 ## Method and limits
@@ -41,8 +41,8 @@ A phase shorter than the configured summary interval does not measure a periodic
 {
   "status": "measured",
   "cycles": 10,
-  "rss_growth_mb": 0.4055,
-  "retained_python_growth_mb": 0.0029,
+  "rss_growth_mb": 0.2949,
+  "retained_python_growth_mb": 0.0024,
   "retained_python_bytes_after_each_cycle": [
     624,
     736,
@@ -51,9 +51,9 @@ A phase shorter than the configured summary interval does not measure a periodic
     1648,
     1792,
     1904,
-    2528,
-    2704,
-    2880
+    2016,
+    2192,
+    2368
   ],
   "remaining_additional_python_threads": [],
   "retained_tracker_fixtures": 0,

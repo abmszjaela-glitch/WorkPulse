@@ -431,3 +431,90 @@ cycles for soak testing. The command returns nonzero on measured threshold
 violations, sampling/listener failures, suspected leaks or interruption. An
 unavailable backend scenario remains explicitly incomplete even if measured
 scenarios finish within thresholds.
+
+# Centralized privacy-restricted logging
+
+`utils/logger.py` uses Python's built-in `logging` and `RotatingFileHandler`.
+Visible console/tray entry points configure it once, record startup/shutdown,
+and close their handlers on exit. Imports and standalone tracker tests do not
+create log files. The default dedicated directory is
+`%LOCALAPPDATA%\WorkPulse\logs`; if LOCALAPPDATA is unavailable it falls back to
+`agent/logs`. Set `LOG_DIRECTORY` to override it. Files are `workpulse.log`,
+`workpulse.log.1`, etc. No administrator privileges are requested.
+
+| Environment setting | Default | Purpose |
+|---|---|---|
+| `LOG_DIRECTORY` | Dedicated directory above | Log file location |
+| `LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, or `ERROR` |
+| `LOG_MAX_BYTES` | `2097152` | Rotation size (2 MiB) |
+| `LOG_BACKUP_COUNT` | `3` | Retained rotated files, plus the active file |
+| `LOG_REPEAT_SECONDS` | `30` | Minimum period between repeated high-frequency error/sync events |
+
+Reuse the shared logger with a catalog event code, not a free-form message:
+
+```python
+from agent.utils.logger import get_logger
+
+get_logger().info('tracking_on')
+get_logger().warning('sync_offline')
+get_logger().error('sync_failed')
+```
+
+The fixed `EVENTS` catalog documents accepted codes and messages. DEBUG records
+configuration completion; INFO records lifecycle/state changes and acknowledged
+sync results; WARNING covers offline/authentication/startup problems; ERROR
+covers tracking/control/cleanup failures. Actual backend upload integration is
+still absent: the tray's existing synchronization status hook logs only supplied
+server acknowledgements/offline transitions. A future sender must call the
+corresponding event only after the real result; no sync success is fabricated.
+
+Never pass passwords, JWTs, typed text, key objects, window titles, application
+names, employee IDs, emails, paths, summary payloads, request/response bodies or
+exception objects to the logger. The event allowlist rejects unknown/free-form
+messages, formatting arguments, `exc_info`/`logger.exception()` and stack info.
+Only UTC timestamp, log level, and fixed catalog text reach the file. Extra fields
+are not formatted. No root logger or third-party library logging is captured.
+This intentionally favors privacy over detailed stack-trace diagnostics; adding
+events requires keeping their messages fixed and free of personal data.
+
+No logging occurs inside input callbacks or resource-sampling loops. Repeated
+sync/error events are throttled per fixed event code using bounded state; real
+lifecycle/state transitions are not throttled. File writes use the standard
+handler lock without adding another worker thread. Rotation bounds normal disk
+usage to the active file plus configured backups (individual records are not
+split if the size limit is smaller than a single line).
+
+Directory/permission/disk/rotation failures never dump exceptions, paths or log
+records to stderr. A single generic warning is shown when possible. A handler
+that fails at runtime stops further disk-write attempts until explicit logging
+shutdown/reconfiguration. Tracking and emergency controls remain available.
+Tests cover privacy rejection, levels, root isolation, bounded rotation,
+idempotent setup, repeated-event throttling and setup/runtime disk failures.
+
+# Windows compatibility plan and execution reports
+
+See `WINDOWS_COMPATIBILITY_TEST_PLAN.md` for the Windows 10/11 matrix, native and
+manual test procedures, acceptance criteria, blockers and evidence rules. Run:
+
+```powershell
+.\agent\venv\Scripts\python.exe -B -m agent.compatibility_test
+# Opt-in native paused tray smoke and controlled resource/listener benchmark:
+.\agent\venv\Scripts\python.exe -B -m agent.compatibility_test --native-tray-smoke --performance
+```
+
+The runner writes `agent/reports/windows-compatibility-report.md` and
+`windows-compatibility-results.json`, including actual host build/Python/dependency
+metadata and per-test **PASS**, **FAIL**, or **NOT TESTED**. Each run overwrites the
+latest reports; use `--output agent/reports/<your-run-label>` or archive outputs
+per build. Performance output location is controlled separately by
+`PERF_REPORT_DIRECTORY`. Native smoke displays a real icon paused and exits;
+startup writes remain mocked and no real startup entry is enabled.
+
+Only the OS actually executing the runner receives an automated result. A Windows
+11 run leaves Windows 10 NOT TESTED, and vice versa. Mocked version tests do not
+count as running the mocked OS. Clean-machine installs, physical input and app
+switching, full tray UX, sign-in/reboot startup, real OS recovery, packaged builds,
+and long soaks require separate plan execution. Backend employee auth/JWT and
+sync/retries remain NOT TESTED until their real implementations/contracts exist.
+Exit zero means executed automated checks did not fail; it does not certify full
+compatibility or turn NOT TESTED gaps into PASS.

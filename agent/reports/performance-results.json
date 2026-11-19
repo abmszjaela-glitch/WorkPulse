@@ -1,5 +1,5 @@
 {
-  "started_at_utc": "2026-11-19T10:21:41.166009+00:00",
+  "started_at_utc": "2026-11-19T10:37:58.578870+00:00",
   "python_version": "3.15.2",
   "psutil_version": "7.2.2",
   "method": "15s per phase, 1s resource sampling, target 20 synthetic active ticks/s (one movement, click and key count per tick). Native mouse/keyboard listeners plus foreground poller; OS callbacks discard data. Summary interval remains 60s.",
@@ -13,15 +13,15 @@
   },
   "scenarios": {
     "paused": {
-      "duration_seconds": 15.026,
+      "duration_seconds": 15.0122,
       "sample_count": 16,
-      "average_cpu_percent": 1.1439,
-      "peak_cpu_percent": 1.8516,
-      "start_memory_mb": 32.342,
-      "end_memory_mb": 32.6451,
-      "average_memory_mb": 32.6242,
-      "peak_memory_mb": 32.6697,
-      "rss_growth_mb": 0.3031,
+      "average_cpu_percent": 0.9367,
+      "peak_cpu_percent": 1.919,
+      "start_memory_mb": 32.4116,
+      "end_memory_mb": 32.8049,
+      "average_memory_mb": 32.7791,
+      "peak_memory_mb": 32.8294,
+      "rss_growth_mb": 0.3932,
       "start_os_threads": 4,
       "peak_os_threads": 5,
       "sampling_error": false,
@@ -30,15 +30,15 @@
       "mode": "No listeners; process baseline"
     },
     "idle": {
-      "duration_seconds": 15.0081,
+      "duration_seconds": 15.0538,
       "sample_count": 16,
-      "average_cpu_percent": 0.8329,
-      "peak_cpu_percent": 2.018,
-      "start_memory_mb": 32.2724,
-      "end_memory_mb": 32.8253,
-      "average_memory_mb": 32.3505,
-      "peak_memory_mb": 32.8253,
-      "rss_growth_mb": 0.553,
+      "average_cpu_percent": 1.1417,
+      "peak_cpu_percent": 2.0275,
+      "start_memory_mb": 32.4198,
+      "end_memory_mb": 32.4649,
+      "average_memory_mb": 32.4827,
+      "peak_memory_mb": 32.9646,
+      "rss_growth_mb": 0.0451,
       "start_os_threads": 7,
       "peak_os_threads": 10,
       "sampling_error": false,
@@ -54,15 +54,15 @@
       "listeners_healthy_at_end": true
     },
     "active": {
-      "duration_seconds": 15.0114,
+      "duration_seconds": 15.0131,
       "sample_count": 16,
-      "average_cpu_percent": 0.7286,
-      "peak_cpu_percent": 3.87,
-      "start_memory_mb": 32.3953,
-      "end_memory_mb": 32.4321,
-      "average_memory_mb": 32.4692,
-      "peak_memory_mb": 32.9236,
-      "rss_growth_mb": 0.0369,
+      "average_cpu_percent": 0.8326,
+      "peak_cpu_percent": 3.0716,
+      "start_memory_mb": 33.0793,
+      "end_memory_mb": 33.0916,
+      "average_memory_mb": 33.0762,
+      "peak_memory_mb": 33.1162,
+      "rss_growth_mb": 0.0123,
       "start_os_threads": 9,
       "peak_os_threads": 10,
       "sampling_error": false,
@@ -71,12 +71,12 @@
       "mode": "Native listener threads; real input discarded; synthetic foreground",
       "observed_activity_status": "ACTIVE",
       "synthetic_counts": {
-        "movement_count": 246,
-        "click_count": 246,
-        "key_press_count": 246
+        "movement_count": 254,
+        "click_count": 254,
+        "key_press_count": 254
       },
-      "listeners_healthy_at_end": true,
-      "achieved_synthetic_ticks_per_second": 16.3875
+      "achieved_synthetic_ticks_per_second": 16.9186,
+      "listeners_healthy_at_end": true
     },
     "backend_synchronization": {
       "status": "not_measured",
@@ -89,8 +89,8 @@
   "lifecycle": {
     "status": "measured",
     "cycles": 10,
-    "rss_growth_mb": 0.4055,
-    "retained_python_growth_mb": 0.0029,
+    "rss_growth_mb": 0.2949,
+    "retained_python_growth_mb": 0.0024,
     "retained_python_bytes_after_each_cycle": [
       624,
       736,
@@ -99,9 +99,9 @@
       1648,
       1792,
       1904,
-      2528,
-      2704,
-      2880
+      2016,
+      2192,
+      2368
     ],
     "remaining_additional_python_threads": [],
     "retained_tracker_fixtures": 0,

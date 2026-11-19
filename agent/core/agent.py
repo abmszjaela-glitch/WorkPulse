@@ -23,6 +23,7 @@ if __package__ == "core":
     from tracker.keyboard_tracker import KeyboardTracker
     from tracker.mouse_tracker import MouseTracker
     from core.working_hours import WorkingHoursPolicy
+    from utils.logger import get_logger, configure_logging, shutdown_logging
 else:
     from ..config import config
     from ..tracker.activity_state import ActivityState
@@ -33,6 +34,7 @@ else:
     from ..tracker.keyboard_tracker import KeyboardTracker
     from ..tracker.mouse_tracker import MouseTracker
     from .working_hours import WorkingHoursPolicy
+    from ..utils.logger import get_logger, configure_logging, shutdown_logging
 
 
 @dataclass(frozen=True)
@@ -169,6 +171,12 @@ class ActivityAgent:
         self, *, started: bool, failed: bool, cleanup_failures: list[str]
     ) -> bool:
         """Report the outcome without failing cleanup on a closed output stream."""
+        if failed:
+            get_logger().error("tracking_error")
+        if cleanup_failures:
+            get_logger().error("tracking_cleanup_error")
+        elif started:
+            get_logger().info("tracking_stopped")
         try:
             if failed:
                 self._output("Tracking failed; shutdown was requested for all listeners.")
@@ -201,9 +209,11 @@ class ActivityAgent:
         try:
             if not self._recording_allowed() and not self._stop_event.is_set():
                 self.pause_reason = "working_hours"
+                get_logger().info("tracking_policy_paused")
                 self._output("Tracking PAUSED: outside working hours. " + self.policy.describe())
                 self.stop()
             if not self._stop_event.is_set():
+                get_logger().info("tracking_starting")
                 self._output("Working-hours policy: " + self.policy.describe())
                 self._output(
                     "WorkPulse foreground activity tracking is starting. "
@@ -231,6 +241,7 @@ class ActivityAgent:
                     self.activity_calculator.start()
                     started = True
                     self._tracking_event.set()
+                    get_logger().info("tracking_on")
                     policy_worker = Thread(target=self._watch_policy, args=(policy_done,),
                                            name="WorkPulse working-hours control")
                     policy_worker.start()
@@ -275,6 +286,7 @@ class ActivityAgent:
             except (Exception, KeyboardInterrupt):
                 failed = True
         if self.pause_reason == "working_hours":
+            get_logger().info("tracking_policy_paused")
             self._output("Tracking PAUSED by working-hours policy. No listeners remain after successful cleanup.")
         reported = self._report_shutdown(
             started=started, failed=failed, cleanup_failures=cleanup_failures
@@ -284,19 +296,26 @@ class ActivityAgent:
 
 def main() -> int:
     """CLI entry point: request orderly cleanup on console interrupt or SIGTERM."""
-    agent = ActivityAgent()
+    configure_logging()
+    get_logger().info("application_started")
     previous_handlers = {}
 
     def request_stop(_signum, _frame) -> None:
         agent.stop()
 
     try:
+        agent = ActivityAgent()
         for signum in (signal.SIGINT, signal.SIGTERM):
             previous_handlers[signum] = signal.signal(signum, request_stop)
         return agent.run()
+    except Exception:
+        get_logger().error("application_error")
+        return 1
     finally:
         for signum, handler in previous_handlers.items():
             signal.signal(signum, handler)
+        get_logger().info("application_stopped")
+        shutdown_logging()
 
 
 if __name__ == "__main__":

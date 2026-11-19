@@ -16,6 +16,7 @@ from ..config import config
 from ..auth.token_store import WindowsTokenStore
 from ..core.working_hours import WorkingHoursPolicy
 from ..core.windows_startup import WindowsStartup, StartupError
+from ..utils.logger import get_logger, configure_logging, shutdown_logging
 
 
 class TrayState:
@@ -38,9 +39,14 @@ class TrayState:
             if acknowledged_at > datetime.now(timezone.utc):
                 raise ValueError("Synchronization time cannot be in the future.")
         with self._lock:
+            was_offline = self.sync.startswith("Offline")
             self.sync = "Offline: synchronization pending" if offline else "Online"
             if acknowledged_at is not None:
                 self.last_sync = acknowledged_at.astimezone().strftime("%Y-%m-%d %H:%M:%S %Z")
+        if offline and not was_offline:
+            get_logger().warning("sync_offline")
+        if acknowledged_at is not None:
+            get_logger().info("sync_succeeded")
 
     def snapshot(self):
         with self._lock:
@@ -124,6 +130,15 @@ class WorkPulseTray:
             self.icon.title = title
             self.icon.icon = tray_image(active)
             self.icon.notify(self.state.snapshot()[0], "WorkPulse tracking status")
+            status = self.state.snapshot()[0]
+            if status == "Tracking ON":
+                get_logger().info("tracking_on")
+            elif "outside working hours" in status:
+                get_logger().info("tracking_policy_paused")
+            elif "explicit restart" in status:
+                get_logger().info("tracking_manual_stopped")
+            elif status == "Tracking PAUSED":
+                get_logger().info("tracking_paused")
         self.icon.update_menu()
 
     def _pause(self):
@@ -147,12 +162,15 @@ class WorkPulseTray:
             try:
                 if command == "startup_enable":
                     self._startup.enable()
+                    get_logger().info("startup_enabled")
                     self.icon.notify("WorkPulse will open visibly and PAUSED at sign-in. Explicit Start and working-hours checks still apply. Windows startup settings can disable this entry.", "Windows auto-start registered")
                 elif command == "startup_remove":
                     self._startup.remove()
+                    get_logger().info("startup_removed")
                     self.icon.notify("WorkPulse startup entry removed. Current tracking status is unchanged.", "Windows auto-start disabled")
                 self._startup_status = self._startup.status()
             except StartupError as error:
+                get_logger().warning("startup_error")
                 self._startup_status = "Unable to verify; check Windows startup settings"
                 self.icon.notify(str(error), "WorkPulse startup settings")
             self.icon.update_menu()
@@ -183,6 +201,7 @@ class WorkPulseTray:
                 self.state.set_tracking("Tracking STOPPED: explicit restart required")
             if command == "logout":
                 self._tokens.clear()
+                get_logger().info("local_logout")
                 self.icon.notify("Tracking paused; local token removed. Server logout is unavailable until backend integration.", "WorkPulse")
             elif command == "exit":
                 self._closing.set()
@@ -220,6 +239,7 @@ class WorkPulseTray:
                 self._schedule()
                 self._refresh()
             except Exception:
+                get_logger().error("ui_error")
                 self._manual_stop.set()
                 self._requested = False
                 if self._agent is not None:
@@ -231,6 +251,8 @@ class WorkPulseTray:
                 self.icon.notify("Action failed. Tracking shutdown may require attention.", "WorkPulse")
 
     def run(self):
+        configure_logging()
+        get_logger().info("application_started")
         def setup(icon):
             icon.visible = True
             self._worker = Thread(target=self._work, name="WorkPulse tray controls")
@@ -239,10 +261,15 @@ class WorkPulseTray:
             icon.notify("Tracking PAUSED. Explicit Start enables work-hours tracking and scheduled resumption. Manual pause/stop disables resumption. " + self.policy.describe(), "WorkPulse")
         try:
             self.icon.run(setup=setup)
+        except Exception:
+            get_logger().error("application_error")
+            raise
         finally:
             self._commands.put("exit")
             if self._worker is not None:
                 self._worker.join()
+            get_logger().info("application_stopped")
+            shutdown_logging()
 
 
 if __name__ == "__main__":

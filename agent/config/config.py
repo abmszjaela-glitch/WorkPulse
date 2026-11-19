@@ -159,3 +159,14 @@ PERF_MAX_PYTHON_GROWTH_MB = _positive_integer("PERF_MAX_PYTHON_GROWTH_MB", 2)
 PERF_MAX_ADDITIONAL_THREADS = _positive_integer("PERF_MAX_ADDITIONAL_THREADS", 8)
 PERF_REPORT_DIRECTORY = Path(os.environ.get(
     "PERF_REPORT_DIRECTORY", str(Path(__file__).resolve().parents[1] / "reports")))
+
+# Operational logs contain fixed event messages only, never activity payloads.
+_log_base = (Path(os.environ["LOCALAPPDATA"]) / "WorkPulse" if os.environ.get("LOCALAPPDATA")
+             else Path(__file__).resolve().parents[1])
+LOG_DIRECTORY = Path(os.environ.get("LOG_DIRECTORY", str(_log_base / "logs")))
+LOG_MAX_BYTES = _positive_integer("LOG_MAX_BYTES", 2 * 1024 * 1024)
+LOG_BACKUP_COUNT = _positive_integer("LOG_BACKUP_COUNT", 3)
+LOG_REPEAT_SECONDS = _positive_seconds("LOG_REPEAT_SECONDS", 30)
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper().strip()
+if LOG_LEVEL not in {"DEBUG", "INFO", "WARNING", "ERROR"}:
+    raise ValueError("LOG_LEVEL must be DEBUG, INFO, WARNING or ERROR.")

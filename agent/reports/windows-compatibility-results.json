@@ -1,0 +1,1098 @@
+{
+  "executed_at_utc": "2026-11-19T10:37:50.416907+00:00",
+  "environment": {
+    "python": "3.15.2",
+    "architecture": "AMD64",
+    "os": "Windows 11",
+    "windows_build": 26200,
+    "windows_product_type": 1,
+    "windows_version": "10.0.26200"
+  },
+  "checks": [
+    {
+      "check": "Installed required packages",
+      "status": "PASS",
+      "detail": "Metadata for the required agent packages; does not replace clean installation testing"
+    },
+    {
+      "check": "Python dependency consistency",
+      "status": "PASS",
+      "detail": "Executed python -m pip check in the current environment"
+    },
+    {
+      "check": "Automated suite",
+      "status": "PASS",
+      "detail": "168 unittest cases executed; detailed scope and outcomes below"
+    },
+    {
+      "check": "Native tray create / paused launch / exit",
+      "status": "PASS",
+      "detail": "Real Windows event loop only when explicitly requested; no tracking listeners started"
+    },
+    {
+      "check": "Controlled CPU/RSS/listener lifecycle benchmark",
+      "status": "PASS",
+      "detail": "Only a fresh benchmark from this invocation counts; real backend synchronization remains unmeasured"
+    },
+    {
+      "check": "Clean Python installation",
+      "status": "NOT TESTED",
+      "detail": "Existing venv tested; clean VM setup not executed"
+    },
+    {
+      "check": "Physical mouse/keyboard counters",
+      "status": "NOT TESTED",
+      "detail": "Unit tests use fabricated callback events; actual hardware/lock-screen cases not executed"
+    },
+    {
+      "check": "Real foreground application switches",
+      "status": "NOT TESTED",
+      "detail": "Unit tests mock window/process calls; native benchmark substitutes a fixed app name"
+    },
+    {
+      "check": "Real application usage and idle transitions",
+      "status": "NOT TESTED",
+      "detail": "Controlled unit tests pass/fail separately; physical cross-app timing requires manual execution"
+    },
+    {
+      "check": "Backend employee login and verified JWT",
+      "status": "NOT TESTED",
+      "detail": "Backend auth endpoints/verification contract are absent; UI/cache tests are support only"
+    },
+    {
+      "check": "Backend synchronization/retries/idempotency",
+      "status": "NOT TESTED",
+      "detail": "Sender/upload contract unavailable; no successful upload claimed"
+    },
+    {
+      "check": "Complete tray UX and emergency control",
+      "status": "NOT TESTED",
+      "detail": "Native smoke is limited; manual menu, Explorer restart and visibility checks not executed"
+    },
+    {
+      "check": "Actual startup Run registration and reboot",
+      "status": "NOT TESTED",
+      "detail": "Registry writes mocked; no real startup entry enabled"
+    },
+    {
+      "check": "Packaged executable installation",
+      "status": "NOT TESTED",
+      "detail": "No packaged installer/executable supplied"
+    },
+    {
+      "check": "Sleep/resume/Explorer/network fault recovery",
+      "status": "NOT TESTED",
+      "detail": "Unit error paths tested separately; real OS transitions not executed"
+    },
+    {
+      "check": "Long-duration memory/thread soak",
+      "status": "NOT TESTED",
+      "detail": "Short controlled cycles cannot prove leak absence"
+    }
+  ],
+  "unit_modules": {
+    "test_active_window_tracker": [
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_configurable_interval_and_invalid_values",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_disappearing_window_is_safe",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_focus_change_during_lookup_discards_stale_result",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_foreground_handle_resolves_pid_and_only_process_name",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_inaccessible_or_terminated_process_clears_previous_app",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_late_lookup_after_stop_is_discarded_and_timeout_can_be_retried",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_no_foreground_window_or_pid_is_unavailable",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_observer_failure_does_not_block_other_consumers_or_shutdown",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_polling_interval_is_environment_configurable",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_same_app_preserves_timestamp_and_changed_app_resets_it",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_snapshot_is_immutable_and_empty_when_stopped",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_start_stop_restart_and_interruptible_interval",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_active_window_tracker.ActiveWindowTrackerTests.test_unexpected_worker_error_is_not_logged_or_retained",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_activity_calculator": [
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_application_interval_deltas_preserve_cumulative_usage",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_completely_idle_interval",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_concurrent_calls_commit_only_one_due_interval",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_custom_weights_and_saturation",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_empty_interval_is_zero_score_but_respects_idle_grace_period",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_external_counter_reset_is_reported_without_committing",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_failed_summary_does_not_reset_interval",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_idle_resume_between_summary_calls_is_excluded",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_interval_crossing_idle_threshold",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_invalid_policies_and_intervals",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_normal_interval_counts_durations_score_and_json",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_not_due_does_not_consume_counts",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_score_settings_are_environment_configurable",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_stop_flushes_partial_interval_and_is_idempotent",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_success_resets_interval_view_without_erasing_raw_totals",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_activity_calculator.ActivityCalculatorTests.test_zero_duration_forced_summary_does_not_divide_by_zero",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_agent": [
+      {
+        "test": "test_agent.ActivityAgentTests.test_agent_emits_due_json_interval_summary_without_resetting_totals",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_all_modules_share_one_activity_state",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_cli_installs_stop_signals_and_restores_handlers",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_closed_console_does_not_raise_during_shutdown",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_ctrl_c_stops_both_listeners",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_failure_stopping_one_tracker_still_stops_the_other",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_foreground_failure_still_stops_input_trackers",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_foreground_tracker_is_started_reported_and_stopped",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_idle_status_is_reported",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_listener_failure_during_run_requests_cleanup",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_output_failure_does_not_leave_listeners_running",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_partial_startup_failure_cleans_up_without_printing_error_details",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_periodic_counts_status_and_visible_shutdown",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_policy_closure_interrupts_reporting_wait_and_stops_every_listener",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_second_concurrent_run_is_rejected",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_stop_before_run_prevents_listener_start",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_stop_interrupts_a_real_wait_without_waiting_for_the_interval",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_agent.ActivityAgentTests.test_summary_contains_only_status_numeric_counts_and_app_name",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_app_usage_tracker": [
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_active_clock_accounts_multiple_idle_resume_cycles_without_history",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_changed_threshold_requires_a_new_session",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_concurrent_resets_drain_time_only_once",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_foreground_stop_finalizes_and_clears_attribution",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_idle_gap_is_excluded_even_if_resumed_between_summaries",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_no_wall_clock_and_no_additional_worker",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_partial_interval_crossing_idle_cutoff_is_clamped_exactly",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_reset_returns_interval_and_preserves_cumulative_totals",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_running_usage_and_repeated_reads_never_double_count",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_stop_finalizes_and_restart_does_not_count_stopped_gap",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_subscription_failure_does_not_leave_usage_enabled",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_summary_is_an_isolated_name_to_duration_mapping",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_switch_finalizes_previous_app_and_return_accumulates",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_switch_while_idle_does_not_attribute_idle_time_to_either_app",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_app_usage_tracker.AppUsageTrackerTests.test_unavailable_application_gap_is_not_attributed",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_compatibility_report": [
+      {
+        "test": "test_compatibility_report.CompatibilityReportTests.test_fail_and_missing_coverage_are_not_passes",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_compatibility_report.CompatibilityReportTests.test_skip_is_not_tested_and_error_is_fail_without_exception_payload",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_compatibility_report.CompatibilityReportTests.test_windows_10_and_11_are_distinguished_by_actual_workstation_build",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_idle_detector": [
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_concurrent_touches_and_checks_are_safe",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_duration_and_wall_clock_independence",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_fresh_activity_is_active_with_zero_inactivity",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_mouse_movement_click_and_key_press_reset_the_shared_timer",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_reads_centralized_threshold",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_status_queries_do_not_modify_activity",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_threshold_boundary",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_idle_detector.IdleDetectorTests.test_threshold_can_be_loaded_from_the_environment",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_keyboard_tracker": [
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_callback_failure_stops_without_logging_sensitive_exception",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_concurrent_counts_and_atomic_snapshot_reset",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_counts_only_and_refreshes_shared_timestamp",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_invalid_stop_timeout_is_rejected",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_key_is_not_retained_or_written_to_console_or_logs",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_keyboard_and_mouse_share_the_same_activity_state",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_late_events_after_stop_do_not_change_count_or_activity",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_safe_stop_repeat_start_and_restart_preserve_counts",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_shutdown_timeout_can_be_retried",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_keyboard_tracker.KeyboardTrackerTests.test_stop_does_not_join_the_listener_from_its_own_thread",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_logger": [
+      {
+        "test": "test_logger.LoggerTests.test_credentials_content_exceptions_and_untrusted_objects_never_render",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_logger.LoggerTests.test_directory_failure_is_safe_and_does_not_reveal_exception_or_path",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_logger.LoggerTests.test_disk_failure_opens_circuit_without_tracebacks_or_repeated_io",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_logger.LoggerTests.test_repeated_errors_are_throttled_without_throttling_state_transitions",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_logger.LoggerTests.test_reusable_idempotent_configuration_and_standard_levels",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_logger.LoggerTests.test_root_handlers_do_not_receive_workpulse_events",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_logger.LoggerTests.test_rotation_keeps_bounded_number_of_backups",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_login_ui": [
+      {
+        "test": "test_login_ui.LoginFormTests.test_backend_exception_is_not_printed_or_shown",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_login_ui.LoginFormTests.test_empty_fields_do_not_reach_backend_handler",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_login_ui.LoginFormTests.test_missing_backend_disables_credentials_and_submission",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_login_ui.LoginFormTests.test_network_invalid_credentials_and_expiry_feedback",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_login_ui.LoginFormTests.test_password_is_masked_cleared_and_duplicate_submit_is_blocked",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_mouse_tracker": [
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_callbacks_after_stop_are_ignored",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_concurrent_counts_and_atomic_reset",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_counts_and_shared_timestamp_without_input_details",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_invalid_stop_timeouts",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_listener_start_failure_leaves_tracker_disabled",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_multiple_trackers_share_timestamp_but_not_counts",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_safe_stop_before_start_and_idempotent_lifecycle",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_shutdown_timeout_can_be_retried_without_recording",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_mouse_tracker.MouseTrackerTests.test_stop_from_listener_thread_does_not_join_itself",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_offline_queue": [
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_acknowledge_then_delete_preserves_receipt_and_prevents_reenqueue",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_concurrent_inserts_return_one_stable_id",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_corrupt_payload_is_preserved_not_acknowledged_or_deleted",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_credentials_content_and_individual_keys_are_rejected",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_database_corruption_is_not_silently_replaced",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_encryption_error_rolls_back_and_has_no_plaintext_fallback",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_exact_retry_deduplicates_and_conflicts_do_not_overwrite",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_explicit_retention_expiration_removes_pending_records",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_insert_retrieve_uuid_and_encrypted_at_rest",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_invalid_durations_urls_and_naive_timestamps_are_rejected",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_invalid_limits_ids_and_closed_queue",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_locked_database_error_does_not_discard_pending_records",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_old_intervals_are_not_inserted",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_only_acknowledged_payloads_can_be_deleted",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_parameterized_sql_preserves_literal_application_names",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_pending_records_survive_reopen_and_offline_retries",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_private_acl_is_protected_and_existing_shared_directory_is_unchanged",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_queue_byte_and_per_record_limits",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_queue_count_limit_retains_pending_records",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_queue_limits_and_path_can_be_configured_without_side_effects",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_receipts_are_bounded_but_default_ids_remain_stable",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_record_id_cannot_be_reused_for_another_interval",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_security_failure_does_not_open_sqlite",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_timezone_normalization_deduplicates_equivalent_intervals",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_offline_queue.OfflineQueueTests.test_two_connections_deduplicate_under_transaction_lock",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_performance": [
+      {
+        "test": "test_performance.PerformanceTests.test_average_peak_units_thresholds_and_only_current_process",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_performance.PerformanceTests.test_constant_memory_sampling_and_interruptible_shutdown",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_performance.PerformanceTests.test_empty_duration_does_not_divide_by_zero",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_performance.PerformanceTests.test_invalid_polling_intervals_are_rejected",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_performance.PerformanceTests.test_sampling_failure_is_reported_without_raw_error",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_token_store": [
+      {
+        "test": "test_token_store.WindowsCredentialManagerIntegrationTests.test_synthetic_credential_round_trip_and_deletion",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_token_store.WindowsTokenStoreTests.test_corrupt_cache_is_removed_without_logging_its_contents",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_token_store.WindowsTokenStoreTests.test_credential_targets_are_scoped_to_backend_and_no_email_is_stored",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_token_store.WindowsTokenStoreTests.test_expiration_clears_storage_at_exact_boundary",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_token_store.WindowsTokenStoreTests.test_expired_invalid_and_oversize_values_are_not_stored",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_token_store.WindowsTokenStoreTests.test_native_errors_are_sanitized_without_plaintext_fallback",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_token_store.WindowsTokenStoreTests.test_save_load_and_idempotent_clear",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_token_store.WindowsTokenStoreTests.test_token_is_excluded_from_default_object_representation",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_tray": [
+      {
+        "test": "test_tray.TrayTests.test_closed_hours_reject_start_without_arming_restart",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_dashboard_uses_explicit_configured_url",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_emergency_vetoes_queued_start",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_failed_listener_shutdown_does_not_claim_paused",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_logout_stops_before_clearing_token",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_scheduled_pause_can_resume_but_manual_stop_cannot",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_starts_paused_and_only_reports_confirmed_activity",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_startup_error_does_not_stop_or_enable_tracking",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_startup_is_opt_in_and_does_not_authorize_tracking",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_tray.TrayTests.test_sync_requires_real_acknowledgement_to_show_success_time",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_windows_startup": [
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_construction_and_status_never_register_anything",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_existing_different_entry_is_not_overwritten",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_explicit_enable_uses_hkcu_visible_name_and_reg_sz_then_remove",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_missing_or_excessive_path_never_registers",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_packaged_command_quotes_actual_executable_path",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_registry_permissions_fail_safely_without_elevation",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_source_command_is_absolute_and_independent_of_working_directory",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_startup_launcher_only_opens_visible_tray",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_windows_startup.WindowsStartupTests.test_write_error_is_sanitized_and_no_success_entry_appears",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ],
+    "test_working_hours": [
+      {
+        "test": "test_working_hours.WorkingHoursTests.test_boundaries_and_weekends",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_working_hours.WorkingHoursTests.test_closed_policy_skips_foreground_process_query",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_working_hours.WorkingHoursTests.test_console_agent_outside_hours_never_starts_listeners",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_working_hours.WorkingHoursTests.test_denied_input_does_not_count_or_touch_activity_timestamp",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_working_hours.WorkingHoursTests.test_dst_spring_gap_and_repeated_autumn_hour",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_working_hours.WorkingHoursTests.test_instant_conversion_and_explicit_policy_timezone_change",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      },
+      {
+        "test": "test_working_hours.WorkingHoursTests.test_overnight_shift_belongs_to_start_day",
+        "status": "PASS",
+        "detail": "Automated assertion passed"
+      }
+    ]
+  },
+  "unit_tests_run": 168,
+  "dependency_versions": {
+    "psutil": "7.2.2",
+    "pynput": "1.8.2",
+    "pywin32": "312",
+    "requests": "2.34.2",
+    "pystray": "0.19.5",
+    "Pillow": "12.3.0",
+    "tzdata": "2026.6"
+  },
+  "performance": {
+    "started_at_utc": "2026-11-19T10:37:58.578870+00:00",
+    "python_version": "3.15.2",
+    "psutil_version": "7.2.2",
+    "method": "15s per phase, 1s resource sampling, target 20 synthetic active ticks/s (one movement, click and key count per tick). Native mouse/keyboard listeners plus foreground poller; OS callbacks discard data. Summary interval remains 60s.",
+    "thresholds": {
+      "average_cpu_percent": 5,
+      "peak_cpu_percent": 25,
+      "peak_memory_mb": 200,
+      "rss_growth_mb": 10,
+      "retained_python_growth_mb": 2,
+      "additional_os_threads": 8
+    },
+    "scenarios": {
+      "paused": {
+        "duration_seconds": 15.0122,
+        "sample_count": 16,
+        "average_cpu_percent": 0.9367,
+        "peak_cpu_percent": 1.919,
+        "start_memory_mb": 32.4116,
+        "end_memory_mb": 32.8049,
+        "average_memory_mb": 32.7791,
+        "peak_memory_mb": 32.8294,
+        "rss_growth_mb": 0.3932,
+        "start_os_threads": 4,
+        "peak_os_threads": 5,
+        "sampling_error": false,
+        "threshold_exceedances": [],
+        "status": "measured",
+        "mode": "No listeners; process baseline"
+      },
+      "idle": {
+        "duration_seconds": 15.0538,
+        "sample_count": 16,
+        "average_cpu_percent": 1.1417,
+        "peak_cpu_percent": 2.0275,
+        "start_memory_mb": 32.4198,
+        "end_memory_mb": 32.4649,
+        "average_memory_mb": 32.4827,
+        "peak_memory_mb": 32.9646,
+        "rss_growth_mb": 0.0451,
+        "start_os_threads": 7,
+        "peak_os_threads": 10,
+        "sampling_error": false,
+        "threshold_exceedances": [],
+        "status": "measured",
+        "mode": "Native listener threads; real input discarded; synthetic foreground",
+        "observed_activity_status": "IDLE",
+        "synthetic_counts": {
+          "movement_count": 0,
+          "click_count": 0,
+          "key_press_count": 0
+        },
+        "listeners_healthy_at_end": true
+      },
+      "active": {
+        "duration_seconds": 15.0131,
+        "sample_count": 16,
+        "average_cpu_percent": 0.8326,
+        "peak_cpu_percent": 3.0716,
+        "start_memory_mb": 33.0793,
+        "end_memory_mb": 33.0916,
+        "average_memory_mb": 33.0762,
+        "peak_memory_mb": 33.1162,
+        "rss_growth_mb": 0.0123,
+        "start_os_threads": 9,
+        "peak_os_threads": 10,
+        "sampling_error": false,
+        "threshold_exceedances": [],
+        "status": "measured",
+        "mode": "Native listener threads; real input discarded; synthetic foreground",
+        "observed_activity_status": "ACTIVE",
+        "synthetic_counts": {
+          "movement_count": 254,
+          "click_count": 254,
+          "key_press_count": 254
+        },
+        "achieved_synthetic_ticks_per_second": 16.9186,
+        "listeners_healthy_at_end": true
+      },
+      "backend_synchronization": {
+        "status": "not_measured",
+        "reason": "No implemented sender, backend upload contract or authenticated session. No simulated HTTP results substituted."
+      }
+    },
+    "findings": [
+      "No configured threshold exceeded in this short controlled run; this does not establish absence of leaks or production overhead."
+    ],
+    "lifecycle": {
+      "status": "measured",
+      "cycles": 10,
+      "rss_growth_mb": 0.2949,
+      "retained_python_growth_mb": 0.0024,
+      "retained_python_bytes_after_each_cycle": [
+        624,
+        736,
+        1392,
+        1504,
+        1648,
+        1792,
+        1904,
+        2016,
+        2192,
+        2368
+      ],
+      "remaining_additional_python_threads": [],
+      "retained_tracker_fixtures": 0,
+      "suspected_leaks_or_unnecessary_threads": [],
+      "limitation": "Short-run growth is a leak signal, not proof. Allocators cache memory; long soak tests are required."
+    }
+  },
+  "platforms": {
+    "Windows 10": {
+      "automated_run": "NOT TESTED",
+      "full_acceptance": "NOT TESTED"
+    },
+    "Windows 11": {
+      "automated_run": "PASS",
+      "full_acceptance": "NOT TESTED"
+    }
+  }
+}
