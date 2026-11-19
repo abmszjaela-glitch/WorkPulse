@@ -361,3 +361,73 @@ environment configuration for the intended schedule, timezone and dashboard URL.
 Startup tests mock all registry calls and never create a real Run entry. Installing,
 running tests, importing the module, and ordinary application launches do not opt
 the employee into startup. This implementation has not enabled auto-start for you.
+
+# Opt-in performance monitoring and measured report
+
+Run the visible benchmark from the repository root:
+
+```powershell
+.\agent\venv\Scripts\python.exe -B -m agent.performance_test
+```
+
+It writes `agent/reports/performance-report.md` and machine-readable
+`performance-results.json`. These are actual measurements of this Python process,
+not estimates. Only `psutil.Process(current_pid)` CPU times, resident memory and
+thread counts are read. The test never enumerates employee processes, reads
+foreground windows, uploads data, changes startup registration or starts the
+normal production agent. Stop with Ctrl+C; cleanup attempts every listener.
+
+The three controlled phases are paused (no listeners), idle tracking, and active
+tracking. Real native `pynput` listener threads are used, but their OS callbacks
+discard all real input arguments. Active workload invokes the anonymous counter
+callbacks with fabricated events at a configurable rate. Foreground detection
+returns a fixed synthetic name without querying another process. Idle detection
+uses a disclosed one-second test threshold rather than changing the production
+idle threshold. This exercises actual listener lifecycle and tracker code but
+does not represent the full UI, authorization/policy controller, production input
+dispatch workload or real foreground-app discovery overhead.
+
+Backend synchronization is explicitly **not measured** while the checkout has no
+implemented sender, upload API contract or authenticated session. No fake HTTP
+benchmark is reported as backend synchronization. Once those exist, wrap the real
+authorized operation with `core.performance.ProcessPerformanceMonitor` (context
+manager), then call `result()` after the block for the same resource metrics.
+Sampling itself runs off the listener thread and is opt-in; it never runs merely
+because a tracking module was imported.
+
+CPU average uses total process user+system CPU-time deltas divided by monotonic
+elapsed seconds. CPU 100% means one logical CPU fully occupied; multi-core CPU can
+exceed 100%. Peak CPU is the largest sampled interval, so shorter spikes may be
+missed. RSS memory uses decimal MB (1,000,000 bytes); average RSS is time-weighted
+between samples, and start/end/peak and growth are also recorded. Measurements
+include the sampler/test overhead. Scalar online accumulators keep sampling memory
+bounded; the sampler sleeps using an interruptible event, with no busy-wait loop.
+
+Environment configuration (centralized in `config/config.py`):
+
+| Setting | Default | Meaning |
+|---|---:|---|
+| `PERF_SAMPLE_SECONDS` | 1 | Process resource sample period |
+| `PERF_PHASE_SECONDS` | 15 | Seconds per controlled phase |
+| `PERF_LIFECYCLE_CYCLES` | 10 | Native listener start/stop repetitions |
+| `PERF_EVENT_HZ` | 20 | Synthetic ticks/sec; each adds one movement, click and key count |
+| `PERF_MAX_AVG_CPU_PERCENT` | 5 | CPU average warning threshold |
+| `PERF_MAX_PEAK_CPU_PERCENT` | 25 | Sampled CPU peak warning threshold |
+| `PERF_MAX_MEMORY_MB` | 200 | RSS peak warning threshold |
+| `PERF_MAX_RSS_GROWTH_MB` | 10 | RSS growth warning threshold |
+| `PERF_MAX_PYTHON_GROWTH_MB` | 2 | Retained Python allocation growth warning threshold |
+| `PERF_MAX_ADDITIONAL_THREADS` | 8 | Maximum OS thread increase relative to phase start |
+| `PERF_REPORT_DIRECTORY` | `agent/reports` | Output directory |
+
+All numeric settings are positive integers. Thresholds are configurable review
+budgets, not claims that those costs are acceptable for every deployment.
+The lifecycle phase warms native backends first, then uses GC, weak references,
+current-process RSS, `tracemalloc`, and this process's Python thread inventory.
+Unexpected remaining threads, retained tracker fixtures, or excessive retained
+growth are flagged. Tracemalloc is enabled only for lifecycle checks, not the CPU
+phases. Native allocator caching can grow RSS without a leak, and a short run with
+no growth cannot establish leak absence. Use longer phases and more lifecycle
+cycles for soak testing. The command returns nonzero on measured threshold
+violations, sampling/listener failures, suspected leaks or interruption. An
+unavailable backend scenario remains explicitly incomplete even if measured
+scenarios finish within thresholds.

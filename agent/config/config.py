@@ -145,3 +145,17 @@ try:
 except ValueError:
     raise ValueError("WORKING_DAYS must list weekday numbers 0 (Monday) to 6 (Sunday).") from None
 WORKING_POLICY_CHECK_SECONDS = 0.25
+
+# Opt-in performance diagnostics; normal tracking never starts the sampler.
+PERF_SAMPLE_SECONDS = _positive_seconds("PERF_SAMPLE_SECONDS", 1)
+PERF_PHASE_SECONDS = _positive_seconds("PERF_PHASE_SECONDS", 15)
+PERF_LIFECYCLE_CYCLES = _positive_integer("PERF_LIFECYCLE_CYCLES", 10)
+PERF_EVENT_HZ = _positive_integer("PERF_EVENT_HZ", 20)
+PERF_MAX_AVG_CPU_PERCENT = _positive_integer("PERF_MAX_AVG_CPU_PERCENT", 5)
+PERF_MAX_PEAK_CPU_PERCENT = _positive_integer("PERF_MAX_PEAK_CPU_PERCENT", 25)
+PERF_MAX_MEMORY_MB = _positive_integer("PERF_MAX_MEMORY_MB", 200)
+PERF_MAX_RSS_GROWTH_MB = _positive_integer("PERF_MAX_RSS_GROWTH_MB", 10)
+PERF_MAX_PYTHON_GROWTH_MB = _positive_integer("PERF_MAX_PYTHON_GROWTH_MB", 2)
+PERF_MAX_ADDITIONAL_THREADS = _positive_integer("PERF_MAX_ADDITIONAL_THREADS", 8)
+PERF_REPORT_DIRECTORY = Path(os.environ.get(
+    "PERF_REPORT_DIRECTORY", str(Path(__file__).resolve().parents[1] / "reports")))

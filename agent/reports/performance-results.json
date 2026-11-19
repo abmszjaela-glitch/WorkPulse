@@ -1,0 +1,111 @@
+{
+  "started_at_utc": "2026-11-19T10:21:41.166009+00:00",
+  "python_version": "3.15.2",
+  "psutil_version": "7.2.2",
+  "method": "15s per phase, 1s resource sampling, target 20 synthetic active ticks/s (one movement, click and key count per tick). Native mouse/keyboard listeners plus foreground poller; OS callbacks discard data. Summary interval remains 60s.",
+  "thresholds": {
+    "average_cpu_percent": 5,
+    "peak_cpu_percent": 25,
+    "peak_memory_mb": 200,
+    "rss_growth_mb": 10,
+    "retained_python_growth_mb": 2,
+    "additional_os_threads": 8
+  },
+  "scenarios": {
+    "paused": {
+      "duration_seconds": 15.026,
+      "sample_count": 16,
+      "average_cpu_percent": 1.1439,
+      "peak_cpu_percent": 1.8516,
+      "start_memory_mb": 32.342,
+      "end_memory_mb": 32.6451,
+      "average_memory_mb": 32.6242,
+      "peak_memory_mb": 32.6697,
+      "rss_growth_mb": 0.3031,
+      "start_os_threads": 4,
+      "peak_os_threads": 5,
+      "sampling_error": false,
+      "threshold_exceedances": [],
+      "status": "measured",
+      "mode": "No listeners; process baseline"
+    },
+    "idle": {
+      "duration_seconds": 15.0081,
+      "sample_count": 16,
+      "average_cpu_percent": 0.8329,
+      "peak_cpu_percent": 2.018,
+      "start_memory_mb": 32.2724,
+      "end_memory_mb": 32.8253,
+      "average_memory_mb": 32.3505,
+      "peak_memory_mb": 32.8253,
+      "rss_growth_mb": 0.553,
+      "start_os_threads": 7,
+      "peak_os_threads": 10,
+      "sampling_error": false,
+      "threshold_exceedances": [],
+      "status": "measured",
+      "mode": "Native listener threads; real input discarded; synthetic foreground",
+      "observed_activity_status": "IDLE",
+      "synthetic_counts": {
+        "movement_count": 0,
+        "click_count": 0,
+        "key_press_count": 0
+      },
+      "listeners_healthy_at_end": true
+    },
+    "active": {
+      "duration_seconds": 15.0114,
+      "sample_count": 16,
+      "average_cpu_percent": 0.7286,
+      "peak_cpu_percent": 3.87,
+      "start_memory_mb": 32.3953,
+      "end_memory_mb": 32.4321,
+      "average_memory_mb": 32.4692,
+      "peak_memory_mb": 32.9236,
+      "rss_growth_mb": 0.0369,
+      "start_os_threads": 9,
+      "peak_os_threads": 10,
+      "sampling_error": false,
+      "threshold_exceedances": [],
+      "status": "measured",
+      "mode": "Native listener threads; real input discarded; synthetic foreground",
+      "observed_activity_status": "ACTIVE",
+      "synthetic_counts": {
+        "movement_count": 246,
+        "click_count": 246,
+        "key_press_count": 246
+      },
+      "listeners_healthy_at_end": true,
+      "achieved_synthetic_ticks_per_second": 16.3875
+    },
+    "backend_synchronization": {
+      "status": "not_measured",
+      "reason": "No implemented sender, backend upload contract or authenticated session. No simulated HTTP results substituted."
+    }
+  },
+  "findings": [
+    "No configured threshold exceeded in this short controlled run; this does not establish absence of leaks or production overhead."
+  ],
+  "lifecycle": {
+    "status": "measured",
+    "cycles": 10,
+    "rss_growth_mb": 0.4055,
+    "retained_python_growth_mb": 0.0029,
+    "retained_python_bytes_after_each_cycle": [
+      624,
+      736,
+      1392,
+      1504,
+      1648,
+      1792,
+      1904,
+      2528,
+      2704,
+      2880
+    ],
+    "remaining_additional_python_threads": [],
+    "retained_tracker_fixtures": 0,
+    "suspected_leaks_or_unnecessary_threads": [],
+    "limitation": "Short-run growth is a leak signal, not proof. Allocators cache memory; long soak tests are required."
+  }
+}
