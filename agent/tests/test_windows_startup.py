@@ -111,6 +111,12 @@ class WindowsStartupTests(unittest.TestCase):
         tray.return_value._handle.assert_not_called()
         self.assertIn("Tracking PAUSED", output.call_args.args[0])
 
+    def test_packaging_diagnostics_do_not_run_normal_tracking_launcher(self):
+        with patch("sys.argv", ["start_agent.py", "--smoke-test"]), patch("agent.packaging_smoke.run", return_value=0) as diagnostic, patch("agent.ui.tray.WorkPulseTray") as tray:
+            self.assertEqual(main(), 0)
+        diagnostic.assert_called_once_with()
+        tray.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

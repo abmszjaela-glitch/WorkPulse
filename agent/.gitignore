@@ -8,3 +8,6 @@ venv/
 .logger-test-*/
 .compatibility-test-*/
 logs/
+build/
+dist/
+.packaging-smoke-*/

@@ -518,3 +518,13 @@ and long soaks require separate plan execution. Backend employee auth/JWT and
 sync/retries remain NOT TESTED until their real implementations/contracts exist.
 Exit zero means executed automated checks did not fail; it does not certify full
 compatibility or turn NOT TESTED gaps into PASS.
+
+# Windows executable packaging
+
+The main entry point is `start_agent.py`. Console-enabled PyInstaller one-folder
+and one-file specs, explicit Windows hidden imports, resource handling, smoke
+verification and build commands are in `packaging/BUILDING.md`. Build and verify
+onedir first, then onefile. No venv folders, `.env`, queues, logs, reports or test
+credentials are included as application data. Required config is compiled code;
+timezone and public CA resources are bundled. Executables open visibly PAUSED.
+The smoke test is explicit (`--smoke-test`) and never starts activity tracking.

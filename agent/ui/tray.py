@@ -17,6 +17,7 @@ from ..auth.token_store import WindowsTokenStore
 from ..core.working_hours import WorkingHoursPolicy
 from ..core.windows_startup import WindowsStartup, StartupError
 from ..utils.logger import get_logger, configure_logging, shutdown_logging
+from ..version import APP_NAME, APP_VERSION, PUBLISHER_DISPLAY_NAME, APP_DESCRIPTION
 
 
 class TrayState:
@@ -83,6 +84,8 @@ class WorkPulseTray:
             return lambda *_: self.request(name)
         self.icon = pystray.Icon("WorkPulse", tray_image(), "WorkPulse | Tracking PAUSED",
             menu=pystray.Menu(
+                item(f"{APP_NAME} {APP_VERSION}", None, enabled=False),
+                item("About WorkPulse Agent", self._show_about),
                 item(lambda _: self.state.snapshot()[0], None, enabled=False),
                 item("View tracking status", self._show_status, default=True),
                 item("Open dashboard", command("dashboard")),
@@ -101,6 +104,9 @@ class WorkPulseTray:
                 item("Logout (local)", command("logout")),
                 item("Exit", command("exit")),
             ))
+
+    def _show_about(self, *_):
+        self.icon.notify(f"{APP_NAME} {APP_VERSION}\n{APP_DESCRIPTION}\nPublisher display name: {PUBLISHER_DISPLAY_NAME}\nUnsigned; publisher identity is not verified.", "About WorkPulse Agent")
 
     def request(self, command):
         """Emergency/manual stop vetoes queued starts before worker cleanup."""
