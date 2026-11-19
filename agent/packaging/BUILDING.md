@@ -118,7 +118,9 @@ on clean standard-user Windows 10 and 11 systems without a Python installation.
   but extracts dependencies into a temporary location at launch; never store logs,
   settings, queues or credentials in that extraction tree. Normal persistence uses
   per-user AppData/Credential Manager; configure explicit writable paths if needed.
-- No installer, signing certificate or production release version was invented.
+- The initial Agent version and publisher display are now supplied centrally by
+  `agent/version.py`; the Inno Setup installer is documented in `installer/README.md`.
+  No signing certificate or verified legal publisher identity is configured.
   Sign and validate through your authorized release process; test endpoint security,
   SmartScreen, clean-machine prerequisites, upgrades, uninstall/startup removal,
   one-file extraction cleanup and enterprise policy before distribution. Do not

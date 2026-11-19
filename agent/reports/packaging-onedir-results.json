@@ -1,10 +1,10 @@
 {
-  "tested_at_utc": "2026-11-19T10:50:13.421199+00:00",
+  "tested_at_utc": "2026-11-19T11:35:46.340471+00:00",
   "mode": "onedir",
   "windows_build": 26200,
   "console_enabled": true,
-  "artifact_sha256": "2f3b1b01d3973e224362cecc1f9cadb571fcf552db3d1609a2ceae5b7336e7f7",
-  "artifact_bytes": 6500989,
+  "artifact_sha256": "6b43e38c1237783be28dacfb58e10846c0795cc5af96776c9bdd5ca085550509",
+  "artifact_bytes": 6503822,
   "checks": {
     "help_command": "PASS",
     "smoke_exit_code": "PASS",
@@ -36,6 +36,8 @@
     "win32security": "PASS"
   },
   "runtime": {
+    "app_name": "WorkPulse Agent",
+    "app_version": "1.0.0",
     "checks": {
       "PIL.Image": "PASS",
       "agent.core.offline_queue": "PASS",
@@ -63,6 +65,7 @@
     },
     "frozen": true,
     "limitations": "Dependency/paused-tray smoke only; no tracking, backend auth/upload, real startup registration, clean-machine or Windows 10 acceptance.",
+    "publisher_display_name": "WorkPulse",
     "python": "3.15.2",
     "windows_build": 26200
   },

@@ -1,0 +1,62 @@
+WORKPULSE AGENT - INSTALLATION AND PRIVACY NOTICE
+
+WorkPulse Agent is an employee activity tracking application. The publisher
+display name is supplied by the project owner; it is not a legally verified
+identity. This installer and application are unsigned unless an authorized
+release process explicitly signs them. No publisher verification is claimed.
+
+INSTALLATION IS NOT CONSENT TO TRACKING
+The application opens with Tracking PAUSED. An employee must explicitly start
+tracking, and working-hours controls apply. Manual pause and Emergency Stop
+disable scheduled resumption until an explicit restart. The visible system tray
+provides status, stop, logout and optional startup controls. The desktop window
+also shows tracking status and emergency controls. Errors are logged; startup
+failure uses a visible error notice. Windows may put tray icons in its overflow area.
+
+CURRENT APPLICATION CAPABILITIES
+The existing build runs in disclosed local mode. Backend login, cryptographic
+JWT/session verification and backend synchronization are not implemented in this
+checkout. Installing it does not grant a verified employee session or bypass
+backend authorization. Do not treat this initial installer as production
+authentication or full deployment acceptance.
+
+When explicitly enabled, activity tracking counts mouse movement/click and
+anonymous keyboard presses, determines foreground process names, calculates
+application durations and applies idle detection. It does not record individual
+key values, typed text, screenshots, coordinates, window titles, document names
+or URLs. Activity scores describe input intensity, not employee productivity.
+Operational logs contain fixed event messages rather than activity payloads.
+
+LOCAL DATA AND UNINSTALL
+The current-user offline queue component encrypts aggregate payloads using
+Windows DPAPI and applies restricted ACLs. Already-verified tokens, when backend
+integration is supplied, belong in Windows Credential Manager; passwords must
+never be saved in plaintext. Normal data/log locations are within the user's
+WorkPulse AppData directory or explicitly configured paths.
+
+Uninstall removes installed application files and shortcuts. It DOES NOT delete
+employee activity queues, logs, credentials, custom configuration or other user
+data. No data-deletion option is silently selected or executed. Any later data
+removal must be a separate, informed action under your retention policy.
+
+STARTUP IS OPTIONAL
+The startup task is unchecked. Selecting it explicitly asks the original user
+account to register the visible WorkPulse Agent entry in the current-user Run
+key. It launches the app PAUSED at Windows sign-in. Leaving it unchecked makes
+no new startup change; it does not silently reverse an existing preference.
+Disable/remove startup in the WorkPulse tray whenever desired. No service,
+scheduled task, hidden entry or tracking autostart is installed.
+
+Program Files installation requires administrator authorization. Normal
+application execution and current-user startup changes do not require elevation.
+Launch Setup normally, not through a different-account Run As command, so the
+optional startup action targets the intended original user. Other users manage
+their own startup preference from the tray. Uninstall cannot clean other users'
+startup values; disable those before uninstalling the shared application.
+
+CONFIGURATION
+Working hours/timezone, API base address, dashboard URL and limits are centralized
+in the bundled Python configuration with environment overrides. No deployment
+passwords, JWTs, backend .env or private signing keys are included. Review the
+displayed working-hours policy before explicit Start. See the installed build
+and configuration documentation for details.

@@ -8,7 +8,7 @@ from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.win32.versioninfo import VSVersionInfo, FixedFileInfo, StringFileInfo, StringTable, StringStruct, VarFileInfo, VarStruct
 
 
-def build(spec_directory, *, onefile):
+def build(spec_directory, *, onefile, windowed=False):
     directory = Path(spec_directory)
     agent = directory.parent
     repository = agent.parent
@@ -34,7 +34,7 @@ def build(spec_directory, *, onefile):
         "pystray._win32", "psutil._psutil_windows", "pywintypes",
         "win32api", "win32con", "win32gui", "win32process", "win32security",
         "win32file", "win32crypt", "win32cryptcon", "win32cred", "ntsecuritycon",
-        "agent.ui.login", "agent.core.offline_queue", "requests", "tkinter",
+        "agent.ui.login", "agent.ui.desktop", "agent.desktop_bootstrap", "agent.core.offline_queue", "requests", "tkinter", "tkinter.ttk",
     ]
     analysis = Analysis(
         [str(agent / "start_agent.py")], pathex=[str(repository)],
@@ -52,7 +52,7 @@ def build(spec_directory, *, onefile):
             raise RuntimeError("Unexpected private/development data in the PyInstaller input manifest.")
     archive = PYZ(analysis.pure)
     options = dict(name="WorkPulseAgent", debug=False, strip=False, upx=False,
-                   console=True, disable_windowed_traceback=False, version=version_info)
+                   console=not windowed, disable_windowed_traceback=False, version=version_info)
     if onefile:
         EXE(archive, analysis.scripts, analysis.binaries, analysis.datas, [], **options)
     else:

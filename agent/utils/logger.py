@@ -41,8 +41,11 @@ EVENTS = {
     "startup_removed": "Current-user Windows startup registration removed.",
     "startup_error": "Windows startup registration could not be changed or verified.",
     "local_logout": "Local logout completed; server revocation is unavailable.",
+    "desktop_callback_error": "Desktop callback failed; emergency stop requested.",
+    "desktop_thread_error": "Desktop background worker failed; emergency stop requested.",
+    "desktop_started": "Desktop window opened with tracking paused.",
 }
-_THROTTLED = frozenset({"tracking_error", "ui_error", "sync_succeeded", "sync_offline", "sync_failed", "sync_auth_expired", "startup_error"})
+_THROTTLED = frozenset({"tracking_error", "ui_error", "sync_succeeded", "sync_offline", "sync_failed", "sync_auth_expired", "startup_error", "desktop_callback_error", "desktop_thread_error"})
 _lock = Lock()
 _warned = False
 _configured = False
@@ -113,6 +116,12 @@ _logger.addHandler(logging.NullHandler())
 def get_logger():
     """Return shared logging.Logger; this function never opens files."""
     return _logger
+
+
+def logging_available():
+    """Read logging health without disk access or an additional polling thread."""
+    with _lock:
+        return _configured and not any(getattr(h, "failed", False) for h in _logger.handlers)
 
 
 def configure_logging():

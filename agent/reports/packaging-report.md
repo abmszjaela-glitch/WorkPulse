@@ -7,16 +7,16 @@ release approval or full Windows compatibility certification.
 | Artifact / check | Result | Evidence |
 |---|---|---|
 | Console-enabled one-folder build | PASS | agent/dist/onedir/WorkPulseAgent/WorkPulseAgent.exe |
-| Relocated one-folder executable smoke | PASS | packaging-onedir-results.json, 2026-11-19 10:50:13 UTC |
+| Relocated one-folder executable smoke | PASS | Refreshed 1.0.0: packaging-onedir-results.json, 2026-11-19 11:04:51 UTC |
 | Console-enabled one-file build, after onedir success | PASS | agent/dist/onefile/WorkPulseAgent.exe |
-| Relocated one-file executable smoke | PASS | packaging-onefile-results.json, 2026-11-19 10:52:39 UTC |
-| Source regression suite | PASS | 169 tests; includes smoke-mode routing without starting normal tracking |
+| Relocated one-file executable smoke | PASS | Refreshed 1.0.0: packaging-onefile-results.json, 2026-11-19 11:15:10 UTC |
+| Source regression suite | PASS | 170 tests; includes explicit startup actions without starting normal tracking |
 | Windows 10 execution | NOT TESTED | No Windows 10 host used |
 | Clean Windows machine without Python installed | NOT TESTED | Current development host only |
 | Physical input tracking and long soak in packaged executable | NOT TESTED | Smoke deliberately never starts input listeners |
 | Backend authentication / synchronization | NOT TESTED | Actual backend contracts and implementations unavailable |
 | Real startup registration and sign-in/reboot | NOT TESTED | Smoke checks executable command construction only; no registry writes |
-| Code signing / installer / enterprise security acceptance | NOT TESTED | Unsigned build outputs; no installer supplied |
+| Code signing / enterprise security acceptance | NOT TESTED | Unsigned outputs; separate initial installer evidence is in installer-report.md |
 
 Both smoke runs copied the distribution to a path containing spaces, changed to
 an unrelated working directory, and removed Python/Tcl path overrides. They

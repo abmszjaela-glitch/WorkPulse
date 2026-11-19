@@ -1,0 +1,31 @@
+{
+  "executed_at_utc": "2026-11-19T12:29:59.776518+00:00",
+  "windows_build": 26200,
+  "target": "agent\\dist\\gui\\WorkPulseAgent\\WorkPulseAgent.exe",
+  "checks": {
+    "windows_gui_subsystem_no_console": "PASS",
+    "normal_desktop_visible_paused": "PASS",
+    "callback_error_desktop_visible_paused": "PASS",
+    "callback_error_logged_without_private_details": "PASS",
+    "early_configuration_error_logged": "PASS"
+  },
+  "normal": {
+    "window_title": "WorkPulse Agent 1.0.0",
+    "window_was_visible": true,
+    "tray_was_visible": true,
+    "tracking_never_started": true,
+    "callback_error_seen": false,
+    "tracking": "Tracking PAUSED",
+    "employee_status": "Not signed in; backend authentication unavailable"
+  },
+  "callback_error": {
+    "window_title": "WorkPulse Agent 1.0.0",
+    "window_was_visible": true,
+    "tray_was_visible": true,
+    "tracking_never_started": true,
+    "callback_error_seen": true,
+    "tracking": "Tracking PAUSED",
+    "employee_status": "Not signed in; backend authentication unavailable"
+  },
+  "status": "PASS"
+}

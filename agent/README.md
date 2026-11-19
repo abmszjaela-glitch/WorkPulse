@@ -528,3 +528,19 @@ onedir first, then onefile. No venv folders, `.env`, queues, logs, reports or te
 credentials are included as application data. Required config is compiled code;
 timezone and public CA resources are bundled. Executables open visibly PAUSED.
 The smoke test is explicit (`--smoke-test`) and never starts activity tracking.
+
+# Windows installer and release version
+
+`version.py` is the single Agent release-metadata source: WorkPulse Agent 1.0.0,
+publisher display WorkPulse, description WorkPulse Employee Activity Tracking
+Agent. The initial Agent version is independent of the backend package. The tray
+About entry, executable version resources and installer use these same values.
+The publisher display name is configurable and is not a verified legal identity.
+No digital signing is configured or claimed.
+
+`installer/WorkPulseAgent.iss` packages the existing versioned PyInstaller onedir
+output. It defaults to Program Files, adds Start Menu shortcuts, displays the
+installation/privacy notice, and offers unchecked current-user startup. It never
+starts tracking on installation and preserves all employee data on uninstall.
+Build commands, compiler licensing status, startup account-scope caveats and
+actual Windows test coverage are documented in `installer/README.md`.

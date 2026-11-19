@@ -12,7 +12,7 @@ from threading import Timer
 from zoneinfo import ZoneInfo
 
 
-def run():
+def run(*, diagnostics_file=None):
     checks = {}
     modules = ("pynput.mouse._win32", "pynput.keyboard._win32", "pystray._win32",
                "psutil._psutil_windows", "win32api", "win32gui", "win32process",
@@ -63,5 +63,9 @@ def run():
               "frozen": bool(getattr(sys, "frozen", False)), "python": platform.python_version(),
               "windows_build": sys.getwindowsversion().build, "checks": checks,
               "limitations": "Dependency/paused-tray smoke only; no tracking, backend auth/upload, real startup registration, clean-machine or Windows 10 acceptance."}
-    print(json.dumps(result, sort_keys=True), flush=True)
+    if diagnostics_file is not None:
+        from pathlib import Path
+        Path(diagnostics_file).write_text(json.dumps(result, sort_keys=True), encoding="utf-8")
+    if sys.stdout is not None:
+        print(json.dumps(result, sort_keys=True), flush=True)
     return int(any(value == "FAIL" for value in checks.values()))

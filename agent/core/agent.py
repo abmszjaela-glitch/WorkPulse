@@ -12,6 +12,7 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from threading import Event, Lock, Thread
+from time import monotonic
 
 if __package__ == "core":
     from config import config
@@ -108,6 +109,10 @@ class ActivityAgent:
         self.pause_reason = None
         self.activity_state.recording_allowed = self._recording_allowed
         self.active_window_tracker.recording_allowed = self._recording_allowed
+        self._timing_lock = Lock()
+        self._session_started = self._session_finished = None
+        self._session_active_start = 0.0
+        self._session_active_end = None
 
     def _recording_allowed(self):
         try:
@@ -137,6 +142,21 @@ class ActivityAgent:
     def stop(self) -> None:
         """Request shutdown, immediately interrupting the reporting wait."""
         self._stop_event.set()
+        with self._timing_lock:
+            if self._session_started is not None and self._session_finished is None:
+                self._session_finished = monotonic()
+                self._session_active_end = self.idle_detector.get_active_elapsed()
+
+    def get_session_durations(self) -> dict[str, float]:
+        """Read session totals independently of interval resets; freeze on stop."""
+        with self._timing_lock:
+            if self._session_started is None:
+                return {"active_seconds": 0.0, "idle_seconds": 0.0}
+            end = self._session_finished if self._session_finished is not None else monotonic()
+            elapsed = max(0.0, end - self._session_started)
+            active_end = self._session_active_end if self._session_active_end is not None else self.idle_detector.get_active_elapsed()
+            active = min(elapsed, max(0.0, active_end - self._session_active_start))
+            return {"active_seconds": active, "idle_seconds": elapsed - active}
 
     def get_summary(self) -> ActivitySummary:
         """Read cumulative counters without resetting or recording event data."""
@@ -239,6 +259,9 @@ class ActivityAgent:
                     self._check_listeners()
                     self.activity_state.touch()
                     self.activity_calculator.start()
+                    with self._timing_lock:
+                        self._session_started = monotonic()
+                        self._session_active_start = self.idle_detector.get_active_elapsed()
                     started = True
                     self._tracking_event.set()
                     get_logger().info("tracking_on")

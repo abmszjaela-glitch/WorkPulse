@@ -103,19 +103,23 @@ class WindowsStartupTests(unittest.TestCase):
                 self.startup.enable()
         self.api["SetValueEx"].assert_not_called()
 
-    def test_startup_launcher_only_opens_visible_tray(self):
-        with patch("sys.argv", ["start_agent.py", "--startup"]), patch("agent.ui.tray.WorkPulseTray") as tray, patch("builtins.print") as output:
+    def test_startup_launcher_only_opens_visible_desktop(self):
+        with patch("sys.argv", ["start_agent.py", "--startup"]), patch("agent.ui.desktop.run_desktop", return_value=0) as desktop:
             self.assertEqual(main(), 0)
-        tray.assert_called_once_with()
-        tray.return_value.run.assert_called_once_with()
-        tray.return_value._handle.assert_not_called()
-        self.assertIn("Tracking PAUSED", output.call_args.args[0])
+        desktop.assert_called_once_with(diagnostic=False, exercise_error=False, diagnostics_file=None)
 
     def test_packaging_diagnostics_do_not_run_normal_tracking_launcher(self):
         with patch("sys.argv", ["start_agent.py", "--smoke-test"]), patch("agent.packaging_smoke.run", return_value=0) as diagnostic, patch("agent.ui.tray.WorkPulseTray") as tray:
             self.assertEqual(main(), 0)
-        diagnostic.assert_called_once_with()
+        diagnostic.assert_called_once_with(diagnostics_file=None)
         tray.assert_not_called()
+
+    def test_explicit_installer_startup_action_never_opens_tracking(self):
+        for flag, action in (("--enable-startup", "enable"), ("--disable-startup", "remove")):
+            with self.subTest(flag=flag), patch("sys.argv", ["start_agent.py", flag]), patch("agent.core.windows_startup.WindowsStartup") as startup, patch("agent.utils.logger.configure_logging"), patch("agent.ui.tray.WorkPulseTray") as tray, patch("builtins.print"):
+                self.assertEqual(main(), 0)
+            getattr(startup.return_value, action).assert_called_once_with()
+            tray.assert_not_called()
 
 
 if __name__ == "__main__":

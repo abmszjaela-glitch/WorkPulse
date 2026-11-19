@@ -64,7 +64,7 @@ def tray_image(active=False):
 
 class WorkPulseTray:
     """Tray callbacks enqueue work; listener startup/shutdown runs off the UI thread."""
-    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, policy=None, startup=None):
+    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, policy=None, startup=None, open_window=None):
         self.state = TrayState()
         self._factory = agent_factory
         self._tokens = token_store or WindowsTokenStore(config.SERVER_URL)
@@ -73,12 +73,17 @@ class WorkPulseTray:
         self._commands = Queue()
         self._closing = Event()
         self.policy = WorkingHoursPolicy() if policy is None else policy
+        self._policy_open = self.policy.allows()
         self._requested = False
         self._manual_stop = Event()
         self._manual_stop.set()
         self._control_lock = Lock()
         self._generation = 0
         self._agent = self._runner = self._worker = None
+        self._open_window = open_window
+        self._view_lock = Lock()
+        self._view = {"mouse_movements": 0, "mouse_clicks": 0, "key_presses": 0,
+                      "active_app": "Not tracking", "active_seconds": 0.0, "idle_seconds": 0.0}
         item = pystray.MenuItem
         def command(name):
             return lambda *_: self.request(name)
@@ -86,8 +91,9 @@ class WorkPulseTray:
             menu=pystray.Menu(
                 item(f"{APP_NAME} {APP_VERSION}", None, enabled=False),
                 item("About WorkPulse Agent", self._show_about),
+                item("Open WorkPulse Agent", lambda *_: self._open_window(), enabled=open_window is not None, default=open_window is not None),
                 item(lambda _: self.state.snapshot()[0], None, enabled=False),
-                item("View tracking status", self._show_status, default=True),
+                item("View tracking status", self._show_status, default=open_window is None),
                 item("Open dashboard", command("dashboard")),
                 pystray.Menu.SEPARATOR,
                 item("Start / restart local tracking", command("start")),
@@ -104,6 +110,27 @@ class WorkPulseTray:
                 item("Logout (local)", command("logout")),
                 item("Exit", command("exit")),
             ))
+
+    def desktop_snapshot(self):
+        """GUI reads a cached copy; never waits on tracking/OS operations."""
+        with self._view_lock:
+            result = dict(self._view)
+        result["tracking"], result["sync"], result["last_sync"] = self.state.snapshot()
+        result["startup"] = self._startup_status
+        result["closed"] = self._closing.is_set()
+        result["policy_open"] = self._policy_open
+        result["tray_visible"] = bool(self.icon.visible)
+        return result
+
+    def _cache_metrics(self):
+        if self._agent is None:
+            return
+        summary = self._agent.get_summary()
+        values = {"mouse_movements": summary.mouse_movements, "mouse_clicks": summary.mouse_clicks,
+                  "key_presses": summary.key_presses, "active_app": summary.active_app or "Unavailable"}
+        values.update(self._agent.get_session_durations())
+        with self._view_lock:
+            self._view.update(values)
 
     def _show_about(self, *_):
         self.icon.notify(f"{APP_NAME} {APP_VERSION}\n{APP_DESCRIPTION}\nPublisher display name: {PUBLISHER_DISPLAY_NAME}\nUnsigned; publisher identity is not verified.", "About WorkPulse Agent")
@@ -154,6 +181,8 @@ class WorkPulseTray:
             self._runner.join()  # Worker only; never blocks the tray loop.
             if self._agent.listeners_running:
                 raise RuntimeError("Listener shutdown unconfirmed.")
+            if self._open_window is not None:
+                self._cache_metrics()
         self._agent = self._runner = None
         self.state.set_tracking("Tracking PAUSED")
 
@@ -199,6 +228,9 @@ class WorkPulseTray:
                 self._agent = self._factory(policy=self.policy)
                 self._runner = Thread(target=self._agent.run, name="WorkPulse tracking")
                 self._runner.start()
+                with self._view_lock:
+                    self._view = {"mouse_movements": 0, "mouse_clicks": 0, "key_presses": 0,
+                                  "active_app": "Starting", "active_seconds": 0.0, "idle_seconds": 0.0}
         elif command in ("pause", "emergency", "logout", "exit"):
             self._manual_stop.set()
             self._requested = False
@@ -242,9 +274,13 @@ class WorkPulseTray:
                 command = None
             try:
                 self._handle(command)
+                self._policy_open = self.policy.allows()
                 self._schedule()
+                if self._open_window is not None:
+                    self._cache_metrics()
                 self._refresh()
             except Exception:
+                self._policy_open = False
                 get_logger().error("ui_error")
                 self._manual_stop.set()
                 self._requested = False

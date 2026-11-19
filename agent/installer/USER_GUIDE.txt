@@ -1,0 +1,57 @@
+WorkPulse Agent 1.0.0
+Publisher display name: WorkPulse (provisional; not a verified legal identity)
+
+OPENING AND STOPPING
+Open WorkPulse Agent from the Start Menu or the optional desktop shortcut.
+The native desktop window starts PAUSED, without a terminal. It displays the
+employee login status, input counts, application name, active/idle durations,
+last sync time, and tracking status. Inspect the working-hours policy.
+Do not start activity tracking without applicable employee/organization
+authorization. Installation and Windows sign-in startup do not authorize or
+activate tracking. Emergency Stop and Pause are always in the tray menu.
+A manual stop requires an explicit restart. Closing the window shuts down the
+listeners and exits. Normal minimize keeps a taskbar window; the application
+does not hide itself in an overflow-only tray. The tray can reopen the window.
+
+PRIVACY
+Read PRIVACY.txt before use. Counts are anonymous input-event totals, not key
+contents or text. No screenshots, window titles, URLs or document names are
+collected. Application usage tracks process names and durations only.
+
+CURRENT RELEASE LIMITATIONS
+This build is local mode. Backend employee login/JWT verification and backend
+synchronization are not connected. Do not treat it as a production-authenticated
+employee deployment or bypass organization authorization. The About menu shows
+the Agent version and provisional publisher display. No digital signing or
+verified publisher identity is claimed.
+
+WORKING HOURS AND SETTINGS
+Default hours are Monday-Friday 09:00-17:30 in Asia/Colombo. The displayed policy
+is authoritative for the current session. Central configuration is compiled
+into the application and accepts Windows environment overrides:
+WORKING_TIMEZONE (IANA name), WORKING_START / WORKING_END (24-hour HH:MM),
+WORKING_DAYS (Monday=0 through Sunday=6), DASHBOARD_URL and SERVER_URL.
+Use authorized settings and restart transparently after policy changes.
+Do not put passwords or JWTs in environment settings or plaintext files.
+
+SHORTCUTS AND STARTUP
+Desktop shortcut creation is optional and unchecked. Windows startup is also
+optional and unchecked. Startup opens the visible application PAUSED; it does
+not start tracking. Leaving the startup task unchecked makes no new startup
+change. Existing startup preferences can be disabled or removed from the tray.
+
+LOCAL DATA AND UNINSTALL
+Normal queue/log data is per-user AppData, not Program Files. Operational logs
+use fixed event messages and rotate. Token support uses Windows Credential
+Manager; the queue support component protects aggregate payloads with DPAPI.
+Uninstall through Windows Installed Apps or the Start Menu uninstall shortcut.
+Uninstall retains activity data, logs, credentials and custom configuration;
+no data-deletion task is offered. Any data removal requires a separate informed
+retention decision. Other Windows users must disable their own startup setting.
+
+DIAGNOSTICS
+Errors are captured as privacy-safe fixed events in per-user WorkPulse logs.
+Early configuration failures use a bounded startup-error.log when necessary.
+If logging cannot work, tracking is stopped/blocked and an error is shown.
+No security warning or organization policy should be bypassed. Windows 10/11 x64 are installer targets; consult actual
+test evidence before deploying to an untested Windows build or environment.
