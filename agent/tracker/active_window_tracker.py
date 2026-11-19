@@ -48,6 +48,7 @@ class ActiveWindowTracker:
         self._thread: Thread | None = None
         self._active: ActiveApplication | None = None
         self._failed = False
+        self.recording_allowed = lambda: True
         self._observers: set[Callable[[ActiveApplication | None], None]] = set()
 
     def _set_active(self, snapshot: ActiveApplication | None) -> None:
@@ -114,9 +115,11 @@ class ActiveWindowTracker:
             return None
 
     def _poll(self) -> None:
+        if not self.recording_allowed():
+            return
         name = self._detect_application()
         with self._state_lock:
-            if self._stop_event.is_set():
+            if self._stop_event.is_set() or not self.recording_allowed():
                 return
             if name is None:
                 self._set_active(None)

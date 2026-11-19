@@ -59,7 +59,7 @@ class ActivityAgentTests(unittest.TestCase):
             listener_patch.start()
             self.addCleanup(listener_patch.stop)
         self.messages = []
-        self.agent = ActivityAgent(output=self.messages.append)
+        self.agent = ActivityAgent(output=self.messages.append, policy=Mock(allows=Mock(return_value=True), describe=Mock(return_value="test hours")))
         self.addCleanup(self.agent.mouse_tracker.stop)
         self.addCleanup(self.agent.keyboard_tracker.stop)
         self.addCleanup(self.agent.active_window_tracker.stop)
@@ -74,6 +74,29 @@ class ActivityAgentTests(unittest.TestCase):
             self.assertIs(component.activity_state, self.agent.activity_state)
         self.assertFalse(self.agent.mouse_tracker.is_running)
         self.assertFalse(self.agent.keyboard_tracker.is_running)
+
+    def test_policy_closure_interrupts_reporting_wait_and_stops_every_listener(self):
+        ready = Event()
+        self.agent._output = lambda message: ready.set() if "Activity tracking RUNNING" in message else None
+        results = []
+        worker = Thread(target=lambda: results.append(self.agent.run()))
+        try:
+            worker.start()
+            self.assertTrue(ready.wait(2))
+            self.agent.policy.allows.return_value = False
+            # Even before supervisor cleanup, late input cannot change counts.
+            before = self.agent.keyboard_tracker.key_press_count
+            self.agent.keyboard_tracker._on_press(object())
+            self.assertEqual(self.agent.keyboard_tracker.key_press_count, before)
+            worker.join(2)
+            self.assertFalse(worker.is_alive())
+            self.assertEqual(self.agent.pause_reason, "working_hours")
+            self.assertFalse(self.agent.listeners_running)
+            self.assertFalse(self.agent.is_tracking)
+            self.assertEqual(results, [0])
+        finally:
+            self.agent.stop()
+            worker.join(2)
 
     def test_periodic_counts_status_and_visible_shutdown(self):
         def wait(_interval):

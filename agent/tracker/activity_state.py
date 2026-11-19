@@ -18,6 +18,8 @@ class ActivityState:
         self._active_threshold: float | None = None
         self._active_total = 0.0
         self._active_anchor = self._last_activity
+        # Agent supplies a privacy gate; standalone tracker behavior is unchanged.
+        self.recording_allowed = lambda: True
 
     @property
     def last_activity(self) -> float:

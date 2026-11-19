@@ -6,6 +6,9 @@ Other modules should import these constants rather than define their own values.
 """
 
 import os
+import re
+from datetime import time as wall_time
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from math import isfinite
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -47,6 +50,14 @@ except ValueError:
 
 # Default sampling cadence: once per minute. This module does not start tracking.
 TRACKING_INTERVAL: int = _positive_seconds("TRACKING_INTERVAL", 60)
+
+# Web dashboard address is independent of the backend API; no route is guessed.
+DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "").strip()
+if DASHBOARD_URL:
+    _dashboard = urlsplit(DASHBOARD_URL)
+    if (_dashboard.scheme not in ("http", "https") or not _dashboard.hostname
+            or _dashboard.username is not None or _dashboard.password is not None):
+        raise ValueError("DASHBOARD_URL must be an HTTP(S) URL without credentials.")
 
 # Default inactivity duration before the agent considers the user idle: 5 minutes.
 IDLE_THRESHOLD: int = _positive_seconds("IDLE_THRESHOLD", 300)
@@ -106,3 +117,31 @@ OFFLINE_QUEUE_MAX_RECORDS: int = _positive_integer("OFFLINE_QUEUE_MAX_RECORDS", 
 OFFLINE_QUEUE_MAX_BYTES: int = _positive_integer("OFFLINE_QUEUE_MAX_BYTES", 64 * 1024 * 1024)
 OFFLINE_QUEUE_MAX_RECORD_BYTES: int = _positive_integer("OFFLINE_QUEUE_MAX_RECORD_BYTES", 64 * 1024)
 OFFLINE_QUEUE_DB_TIMEOUT: int = _positive_seconds("OFFLINE_QUEUE_DB_TIMEOUT", 5)
+
+# Fixed IANA policy timezone, independent of the Windows display timezone.
+# Environment changes take effect on restart; an authorized controller may
+# replace the policy explicitly. Invalid settings fail closed during startup.
+WORKING_TIMEZONE = os.environ.get("WORKING_TIMEZONE", "Asia/Colombo").strip()
+try:
+    ZoneInfo(WORKING_TIMEZONE)
+except (ZoneInfoNotFoundError, ValueError):
+    raise ValueError("WORKING_TIMEZONE must be an installed IANA timezone.") from None
+
+def _working_time(name, default):
+    value = os.environ.get(name, default)
+    if not re.fullmatch(r"(?:[01][0-9]|2[0-3]):[0-5][0-9]", value):
+        raise ValueError(f"{name} must use 24-hour HH:MM format.")
+    return wall_time.fromisoformat(value)
+
+WORKING_START = _working_time("WORKING_START", "09:00")
+WORKING_END = _working_time("WORKING_END", "17:30")
+if WORKING_START == WORKING_END:
+    raise ValueError("Working-hours start and end must differ.")
+try:
+    WORKING_DAYS = frozenset(int(day.strip()) for day in os.environ.get(
+        "WORKING_DAYS", "0,1,2,3,4").split(","))
+    if not WORKING_DAYS or not WORKING_DAYS <= set(range(7)):
+        raise ValueError
+except ValueError:
+    raise ValueError("WORKING_DAYS must list weekday numbers 0 (Monday) to 6 (Sunday).") from None
+WORKING_POLICY_CHECK_SECONDS = 0.25

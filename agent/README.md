@@ -191,8 +191,173 @@ SQLite transactions, parameterized values and serialized access protect concurre
 operations. Busy/corrupt databases and encryption failures raise sanitized queue
 errors rather than clearing/replacing the database or logging record contents.
 
+## Authentication integration status
+
+The checked-out `backend` has package files but no implemented routes,
+controllers, JWT middleware or API response contract. The frontend login also
+explicitly reports that backend authentication is unavailable. No login URL,
+JWT algorithm/issuer/audience/key source, refresh flow or logout URL is assumed.
+The agent is therefore **not yet authenticated or gated by a backend session**.
+Do not treat the support components below as completed backend authentication.
+
+- `ui/login.py` provides a masked email/password form. Without a real controller,
+  the form disables credential entry and submission. It never starts tracking.
+  A future adapter must perform the real HTTP request and verified authentication
+  before closing/replacing the form. Error categories are sanitized; raw backend
+  exceptions and response bodies are never shown or printed by the view.
+- `auth/token_store.py` stores an already-verified access token and authoritative
+  expiry in current-user Windows Credential Manager, scoped to the backend URL.
+  It stores no passwords, employee profile, refresh token or plaintext file.
+  Cached entries are not authentication proof, and no JWT claims are trusted or
+  decoded by the cache. Signature/session verification requires the real backend
+  contract. Expired/malformed entries are removed; local clear is idempotent.
+- Credential Manager capacity errors fail closed without a file fallback. Token
+  bytes are omitted from object representations and native errors are sanitized.
+  As with DPAPI, a process controlling the same Windows account remains within
+  the account's trust boundary.
+
+Preview the disabled form with `python -m agent.ui.login` from the repository
+root. To complete actual authentication, provide the implemented backend source
+or API specification covering login payload/response, JWT verification or session
+validation and logout/revocation. No new JWT library or guessed endpoint is added.
+
+Authentication support tests use fabricated values. One integration test writes,
+reads and deletes a synthetic Credential Manager entry under a fresh unique test
+namespace; no existing credential targets are enumerated or read.
+
 Run the synthetic test suite without recording real input:
 
 ```powershell
 .\agent\venv\Scripts\python.exe -B -m unittest discover -s agent/tests -p "test_*.py" -v
 ```
+# Visible system tray
+
+Install `agent/requirements.txt`, then run `python -m agent.ui.tray` from the
+repository root. WorkPulse starts **Tracking PAUSED**; right-click the W icon
+to start local tracking, pause, view status, open the dashboard, logout locally,
+or exit. The green badge and **Tracking ON** tooltip indicate confirmed running
+listeners; the amber badge accompanies paused/transition/error text. Windows
+may place icons in the overflow area; pin WorkPulse in taskbar tray settings.
+The existing foreground console remains visible. Windows auto-start is optional
+and is never enabled automatically; see the startup section below.
+
+Set `DASHBOARD_URL` to the actual web dashboard URL. No frontend route is guessed.
+Lifecycle commands execute on a worker, separate from the tray and input callbacks.
+Pause stops the listeners; starting again creates a fresh in-memory tracking
+session, so previous console session totals are not carried forward.
+
+This is explicitly local mode, not authenticated employee deployment. Logout
+stops tracking and removes the server-scoped cached token; server revocation
+cannot run until the real backend authentication contract is supplied. No data
+is uploaded. Sync initially says unavailable and last successful sync is Never.
+A future sender can call `tray.state.update_sync(offline=True)` after network
+failure, and pass an aware `acknowledged_at` datetime only after server success.
+The tray does not invent connection status or synchronization timestamps.
+
+# Transparent working-hours controls
+
+Working-hours settings live in `config/config.py`. Defaults are Monday–Friday,
+09:00–17:30 in **Asia/Colombo**. Configure before launching, for example:
+
+```powershell
+$env:WORKING_TIMEZONE = 'Asia/Colombo'
+$env:WORKING_START = '09:00'
+$env:WORKING_END = '17:30'
+$env:WORKING_DAYS = '0,1,2,3,4'
+.\agent\venv\Scripts\python.exe -m agent.ui.tray
+```
+
+Days use Monday=0 through Sunday=6. Times use 24-hour `HH:MM`; start is included,
+end is excluded. Overnight shifts (e.g. 22:00–06:00) belong to the day they start.
+Equal start/end is rejected, rather than silently enabling all-day tracking.
+Invalid settings or an unavailable IANA timezone prevent startup. Install the
+requirements, including `tzdata` on Windows. No backend policy endpoint is assumed.
+
+The tray always starts paused. An explicit **Start / restart local tracking**
+during allowed hours enables the current session and its scheduled resumption.
+At closing time, listeners stop and status says **Tracking PAUSED: outside working
+hours**. If the tray remains open, an automatically paused session resumes at the
+next allowed window with a visible **Tracking ON** notification. Start outside
+hours is rejected and does not arm a future automatic start.
+
+**Pause**, **EMERGENCY STOP**, **Logout**, and **Exit** cancel scheduled resumption.
+Only another explicit Start can enable it again; relaunching also starts paused.
+An emergency stop request immediately vetoes input collection and queued starts;
+cleanup runs on the worker so the tray menu remains responsive. A listener failure
+also disables automatic resumption. Windows may put the icon in its overflow
+area; pin WorkPulse to keep its status visible. The console remains visible too.
+
+The console entry point (`python -m agent.core.agent`) applies the same policy,
+prints the schedule/status, and stops its session when hours close; it does not
+automatically restart. Ctrl+C is its always-available emergency stop. Starting
+that command again is an explicit restart. Tray pause/resume creates a fresh
+in-memory agent session and does not combine previous session totals.
+
+Input events check the policy before updating counters or the activity timestamp.
+Foreground sampling checks it before querying and publishing process names.
+The agent checks for closure every 250 ms, independently of the reporting interval;
+the tray refreshes within 500 ms. Once paused, all listeners have been stopped;
+paused time is not carried into the next session's durations or counters.
+Cleanup failures are reported instead of claiming a confirmed pause.
+
+The configured IANA policy zone is explicit and independent of the Windows display
+timezone. UTC instants are converted for each decision, including daylight-saving
+offset changes. During a repeated hour both occurrences follow the same local
+wall-clock schedule; nonexistent spring-forward times are skipped. A shift's real
+elapsed length can therefore differ on DST days. Stop and relaunch with updated
+configuration to change the policy/timezone; this requires an explicit restart
+and cannot covertly resume a manually stopped session.
+
+# Optional Windows sign-in startup (Windows 10 / 11)
+
+Right-click the visible WorkPulse tray icon and choose:
+
+- **Enable Windows auto-start (opens paused)** to opt in for the current user.
+- **Disable / remove Windows startup entry** to opt out and delete the entry.
+- **Refresh Windows startup status** to read the current registration.
+
+Only this clearly named registry value is managed:
+
+```text
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+Value: WorkPulse Agent
+Type: REG_SZ
+```
+
+There are no machine-wide entries, scheduled tasks, hidden names, administrator
+prompts, startup-approval overrides, or automatic re-registration. A missing entry
+is disabled, and removal is idempotent. Registry access errors are shown in the
+tray without changing tracking state. Other applications' entries are untouched.
+An unexpected existing value under the same name is not overwritten: explicitly
+remove it first. Disable/remove remains available even if the executable moved.
+
+The startup command uses the actual running executable (`sys.executable`) in a
+packaged installation. Build a Windows executable with `agent/start_agent.py` as
+its entry point; no packaged binary or installer is supplied in this repository.
+For source installations, registration uses the current visible `python.exe`,
+`-I`, and the absolute `agent/start_agent.py` path. This resolves imports without
+depending on the Windows logon working directory or `PYTHONPATH`. Paths with spaces
+are quoted using Windows command-line rules. Missing executable/launcher files,
+windowless source interpreters and commands exceeding the Windows Run-key limit
+are rejected before any registry write. Re-register explicitly after relocating
+the installation; uninstallers should remove the named current-user value.
+
+Launches at sign-in always open the visible tray **Tracking PAUSED**, display a
+notification, and leave scheduled tracking disabled until the employee explicitly
+chooses Start. `--startup` identifies the launch origin only: it does not restore
+tracking consent, authenticate, upload, or start listeners. Working-hours checks
+still apply to Start. The existing backend authorization integration remains
+unavailable; auto-start does not grant authorization or enable a production
+employee session. Emergency Stop and manual-stop behavior are unchanged.
+
+WorkPulse reports whether its expected entry is **registered**, rather than
+claiming Windows will execute it. Windows Settings / Task Manager, organization
+policy, and sign-in delays can independently prevent or delay startup. Windows
+may also place the tray icon in the overflow area; pin it to keep status visible.
+Settings supplied only to an interactive PowerShell session are not inherited at
+the next Windows sign-in: use centralized defaults or persistent current-user
+environment configuration for the intended schedule, timezone and dashboard URL.
+
+Startup tests mock all registry calls and never create a real Run entry. Installing,
+running tests, importing the module, and ordinary application launches do not opt
+the employee into startup. This implementation has not enabled auto-start for you.

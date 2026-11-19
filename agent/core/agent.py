@@ -11,7 +11,7 @@ import signal
 import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from threading import Event, Lock
+from threading import Event, Lock, Thread
 
 if __package__ == "core":
     from config import config
@@ -22,6 +22,7 @@ if __package__ == "core":
     from tracker.idle_detector import IdleDetector
     from tracker.keyboard_tracker import KeyboardTracker
     from tracker.mouse_tracker import MouseTracker
+    from core.working_hours import WorkingHoursPolicy
 else:
     from ..config import config
     from ..tracker.activity_state import ActivityState
@@ -31,6 +32,7 @@ else:
     from ..tracker.idle_detector import IdleDetector
     from ..tracker.keyboard_tracker import KeyboardTracker
     from ..tracker.mouse_tracker import MouseTracker
+    from .working_hours import WorkingHoursPolicy
 
 
 @dataclass(frozen=True)
@@ -74,6 +76,7 @@ class ActivityAgent:
         activity_state: ActivityState | None = None,
         *,
         output: Callable[[str], None] = _console_output,
+        policy=None,
     ) -> None:
         self.activity_state = (
             activity_state if activity_state is not None else ActivityState()
@@ -98,6 +101,36 @@ class ActivityAgent:
         self._output = output
         self._stop_event = Event()
         self._run_lock = Lock()
+        self._tracking_event = Event()
+        self.policy = WorkingHoursPolicy() if policy is None else policy
+        self.pause_reason = None
+        self.activity_state.recording_allowed = self._recording_allowed
+        self.active_window_tracker.recording_allowed = self._recording_allowed
+
+    def _recording_allowed(self):
+        try:
+            return not self._stop_event.is_set() and self.policy.allows()
+        except Exception:
+            return False  # Policy errors never permit collection.
+
+    def _watch_policy(self, done):
+        while not done.wait(config.WORKING_POLICY_CHECK_SECONDS):
+            if not self._recording_allowed():
+                if not self._stop_event.is_set():
+                    self.pause_reason = "working_hours"
+                self.stop()
+                return
+
+    @property
+    def is_tracking(self) -> bool:
+        """Report confirmed listener activity to the visible tray UI."""
+        return self._tracking_event.is_set() and self._recording_allowed() and all(
+            tracker.is_running for _, tracker in self._trackers
+        )
+
+    @property
+    def listeners_running(self) -> bool:
+        return any(tracker.is_running for _, tracker in self._trackers)
 
     def stop(self) -> None:
         """Request shutdown, immediately interrupting the reporting wait."""
@@ -163,8 +196,15 @@ class ActivityAgent:
         failed = False
         cleanup_failures = []
         final_interval = None
+        policy_done = Event()
+        policy_worker = None
         try:
+            if not self._recording_allowed() and not self._stop_event.is_set():
+                self.pause_reason = "working_hours"
+                self._output("Tracking PAUSED: outside working hours. " + self.policy.describe())
+                self.stop()
             if not self._stop_event.is_set():
+                self._output("Working-hours policy: " + self.policy.describe())
                 self._output(
                     "WorkPulse foreground activity tracking is starting. "
                     "Mouse movement, mouse click and key press counts, plus the current "
@@ -179,6 +219,10 @@ class ActivityAgent:
                 for _, tracker in self._trackers:
                     if self._stop_event.is_set():
                         break
+                    if not self._recording_allowed():
+                        self.pause_reason = "working_hours"
+                        self.stop()
+                        break
                     tracker.start()
 
                 if not self._stop_event.is_set():
@@ -186,6 +230,10 @@ class ActivityAgent:
                     self.activity_state.touch()
                     self.activity_calculator.start()
                     started = True
+                    self._tracking_event.set()
+                    policy_worker = Thread(target=self._watch_policy, args=(policy_done,),
+                                           name="WorkPulse working-hours control")
+                    policy_worker.start()
                     self._output(
                         "Activity tracking RUNNING. "
                         f"Cumulative summaries every {config.TRACKING_INTERVAL} seconds; "
@@ -207,6 +255,10 @@ class ActivityAgent:
         except Exception:
             failed = True
         finally:
+            policy_done.set()
+            if policy_worker is not None:
+                policy_worker.join()
+            self._tracking_event.clear()
             self.stop()
             try:
                 cleanup_failures = self._stop_listeners()
@@ -222,6 +274,8 @@ class ActivityAgent:
                 self._output(json.dumps(final_interval, allow_nan=False))
             except (Exception, KeyboardInterrupt):
                 failed = True
+        if self.pause_reason == "working_hours":
+            self._output("Tracking PAUSED by working-hours policy. No listeners remain after successful cleanup.")
         reported = self._report_shutdown(
             started=started, failed=failed, cleanup_failures=cleanup_failures
         )

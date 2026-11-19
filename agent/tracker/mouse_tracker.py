@@ -28,7 +28,7 @@ class MouseTracker(ActivityTracker):
     def _record_activity(self, *, movement: bool = False, click: bool = False) -> None:
         """Keep callbacks short; counts and activity change together."""
         with self._counter_lock:
-            if not self._enabled:
+            if not self._enabled or not self.activity_state.recording_allowed():
                 return
             self._movement_count += int(movement)
             self._click_count += int(click)

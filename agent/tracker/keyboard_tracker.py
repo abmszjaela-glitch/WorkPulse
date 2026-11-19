@@ -34,7 +34,7 @@ class KeyboardTracker(ActivityTracker):
         del _key
         try:
             with self._counter_lock:
-                if not self._enabled:
+                if not self._enabled or not self.activity_state.recording_allowed():
                     return None
                 self._key_press_count += 1
                 self.activity_state.touch()
