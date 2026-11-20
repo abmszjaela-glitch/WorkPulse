@@ -1,6 +1,7 @@
 import { ApiError } from '../utils/api-error.js';
+import { loadMonitoringConfig } from '../config/monitoring.js';
 
-export function createCoreRepository(client) {
+export function createCoreRepository(client, { offlineTimeoutSeconds=loadMonitoringConfig().offlineTimeoutSeconds }={}) {
   async function rpc(name, args) {
     const { data, error } = await client.rpc(name, args);
     if (error) {
@@ -17,7 +18,7 @@ export function createCoreRepository(client) {
     employeeSummary: (actor) => rpc('wp_core_employee_summary', { p_actor: actor.userId }),
     departments: (actor, options) => rpc('wp_core_departments_read', { p_actor: actor.userId, p_options: options }),
     departmentWrite: (actor, action, id, data) => rpc('wp_core_department_write', { p_actor: actor.userId, p_action: action, p_id: id, p_data: data }),
-    devices: (actor, action, id = null, data = {}) => rpc('wp_core_devices', { p_actor: actor.userId, p_device: actor.deviceId || null, p_action: action, p_id: id, p_data: data }),
+    devices: (actor, action, id = null, data = {}) => rpc('wp_core_devices', { p_actor: actor.userId, p_device: actor.deviceId || null, p_action: action, p_id: id, p_data: {...data,offlineTimeoutSeconds} }),
     profile: (actor, action, data = {}) => rpc('wp_core_profile', { p_actor: actor.userId, p_action: action, p_data: data }),
     consent: (actor, action, data = {}) => rpc('wp_core_consent', { p_actor: actor.userId, p_device: actor.deviceId || null, p_action: action, p_data: data }),
   };

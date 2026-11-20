@@ -9,6 +9,7 @@ export function createDepartmentService({ repository, metrics = null }) {
     write: (actor, action, id, data) => repository.departmentWrite(actor, action, id, data),
     async employees(actor, id, options) { await get(actor,id); return repository.employees(actor,{...options,departmentId:id}); },
     async productivity(actor, id, options) {
+      if (options.from && options.to && options.from > options.to) throw new ApiError(400, 'Invalid date range');
       await get(actor,id);
       if (!metrics) throw new ApiError(503, 'Department productivity requires an approved activity telemetry source');
       return metrics.forDepartment(actor,id,options);

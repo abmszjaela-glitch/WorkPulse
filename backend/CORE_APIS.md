@@ -134,6 +134,14 @@ its visible authorization and working-hours controls. Defaults/overrides live in
 
 ## Files and verification
 
+HTTP handling is separated into `employee-controller.js`, `department-controller.js`,
+`device-controller.js`, `profile-controller.js` and `consent-controller.js` under
+`controllers/`, alongside the existing `auth-controller.js`. Routes declare paths,
+authorization and validation; controllers handle HTTP responses; services handle
+operations and repositories handle database access. Consent uses `services/consent.js`
+so its controller does not call a repository directly. Controller factories receive
+services explicitly and remain compatible with the existing integration test setup.
+
 Added: `config/agent-policy.js`, `config/core-runtime.js`, `middleware/core-validation.js`,
 `routes/core.js`, `services/core-repository.js`, `services/employees.js`,
 `services/departments.js`, `services/devices.js`, `services/profile.js`, `utils/csv.js`,

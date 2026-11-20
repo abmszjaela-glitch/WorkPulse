@@ -205,7 +205,7 @@ domain verification is claimed until configured and tested with an authorized re
 
 ## Verification
 
-Latest combined run: **58 passed, 0 failed**. Configured-backend health and 404 checks
+Latest combined run: **82 passed, 0 failed**. Configured-backend health and 404 checks
 passed; authentication correctly returned 503 with no signing secret configured.
 Production dependency audit reported 0 vulnerabilities. The development-only
 Nodemon/minimatch chain has 2 moderate advisories; no forced dependency downgrade
@@ -222,3 +222,9 @@ and client integration are not tested until deployment prerequisites are supplie
 See [Phase 3 APIs and completion report](CORE_APIS.md) and
 [machine-readable results](reports/phase3-results.json). Live activation and
 department productivity remain pending as documented there.
+
+See [Phase 4 agent data APIs and compatibility report](AGENT_DATA_APIS.md),
+[observed local HTTP examples](reports/phase4-http-examples.json) and
+[Phase 4 verification results](reports/phase4-results.json). The agent's existing
+queue envelope is supported; its missing network/auth integration is not silently
+implemented or claimed working.

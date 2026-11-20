@@ -13,6 +13,7 @@ import { createEmployeeService } from '../services/employees.js';
 import { createDepartmentService } from '../services/departments.js';
 import { createDeviceService } from '../services/devices.js';
 import { createProfileService } from '../services/profile.js';
+import { createConsentService } from '../services/consent.js';
 import { hashPassword } from '../services/passwords.js';
 import { createCoreRouter } from '../routes/core.js';
 import { errorHandler,notFound } from '../middleware/error-handler.js';
@@ -27,7 +28,7 @@ const mailer={async sendAccountCreated(){},async sendPasswordChanged(){},assertR
 const auth=createAuthService({repository:createAuthRepository(client),config,mailer});
 const repository=createCoreRepository(client);
 const services={auth,repository,employees:createEmployeeService({repository,config,mailer}),departments:createDepartmentService({repository}),
-  devices:createDeviceService({repository,config,policy:loadAgentPolicy()}),profile:createProfileService({repository})};
+  devices:createDeviceService({repository,config,policy:loadAgentPolicy()}),profile:createProfileService({repository}),consent:createConsentService({repository})};
 const coverage=new Set();
 async function seed(role='E') {
   const id=randomUUID(),email=`${id}@example.test`;
@@ -270,7 +271,8 @@ test('database failures are sanitized through actual HTTP routes for every manag
   const failing=createCoreRepository({rpc:async()=>({error:{code:'PGRST205',message:'private-database-detail'}})});
   const app=express();app.use(express.json());app.use('/api/v1',createCoreRouter({auth,repository:failing,
     employees:createEmployeeService({repository:failing,config,mailer}),departments:createDepartmentService({repository:failing}),
-    devices:createDeviceService({repository:failing,config,policy:loadAgentPolicy()}),profile:createProfileService({repository:failing})}));app.use(errorHandler);
+    devices:createDeviceService({repository:failing,config,policy:loadAgentPolicy()}),profile:createProfileService({repository:failing}),
+    consent:createConsentService({repository:failing})}));app.use(errorHandler);
   const temporary=app.listen(0,'127.0.0.1');await new Promise(resolve=>temporary.once('listening',resolve));
   try {
     for(const path of ['/employees','/departments','/devices','/profile','/consent/policy']) {

@@ -1,0 +1,364 @@
+{
+  "source": "Actual local integration HTTP responses using synthetic identities and the existing agent serializer fixture. Authorization credentials deliberately omitted.",
+  "examples": [
+    {
+      "name": "Single activity",
+      "method": "POST",
+      "path": "/api/v1/activity",
+      "request": {
+        "record_id": "27bf0a65-d9ff-4709-9714-e45aa7489c75",
+        "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+        "interval_end": "2026-11-19T06:45:56.123456+00:00",
+        "interval_start": "2026-11-19T06:44:56.123456+00:00",
+        "summary": {
+          "active_seconds": 50,
+          "activity_score": 21.5,
+          "application_usage_seconds": {
+            "code.exe": 45
+          },
+          "counts": {
+            "key_presses": 44,
+            "mouse_clicks": 3,
+            "mouse_movements": 120
+          },
+          "idle_seconds": 10,
+          "interval_seconds": 60,
+          "score_is_productivity_or_performance": false,
+          "score_type": "input_activity_intensity",
+          "status": "ACTIVE"
+        },
+        "sync_status": "pending"
+      },
+      "responseStatus": 201,
+      "response": {
+        "acknowledged_record_ids": [
+          "27bf0a65-d9ff-4709-9714-e45aa7489c75"
+        ],
+        "results": [
+          {
+            "index": 0,
+            "status": "accepted",
+            "record_id": "27bf0a65-d9ff-4709-9714-e45aa7489c75",
+            "http_status": 201
+          }
+        ]
+      }
+    },
+    {
+      "name": "Single application usage",
+      "method": "POST",
+      "path": "/api/v1/app-usage",
+      "requestHeaders": {},
+      "request": {
+        "record_id": "d730ad4f-4cef-45d5-bc90-9f99e8c43141",
+        "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+        "interval_end": "2026-11-19T06:51:56.123456+00:00",
+        "interval_start": "2026-11-19T06:50:56.123456+00:00",
+        "summary": {
+          "active_seconds": 50,
+          "activity_score": 21.5,
+          "application_usage_seconds": {
+            "chrome.exe": 30,
+            "code.exe": 15
+          },
+          "counts": {
+            "key_presses": 44,
+            "mouse_clicks": 3,
+            "mouse_movements": 120
+          },
+          "idle_seconds": 10,
+          "interval_seconds": 60,
+          "score_is_productivity_or_performance": false,
+          "score_type": "input_activity_intensity",
+          "status": "ACTIVE"
+        },
+        "sync_status": "pending"
+      },
+      "responseStatus": 201,
+      "response": {
+        "acknowledged_record_ids": [
+          "d730ad4f-4cef-45d5-bc90-9f99e8c43141"
+        ],
+        "results": [
+          {
+            "index": 0,
+            "status": "accepted",
+            "record_id": "d730ad4f-4cef-45d5-bc90-9f99e8c43141",
+            "http_status": 201
+          }
+        ]
+      }
+    },
+    {
+      "name": "Application usage batch",
+      "method": "POST",
+      "path": "/api/v1/app-usage/batch",
+      "requestHeaders": {},
+      "request": [
+        {
+          "record_id": "31b78b13-24fa-40f3-9506-7d701acbc500",
+          "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+          "interval_end": "2026-11-19T06:53:56.123456+00:00",
+          "interval_start": "2026-11-19T06:52:56.123456+00:00",
+          "summary": {
+            "active_seconds": 50,
+            "activity_score": 21.5,
+            "application_usage_seconds": {
+              "code.exe": 45
+            },
+            "counts": {
+              "key_presses": 44,
+              "mouse_clicks": 3,
+              "mouse_movements": 120
+            },
+            "idle_seconds": 10,
+            "interval_seconds": 60,
+            "score_is_productivity_or_performance": false,
+            "score_type": "input_activity_intensity",
+            "status": "ACTIVE"
+          },
+          "sync_status": "pending"
+        },
+        {
+          "record_id": "42300821-237d-4507-aabd-a4989377654a",
+          "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+          "interval_end": "2026-11-19T06:55:56.123456+00:00",
+          "interval_start": "2026-11-19T06:54:56.123456+00:00",
+          "summary": {
+            "active_seconds": 50,
+            "activity_score": 21.5,
+            "application_usage_seconds": {
+              "code.exe": 45
+            },
+            "counts": {
+              "key_presses": 44,
+              "mouse_clicks": 3,
+              "mouse_movements": 120
+            },
+            "idle_seconds": 10,
+            "interval_seconds": 60,
+            "score_is_productivity_or_performance": false,
+            "score_type": "input_activity_intensity",
+            "status": "ACTIVE"
+          },
+          "sync_status": "pending"
+        }
+      ],
+      "responseStatus": 200,
+      "response": {
+        "acknowledged_record_ids": [
+          "31b78b13-24fa-40f3-9506-7d701acbc500",
+          "42300821-237d-4507-aabd-a4989377654a"
+        ],
+        "results": [
+          {
+            "index": 0,
+            "status": "accepted",
+            "record_id": "31b78b13-24fa-40f3-9506-7d701acbc500",
+            "http_status": 201
+          },
+          {
+            "index": 1,
+            "status": "accepted",
+            "record_id": "42300821-237d-4507-aabd-a4989377654a",
+            "http_status": 201
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mixed activity batch",
+      "method": "POST",
+      "path": "/api/v1/activity/batch",
+      "requestHeaders": {},
+      "request": [
+        {
+          "record_id": "f7b5a822-f7d5-42e6-a2bb-fb2504c5e1b8",
+          "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+          "interval_end": "2026-11-19T06:57:56.123456+00:00",
+          "interval_start": "2026-11-19T06:56:56.123456+00:00",
+          "summary": {
+            "active_seconds": 50,
+            "activity_score": 21.5,
+            "application_usage_seconds": {
+              "code.exe": 45
+            },
+            "counts": {
+              "key_presses": 44,
+              "mouse_clicks": 3,
+              "mouse_movements": 120
+            },
+            "idle_seconds": 10,
+            "interval_seconds": 60,
+            "score_is_productivity_or_performance": false,
+            "score_type": "input_activity_intensity",
+            "status": "ACTIVE"
+          },
+          "sync_status": "pending"
+        },
+        {
+          "record_id": "afc15f33-4c78-4369-9cc1-f5082423f732"
+        },
+        {
+          "record_id": "f7b5a822-f7d5-42e6-a2bb-fb2504c5e1b8",
+          "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+          "interval_end": "2026-11-19T06:57:56.123456+00:00",
+          "interval_start": "2026-11-19T06:56:56.123456+00:00",
+          "summary": {
+            "active_seconds": 50,
+            "activity_score": 21.5,
+            "application_usage_seconds": {
+              "code.exe": 45
+            },
+            "counts": {
+              "key_presses": 44,
+              "mouse_clicks": 3,
+              "mouse_movements": 120
+            },
+            "idle_seconds": 10,
+            "interval_seconds": 60,
+            "score_is_productivity_or_performance": false,
+            "score_type": "input_activity_intensity",
+            "status": "ACTIVE"
+          },
+          "sync_status": "pending"
+        },
+        {
+          "record_id": "f7b5a822-f7d5-42e6-a2bb-fb2504c5e1b8",
+          "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+          "interval_end": "2026-11-19T06:57:56.123456+00:00",
+          "interval_start": "2026-11-19T06:56:56.123456+00:00",
+          "summary": {
+            "active_seconds": 50,
+            "activity_score": 21.5,
+            "application_usage_seconds": {
+              "code.exe": 45
+            },
+            "counts": {
+              "key_presses": 45,
+              "mouse_clicks": 3,
+              "mouse_movements": 120
+            },
+            "idle_seconds": 10,
+            "interval_seconds": 60,
+            "score_is_productivity_or_performance": false,
+            "score_type": "input_activity_intensity",
+            "status": "ACTIVE"
+          },
+          "sync_status": "pending"
+        },
+        {
+          "record_id": "e416d556-902f-4cce-85dc-98eaa3eab8c2",
+          "employee_id": "4d7f8b0c-7924-428d-b069-a68d07a6d6fb",
+          "interval_end": "2026-11-20T07:45:59.123456+00:00",
+          "interval_start": "2026-11-20T07:44:59.123456+00:00",
+          "summary": {
+            "active_seconds": 50,
+            "activity_score": 21.5,
+            "application_usage_seconds": {
+              "code.exe": 45
+            },
+            "counts": {
+              "key_presses": 44,
+              "mouse_clicks": 3,
+              "mouse_movements": 120
+            },
+            "idle_seconds": 10,
+            "interval_seconds": 60,
+            "score_is_productivity_or_performance": false,
+            "score_type": "input_activity_intensity",
+            "status": "ACTIVE"
+          },
+          "sync_status": "pending"
+        }
+      ],
+      "responseStatus": 207,
+      "response": {
+        "acknowledged_record_ids": [
+          "f7b5a822-f7d5-42e6-a2bb-fb2504c5e1b8"
+        ],
+        "results": [
+          {
+            "index": 0,
+            "status": "accepted",
+            "record_id": "f7b5a822-f7d5-42e6-a2bb-fb2504c5e1b8",
+            "http_status": 201
+          },
+          {
+            "index": 1,
+            "record_id": "afc15f33-4c78-4369-9cc1-f5082423f732",
+            "status": "rejected",
+            "http_status": 400,
+            "error": {
+              "message": "Invalid aggregate activity record"
+            }
+          },
+          {
+            "index": 2,
+            "status": "duplicate",
+            "record_id": "f7b5a822-f7d5-42e6-a2bb-fb2504c5e1b8",
+            "http_status": 200
+          },
+          {
+            "error": {
+              "message": "Record ID conflicts with stored data"
+            },
+            "index": 3,
+            "status": "rejected",
+            "record_id": "f7b5a822-f7d5-42e6-a2bb-fb2504c5e1b8",
+            "http_status": 409
+          },
+          {
+            "error": {
+              "message": "Activity timestamps outside allowed range"
+            },
+            "index": 4,
+            "status": "rejected",
+            "record_id": "e416d556-902f-4cce-85dc-98eaa3eab8c2",
+            "http_status": 400
+          }
+        ]
+      }
+    },
+    {
+      "name": "Current status",
+      "method": "POST",
+      "path": "/api/v1/status",
+      "requestHeaders": {
+        "Idempotency-Key": "f64f80a2-3b37-4b2e-b05f-fcf6e6163354"
+      },
+      "request": {
+        "status": "ACTIVE"
+      },
+      "responseStatus": 200,
+      "response": {
+        "status": "ACTIVE",
+        "statusAt": "2026-11-20T06:44:59.388+00:00",
+        "duplicate": false,
+        "record_id": "f64f80a2-3b37-4b2e-b05f-fcf6e6163354",
+        "occurred_at": "2026-11-20T06:44:59.388+00:00",
+        "reportedStatus": "ACTIVE",
+        "connectionState": "ONLINE",
+        "effectiveStatus": "ACTIVE",
+        "offlineTimeoutSeconds": 300
+      }
+    },
+    {
+      "name": "Heartbeat after timeout",
+      "method": "POST",
+      "path": "/api/v1/devices/heartbeat",
+      "requestHeaders": {},
+      "request": {},
+      "responseStatus": 200,
+      "response": {
+        "deviceId": "08e55d89-bfda-4df2-ba89-aab4f313406e",
+        "lastSeen": "2026-11-20T06:44:59.456+00:00",
+        "statusAt": "2026-11-20T06:44:59.435+00:00",
+        "reportedStatus": "PAUSED",
+        "connectionState": "ONLINE",
+        "effectiveStatus": "PAUSED",
+        "offlineTimeoutSeconds": 300
+      }
+    }
+  ]
+}

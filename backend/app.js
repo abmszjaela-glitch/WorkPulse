@@ -9,6 +9,8 @@ import { createConfiguredAuthService } from './config/auth-runtime.js';
 import { ApiError } from './utils/api-error.js';
 import { createCoreRouter } from './routes/core.js';
 import { createConfiguredCore } from './config/core-runtime.js';
+import { createMonitoringRouter } from './routes/monitoring.js';
+import { createConfiguredMonitoring } from './config/monitoring-runtime.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -32,8 +34,9 @@ app.use('/api/v1/auth', authService ? createAuthRouter(authService) : (req, res,
 });
 if (authService) {
   app.use('/api/v1',createCoreRouter(createConfiguredCore(authService)));
+  app.use('/api/v1',createMonitoringRouter(createConfiguredMonitoring(authService)));
 } else {
-  for (const resource of ['employees','departments','devices','profile','consent']) {
+  for (const resource of ['employees','departments','devices','profile','consent','activity','app-usage','status']) {
     app.use(`/api/v1/${resource}`,(req,res,next)=>next(new ApiError(503,'Authentication is not configured')));
   }
 }
