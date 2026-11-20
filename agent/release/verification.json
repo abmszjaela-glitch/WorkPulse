@@ -1,5 +1,5 @@
 {
-  "tested_at_utc": "2026-11-19T11:39:22.483822+00:00",
+  "tested_at_utc": "2026-11-20T05:01:52.490286+00:00",
   "windows_build": 26200,
   "mode": "Isolated per-user installation; elevated Program Files path not tested",
   "checks": {
@@ -10,6 +10,8 @@
     "privacy_and_user_guide": "PASS",
     "no_development_guides": "PASS",
     "installed_paused_native_smoke": "PASS",
+    "desktop_link_target": "PASS",
+    "installed_desktop_shortcut_opens_paused_gui": "PASS",
     "uninstall": "PASS",
     "app_and_start_menu_removed": "PASS",
     "desktop_removed": "PASS",
@@ -49,6 +51,15 @@
     "publisher_display_name": "WorkPulse",
     "python": "3.15.2",
     "windows_build": 26200
+  },
+  "desktop_shortcut_gui": {
+    "window_title": "WorkPulse Agent 1.0.0",
+    "window_was_visible": true,
+    "tray_was_visible": true,
+    "tracking_never_started": true,
+    "callback_error_seen": false,
+    "tracking": "Tracking PAUSED",
+    "employee_status": "Not signed in; backend authentication unavailable"
   },
   "status": "PASS"
 }

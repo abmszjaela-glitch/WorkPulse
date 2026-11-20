@@ -531,6 +531,24 @@ The smoke test is explicit (`--smoke-test`) and never starts activity tracking.
 
 # Windows installer and release version
 
+The desktop now opens the compact Paused/session-summary screen, with matching
+Sign In and Before we start consent pages. Rounded cards use CustomTkinter 6.0.0;
+the existing tray worker, tracking agent, emergency stop and working-hours policy
+remain in control. Sign In is disabled until a real backend adapter exists. No
+employee identity, logged shift, offline cache size or successful upload is
+fabricated. Details shows actual anonymous counters, application name and last
+acknowledged sync; the main card shows actual current-session durations.
+Consent alone never starts tracking. A local start still requires explicit
+authorization and allowed working hours. The tray exposes Open WorkPulse,
+Today's summary, Privacy policy and Sign out, retaining emergency controls.
+Green means enabled tracking, amber means idle, gray means paused; paused input
+listeners remain stopped. The next work-window display handles IANA/DST policy.
+
+Build `packaging/WorkPulseAgent-gui.spec` and run
+`packaging/verify_desktop.py --exe dist/gui/WorkPulseAgent/WorkPulseAgent.exe`
+from the agent directory, then compile `installer/build_release.py`. This includes
+the CustomTkinter theme/font resources and keeps the executable windowed.
+
 `version.py` is the single Agent release-metadata source: WorkPulse Agent 1.0.0,
 publisher display WorkPulse, description WorkPulse Employee Activity Tracking
 Agent. The initial Agent version is independent of the backend package. The tray

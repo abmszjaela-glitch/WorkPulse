@@ -38,3 +38,32 @@ class WorkingHoursPolicy:
     def describe(self):
         days = ", ".join(("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")[d] for d in sorted(self.days))
         return f"{days} {self.start:%H:%M}–{self.end:%H:%M} ({self.zone.key})"
+
+    def next_start(self, now=None):
+        """Next real opening instant, including repeated/nonexistent DST starts."""
+        now = datetime.now(timezone.utc) if now is None else now
+        if now.tzinfo is None or now.utcoffset() is None:
+            raise ValueError("Policy decisions require an aware datetime.")
+        local = now.astimezone(self.zone)
+        candidates = []
+        for offset in range(9):
+            day = local.date() + timedelta(days=offset)
+            if day.weekday() not in self.days:
+                continue
+            wall = datetime.combine(day, self.start)
+            instants = sorted({wall.replace(tzinfo=self.zone, fold=fold).astimezone(timezone.utc) for fold in (0, 1)})
+            for instant in instants:
+                if instant > now and self.allows(instant) and not self.allows(instant - timedelta(microseconds=1)):
+                    candidates.append(instant)
+            # Spring-forward start inside the missing hour: find the actual jump.
+            if len(instants) == 2 and not self.allows(instants[0]) and self.allows(instants[1]):
+                low, high = instants
+                while (high - low).total_seconds() > 1:
+                    middle = low + timedelta(seconds=int((high - low).total_seconds() // 2))
+                    if self.allows(middle):
+                        high = middle
+                    else:
+                        low = middle
+                if high > now:
+                    candidates.append(high)
+        return min(candidates).astimezone(self.zone) if candidates else None

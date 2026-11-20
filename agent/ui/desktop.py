@@ -29,7 +29,9 @@ class DesktopApplication:
         self._events = Queue()
         self.controller = controller or WorkPulseTray(
             agent_factory=lambda **kwargs: ActivityAgent(output=lambda _message: None, **kwargs),
-            open_window=lambda: self._events.put("open"))
+            open_window=lambda: self._events.put("open"),
+            show_summary=lambda: self._events.put("summary"),
+            privacy_policy=lambda: self._events.put("privacy"))
         self.diagnostic = diagnostic
         self._exercise_error = exercise_error
         self._callback_error_seen = False
@@ -40,6 +42,10 @@ class DesktopApplication:
         self._last_view = self.controller.desktop_snapshot()
         self._thread = None
         self._poll_id = None
+        self._build_window()
+
+    def _build_window(self):
+        root = self.root
         self.root.title(f"{APP_NAME} {APP_VERSION}")
         self.root.geometry("980x760")
         self.root.minsize(850, 710)
@@ -152,9 +158,12 @@ class DesktopApplication:
         try:
             while True:
                 event = self._events.get_nowait()
-                if event == "open":
+                if event in ("open", "summary", "privacy"):
                     self.root.deiconify()
                     self.root.lift()
+                    callback = getattr(self, "show_summary" if event != "privacy" else "show_privacy", None)
+                    if callback is not None:
+                        callback()
                 else:
                     self.emergency_stop()
                     self._error_message = "Background control failed. Tracking stopped; review logs."
@@ -238,8 +247,9 @@ class DesktopApplication:
 
 
 def run_desktop(*, diagnostic=False, exercise_error=False, diagnostics_file=None):
+    from .compact import CompactDesktop
     root = tk.Tk()
-    application = DesktopApplication(root, diagnostic=diagnostic, exercise_error=exercise_error)
+    application = CompactDesktop(root, diagnostic=diagnostic, exercise_error=exercise_error)
     try:
         result = application.run()
     finally:

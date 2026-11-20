@@ -28,13 +28,13 @@ def build(spec_directory, *, onefile, windowed=False):
         ])]), VarFileInfo([VarStruct("Translation", [1033, 1200])])])
     # No directory-wide add-data: never bundle .env, local queues, logs, reports,
     # venv, test fixtures, credentials, or the frontend/backend source trees.
-    datas = collect_data_files("tzdata") + collect_data_files("certifi")
+    datas = collect_data_files("tzdata") + collect_data_files("certifi") + collect_data_files("customtkinter")
     hidden = [
         "pynput.mouse._win32", "pynput.keyboard._win32", "pynput._util.win32",
         "pystray._win32", "psutil._psutil_windows", "pywintypes",
         "win32api", "win32con", "win32gui", "win32process", "win32security",
         "win32file", "win32crypt", "win32cryptcon", "win32cred", "ntsecuritycon",
-        "agent.ui.login", "agent.ui.desktop", "agent.desktop_bootstrap", "agent.core.offline_queue", "requests", "tkinter", "tkinter.ttk",
+        "agent.ui.login", "agent.ui.desktop", "agent.ui.compact", "agent.desktop_bootstrap", "agent.core.offline_queue", "requests", "tkinter", "tkinter.ttk", "customtkinter", "darkdetect", "PIL._tkinter_finder",
     ]
     analysis = Analysis(
         [str(agent / "start_agent.py")], pathex=[str(repository)],

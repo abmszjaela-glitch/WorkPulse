@@ -1,22 +1,18 @@
 {
-  "compiled_at_utc": "2026-11-19T11:37:11.337371+00:00",
+  "compiled_at_utc": "2026-11-20T05:13:45.910509+00:00",
   "compiler": "C:\\Users\\DELL\\AppData\\Local\\Programs\\Inno Setup 7\\ISCC.exe",
   "output": "C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\release\\WorkPulseAgentSetup.exe",
-  "bytes": 21871466,
-  "sha256": "b87ddbefa3e4bcee0cacc98f59aae1fdc066010ed9f0e411a76ec9bfa2578c45",
-  "source_executable": "C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\dist\\onedir\\WorkPulseAgent\\WorkPulseAgent.exe",
+  "bytes": 22332666,
+  "sha256": "8a3cc7f1d4c32c0ab15781d0b2f0afc70556153e2ae58c3da318cc06fc27517e",
+  "source_executable": "C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\dist\\gui\\WorkPulseAgent\\WorkPulseAgent.exe",
   "version": "1.0.0",
   "publisher_display_name": "WorkPulse (provisional)",
   "compilation": "PASS",
-  "signing": "Unsigned (Authenticode NotSigned)",
+  "signing": "Not configured",
   "errors": [],
   "target_os": [
     "Windows 10 x64",
     "Windows 11 x64"
   ],
-  "windows_10_execution": "NOT TESTED",
-  "compiler_version": "Inno Setup 7.1.1",
-  "compiler_notice": "Non-commercial use only; commercial licensing not verified",
-  "verification": "PASS",
-  "verification_scope": "Windows 11 build 26200, isolated per-user install; default elevated Program Files installation not tested"
+  "windows_10_execution": "NOT TESTED"
 }

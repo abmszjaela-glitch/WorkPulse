@@ -54,17 +54,17 @@ class TrayState:
             return self.tracking, self.sync, self.last_sync
 
 
-def tray_image(active=False):
+def tray_image(active=False, idle=False):
     image = Image.new("RGBA", (64, 64), "#172554")
     draw = ImageDraw.Draw(image)
     draw.line([(9, 15), (19, 46), (32, 25), (43, 46), (54, 15)], fill="white", width=6)
-    draw.ellipse((43, 43, 63, 63), fill="#16A34A" if active else "#F59E0B", outline="white", width=2)
+    draw.ellipse((43, 43, 63, 63), fill="#F59E0B" if idle else ("#16A34A" if active else "#64748B"), outline="white", width=2)
     return image
 
 
 class WorkPulseTray:
     """Tray callbacks enqueue work; listener startup/shutdown runs off the UI thread."""
-    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, policy=None, startup=None, open_window=None):
+    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, policy=None, startup=None, open_window=None, show_summary=None, privacy_policy=None):
         self.state = TrayState()
         self._factory = agent_factory
         self._tokens = token_store or WindowsTokenStore(config.SERVER_URL)
@@ -92,6 +92,8 @@ class WorkPulseTray:
                 item(f"{APP_NAME} {APP_VERSION}", None, enabled=False),
                 item("About WorkPulse Agent", self._show_about),
                 item("Open WorkPulse Agent", lambda *_: self._open_window(), enabled=open_window is not None, default=open_window is not None),
+                item("Today's summary", lambda *_: show_summary(), enabled=show_summary is not None),
+                item("Privacy policy", lambda *_: privacy_policy(), enabled=privacy_policy is not None),
                 item(lambda _: self.state.snapshot()[0], None, enabled=False),
                 item("View tracking status", self._show_status, default=open_window is None),
                 item("Open dashboard", command("dashboard")),
@@ -119,6 +121,7 @@ class WorkPulseTray:
         result["startup"] = self._startup_status
         result["closed"] = self._closing.is_set()
         result["policy_open"] = self._policy_open
+        result["automatic_resume"] = self._requested and not self._manual_stop.is_set()
         result["tray_visible"] = bool(self.icon.visible)
         return result
 
@@ -127,7 +130,7 @@ class WorkPulseTray:
             return
         summary = self._agent.get_summary()
         values = {"mouse_movements": summary.mouse_movements, "mouse_clicks": summary.mouse_clicks,
-                  "key_presses": summary.key_presses, "active_app": summary.active_app or "Unavailable"}
+                  "key_presses": summary.key_presses, "active_app": summary.active_app or "Unavailable", "activity_status": summary.status}
         values.update(self._agent.get_session_durations())
         with self._view_lock:
             self._view.update(values)
@@ -158,10 +161,12 @@ class WorkPulseTray:
         elif self._runner is not None:
             self.state.set_tracking("Tracking starting / stopping" if self._runner.is_alive()
                                     else "Tracking STOPPED: inspect local agent")
-        title = "WorkPulse | " + self.state.snapshot()[0]
+        with self._view_lock:
+            idle = active and self._view.get("activity_status") == "IDLE"
+        title = "WorkPulse | " + self.state.snapshot()[0] + (" — Idle" if idle else "")
         if self.icon.title != title:
             self.icon.title = title
-            self.icon.icon = tray_image(active)
+            self.icon.icon = tray_image(active, idle)
             self.icon.notify(self.state.snapshot()[0], "WorkPulse tracking status")
             status = self.state.snapshot()[0]
             if status == "Tracking ON":
