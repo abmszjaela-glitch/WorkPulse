@@ -7,6 +7,8 @@ import { notFound, errorHandler } from './middleware/error-handler.js';
 import { createAuthRouter } from './routes/auth.js';
 import { createConfiguredAuthService } from './config/auth-runtime.js';
 import { ApiError } from './utils/api-error.js';
+import { createCoreRouter } from './routes/core.js';
+import { createConfiguredCore } from './config/core-runtime.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -28,6 +30,13 @@ try { authService = createConfiguredAuthService(); } catch {
 app.use('/api/v1/auth', authService ? createAuthRouter(authService) : (req, res, next) => {
   next(new ApiError(503, 'Authentication is not configured'));
 });
+if (authService) {
+  app.use('/api/v1',createCoreRouter(createConfiguredCore(authService)));
+} else {
+  for (const resource of ['employees','departments','devices','profile','consent']) {
+    app.use(`/api/v1/${resource}`,(req,res,next)=>next(new ApiError(503,'Authentication is not configured')));
+  }
+}
 app.use(notFound);
 app.use(errorHandler);
 

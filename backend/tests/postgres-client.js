@@ -7,13 +7,13 @@ export function postgresClient(db) {
   };
   async function execute(sql, params) {
     try { return { data: (await db.query(sql, params)).rows, error: null }; }
-    catch (error) { return { data: null, error: { code: error.code } }; }
+    catch (error) { return { data: null, error: { code: error.code, message: error.message } }; }
   }
   return {
     async rpc(name, args) {
       const result = await execute(`select public.${identifier(name)}(${Object.keys(args).map((key, i) =>
         `${identifier(key)} => $${i + 1}`).join(',')}) as value`, Object.values(args).map(value =>
-        typeof value === 'object' ? JSON.stringify(value) : value));
+        value !== null && typeof value === 'object' ? JSON.stringify(value) : value));
       return { data: result.data?.[0]?.value, error: result.error };
     },
     from(table) {

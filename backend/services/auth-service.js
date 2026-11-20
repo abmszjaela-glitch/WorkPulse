@@ -12,7 +12,7 @@ export function createAuthService({ repository, config, mailer, now = () => Date
   const tokens = createTokenService(config);
   const dummyHash = hashPassword(opaqueToken(), config.bcryptRounds);
   const invalid = () => new ApiError(401, 'Invalid credentials');
-  const available = (user) => user?.is_active && (!user.must_change_password
+  const available = (user) => user?.is_active && !user.deleted_at && (!user.must_change_password
     || !user.temporary_expires_at || Date.parse(user.temporary_expires_at) > now());
   const expiry = (seconds) => new Date(now() + seconds * 1000).toISOString();
 
@@ -56,7 +56,7 @@ export function createAuthService({ repository, config, mailer, now = () => Date
           || session.auth_version !== user.auth_version || (session.device_id || null) !== (claims.device_id || null)) throw invalid();
       if (session.device_id) {
         const device = await repository.getDevice(session.device_id);
-        if (!device?.is_active || device.user_id !== user.id) throw invalid();
+        if (!device?.is_active || device.deleted_at || device.user_id !== user.id) throw invalid();
       }
       return Object.freeze({ userId: user.id, sessionId: session.id, role: session.device_id ? 'Agent' : user.role,
         kind: session.device_id ? 'device' : 'user', deviceId: session.device_id || null,
@@ -127,7 +127,7 @@ export function createAuthService({ repository, config, mailer, now = () => Date
     async loginDevice(deviceId, credential) {
       const device = await repository.getDevice(deviceId);
       const candidate = tokenHash(credential);
-      if (!device?.is_active || !timingSafeEqual(Buffer.from(candidate), Buffer.from(device.credential_hash))) throw invalid();
+      if (!device?.is_active || device.deleted_at || !timingSafeEqual(Buffer.from(candidate), Buffer.from(device.credential_hash))) throw invalid();
       const user = await repository.getUser(device.user_id);
       if (!available(user) || user.must_change_password) throw invalid();
       return issue(user, device.id);

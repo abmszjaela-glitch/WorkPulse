@@ -148,10 +148,9 @@ and role Agent. A human login always issues a human token, including when used o
 the desktop. It never grants activity-upload privileges. Disabled devices or users
 fail immediately. Password management requires human credentials, not a device JWT.
 
-No `/devices/*` endpoints are added in this phase. The document labels
-`/devices/register` Agent-only despite saying it follows login; its initial
-enrollment authorization needs an explicit design in the device phase. Do not
-expose `loginDevice` or provisioning publicly to resolve that ambiguity.
+Phase 2 did not expose device endpoints. Phase 3 implements the documented routes
+using the trusted provisioning design in [Core APIs](CORE_APIS.md). Human login
+still cannot grant unrestricted Agent access through a public route.
 
 ## Security and operational limits
 
@@ -206,7 +205,7 @@ domain verification is claimed until configured and tested with an authorized re
 
 ## Verification
 
-Latest local run: **29 passed, 0 failed**. Configured-backend health and 404 checks
+Latest combined run: **58 passed, 0 failed**. Configured-backend health and 404 checks
 passed; authentication correctly returned 503 with no signing secret configured.
 Production dependency audit reported 0 vulnerabilities. The development-only
 Nodemon/minimatch chain has 2 moderate advisories; no forced dependency downgrade
@@ -219,3 +218,7 @@ are created; the configured live database is never mutated. Transaction replay
 and concurrent-promise tests are included; multi-process load testing remains a
 deployment check. Live migration, real employee credentials, real SMTP delivery
 and client integration are not tested until deployment prerequisites are supplied.
+
+See [Phase 3 APIs and completion report](CORE_APIS.md) and
+[machine-readable results](reports/phase3-results.json). Live activation and
+department productivity remain pending as documented there.
