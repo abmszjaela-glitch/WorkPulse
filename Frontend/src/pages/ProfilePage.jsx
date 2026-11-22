@@ -430,6 +430,7 @@ function ProfileForm() {
                           Preferred language
                           <select
                             className={field}
+                            aria-label="Preferred language"
                             value={draft.language}
                             onChange={(event) =>
                               update('language', event.target.value)
@@ -446,6 +447,7 @@ function ProfileForm() {
                           Time zone
                           <select
                             className={field}
+                            aria-label="Time zone"
                             value={draft.timezone}
                             onChange={(event) =>
                               update('timezone', event.target.value)
