@@ -11,7 +11,7 @@ import {
   UserRoundX,
   X,
 } from 'lucide-react'
-import { employeeDepartments, employeeRoles } from '../../data/employees.js'
+import { employeeRoles } from '../../data/employees.js'
 
 function generatePassword() {
   const groups = [
@@ -41,7 +41,7 @@ function generatePassword() {
 
 export default function EmployeeDialog({
   modal,
-  employees,
+  departments = [],
   onClose,
   onSave,
   onBulk,
@@ -49,30 +49,56 @@ export default function EmployeeDialog({
   const [error, setError] = useState(null)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [active, setActive] = useState(modal.employee?.status !== 'Deactivated')
+  const [saving, setSaving] = useState(false)
+  const active = modal.employee?.status !== 'Deactivated'
   const view = modal.type === 'view'
   const bulk = modal.type === 'department'
   const deactivate = modal.type === 'deactivate'
   const employee = modal.employee
   const targets = modal.targets || []
-  const submit = (event) => {
+  const close = () => {
+    if (!saving) onClose()
+  }
+  const submit = async (event) => {
     event.preventDefault()
+    if (saving) return
     const values = Object.fromEntries(new FormData(event.currentTarget))
-    const { temporaryPassword: ignoredPassword, ...profile } = values
-    void ignoredPassword
-    const data = {
-      ...profile,
-      name: `${values.firstName || ''} ${values.lastName || ''}`.trim(),
-      status: active ? 'Active' : 'Deactivated',
+    if (
+      !employee &&
+      !bulk &&
+      !deactivate &&
+      (password.length < 12 ||
+        new TextEncoder().encode(password).length > 72 ||
+        !/[A-Z]/.test(password) ||
+        !/[a-z]/.test(password) ||
+        !/[0-9]/.test(password) ||
+        !/[^a-zA-Z0-9]/.test(password))
+    ) {
+      setError({
+        message:
+          'Use a password of at least 12 characters with uppercase, lowercase, a number and a symbol (maximum 72 bytes).',
+      })
+      return
     }
-    delete data.firstName
-    delete data.lastName
-    const message =
-      bulk || deactivate
-        ? onBulk(values.department)
-        : onSave(data, employee?.id)
-    if (message) setError(message)
-    else onClose()
+    setError(null)
+    setSaving(true)
+    try {
+      const message =
+        bulk || deactivate
+          ? await onBulk(values.departmentId)
+          : await onSave({ ...values, password }, employee?.id)
+      if (message) setError(message)
+      else {
+        setPassword('')
+        onClose()
+      }
+    } catch {
+      setError({
+        message: 'The employee could not be saved. Please try again.',
+      })
+    } finally {
+      setSaving(false)
+    }
   }
   const title = view
     ? 'Employee details'
@@ -85,7 +111,7 @@ export default function EmployeeDialog({
           : 'Add New Employee'
   return (
     <Modal
-      onClose={onClose}
+      onClose={close}
       className={`employee-dialog ${deactivate ? 'deactivate-dialog' : ''}`}
       titleId="employee-dialog-title"
       descriptionId="employee-dialog-description"
@@ -99,7 +125,8 @@ export default function EmployeeDialog({
         <h2 id="employee-dialog-title">{title}</h2>
         <button
           className="icon-button dialog-close"
-          onClick={onClose}
+          onClick={close}
+          disabled={saving}
           aria-label="Close dialog"
         >
           <X size={19} />
@@ -107,7 +134,7 @@ export default function EmployeeDialog({
       </div>
       <p className="dialog-description" id="employee-dialog-description">
         {view || bulk
-          ? 'Changes apply to this preview session only.'
+          ? 'Employee details are loaded from the database.'
           : deactivate
             ? ''
             : 'Enter employee details and assign initial department permissions.'}
@@ -118,13 +145,14 @@ export default function EmployeeDialog({
             {[
               ['Name', employee.name],
               ['Email', employee.email],
-              ['Employee ID', employee.id],
+              ['Employee ID', employee.employeeCode],
               ['Department', employee.department],
               ['Role', employee.role],
               [
                 'Manager',
-                employees.find((row) => row.id === employee.manager)?.name ||
-                  'Not assigned',
+                employee.departmentId
+                  ? 'Managed through the department'
+                  : 'Not assigned',
               ],
               ['Phone', employee.phone || 'Not provided'],
               ['Device / agent', employee.agent],
@@ -142,273 +170,298 @@ export default function EmployeeDialog({
         </>
       ) : (
         <form onSubmit={submit}>
-          {deactivate ? (
-            <>
-              <div className="deactivate-targets">
-                {targets.map((target) => (
-                  <div key={target.id}>
-                    <span>
-                      {target.name
-                        .split(' ')
-                        .map((part) => part[0])
-                        .slice(0, 2)
-                        .join('')}
-                    </span>
+          <fieldset disabled={saving}>
+            {deactivate ? (
+              <>
+                <div className="deactivate-targets">
+                  {targets.map((target) => (
+                    <div key={target.id}>
+                      <span>
+                        {target.name
+                          .split(' ')
+                          .map((part) => part[0])
+                          .slice(0, 2)
+                          .join('')}
+                      </span>
+                      <p>
+                        <strong>{target.name}</strong> · {target.employeeCode} (
+                        {target.department})
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <p className="deactivate-explanation">
+                  {targets.length > 1 ? 'These employees' : 'This employee'}{' '}
+                  will be marked as deactivated. Their past data will be kept.
+                </p>
+                <div className="deactivate-agent-warning">
+                  <Unplug size={16} />
+                  <span>
+                    Deactivation blocks sign-in and authorized device
+                    submissions.
+                  </span>
+                </div>
+                <p className="dialog-preview-note">
+                  This changes the selected accounts in the database.
+                </p>
+              </>
+            ) : bulk ? (
+              <label className="em-field">
+                New department
+                <select
+                  name="departmentId"
+                  aria-label="New department"
+                  defaultValue=""
+                >
+                  <option value="">Unassigned</option>
+                  {departments
+                    .filter((row) => row.is_active)
+                    .map((row) => (
+                      <option key={row.id} value={row.id}>
+                        {row.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            ) : (
+              <>
+                <div className="employee-form-grid">
+                  <label className="em-field">
+                    First name
+                    <input
+                      name="firstName"
+                      defaultValue={employee?.firstName}
+                      required
+                      maxLength={100}
+                      autoComplete="given-name"
+                      placeholder="First name"
+                    />
+                  </label>
+                  <label className="em-field">
+                    Last name
+                    <input
+                      name="lastName"
+                      defaultValue={employee?.lastName}
+                      required
+                      maxLength={100}
+                      autoComplete="family-name"
+                      placeholder="Last name"
+                    />
+                  </label>
+                  <label className="em-field">
+                    Email address
+                    <input
+                      name="email"
+                      aria-label="Email address"
+                      type="email"
+                      defaultValue={employee?.email}
+                      required
+                      maxLength={254}
+                      autoComplete="email"
+                      placeholder="Employee email address"
+                      aria-invalid={error?.field === 'email'}
+                      aria-describedby={
+                        error?.field === 'email'
+                          ? 'employee-email-error'
+                          : undefined
+                      }
+                      onChange={() => setError(null)}
+                    />
+                    {error?.field === 'email' && (
+                      <span
+                        id="employee-email-error"
+                        className="em-form-error"
+                        role="alert"
+                      >
+                        <TriangleAlert size={12} />
+                        {error.message}
+                      </span>
+                    )}
+                  </label>
+                  <label className="em-field">
+                    Phone number
+                    <input
+                      name="phone"
+                      type="tel"
+                      defaultValue={employee?.phone}
+                      autoComplete="tel"
+                      maxLength={32}
+                      placeholder="Phone number"
+                    />
+                  </label>
+                  <label className="em-field">
+                    Employee ID
+                    <input
+                      name="employeeCode"
+                      aria-label="Employee ID"
+                      defaultValue={employee?.employeeCode}
+                      placeholder="Employee ID"
+                      required
+                      maxLength={64}
+                      aria-invalid={error?.field === 'id'}
+                      onChange={() => setError(null)}
+                    />
+                    {error?.field === 'id' && (
+                      <span className="em-form-error" role="alert">
+                        {error.message}
+                      </span>
+                    )}
+                  </label>
+                  <label className="em-field">
+                    Department
+                    <select
+                      name="departmentId"
+                      aria-label="Department"
+                      defaultValue={employee?.departmentId || ''}
+                    >
+                      <option value="">Unassigned</option>
+                      {departments
+                        .filter(
+                          (row) =>
+                            row.is_active || row.id === employee?.departmentId,
+                        )
+                        .map((row) => (
+                          <option
+                            key={row.id}
+                            value={row.id}
+                            disabled={!row.is_active}
+                          >
+                            {row.name}
+                            {!row.is_active ? ' (inactive)' : ''}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <label className="em-field">
+                    Role
+                    <select
+                      name="role"
+                      aria-label="Role"
+                      defaultValue={employee?.role || 'Employee'}
+                    >
+                      {employeeRoles.map((value) => (
+                        <option key={value}>{value}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="em-field">
+                    Manager
+                    <select aria-label="Manager" disabled>
+                      <option>Managed through the department</option>
+                    </select>
+                  </label>
+                </div>
+                {!employee && (
+                  <div className="temporary-password">
+                    <div>
+                      <label htmlFor="temporary-password">
+                        Temporary Password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setPassword(generatePassword())}
+                      >
+                        <RefreshCw size={12} />
+                        Generate
+                      </button>
+                    </div>
+                    <div className="temporary-password-input">
+                      <input
+                        id="temporary-password"
+                        name="temporaryPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        minLength={12}
+                        required
+                        autoComplete="new-password"
+                        placeholder="Generate a temporary password"
+                      />
+                      <button
+                        type="button"
+                        aria-label={
+                          showPassword
+                            ? 'Hide temporary password'
+                            : 'Show temporary password'
+                        }
+                        onClick={() => setShowPassword((previous) => !previous)}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={17} />
+                        ) : (
+                          <Eye size={17} />
+                        )}
+                      </button>
+                    </div>
+                    <small>
+                      Used to create this account. The server stores a bcrypt
+                      hash; the employee must change the temporary password on
+                      first login.
+                    </small>
+                  </div>
+                )}
+                <div className="account-status-control">
+                  <div>
+                    <strong>Account Status</strong>
                     <p>
-                      <strong>{target.name}</strong> · {target.id} (
-                      {target.department})
+                      {employee
+                        ? 'Use directory actions to activate or deactivate this account.'
+                        : 'New accounts are active. Use Deactivate after creation if needed.'}
                     </p>
                   </div>
-                ))}
-              </div>
-              <p className="deactivate-explanation">
-                {targets.length > 1 ? 'These employees' : 'This employee'} will
-                be marked as deactivated. Their past data will be kept.
-              </p>
-              <div className="deactivate-agent-warning">
-                <Unplug size={16} />
-                <span>
-                  In production, deactivation must also block sign-in and
-                  disconnect the desktop agent.
-                </span>
-              </div>
-              <p className="dialog-preview-note">
-                Preview only · No live accounts or agents are affected.
-              </p>
-            </>
-          ) : bulk ? (
-            <label className="em-field">
-              New department
-              <select name="department" required>
-                {employeeDepartments.map((value) => (
-                  <option key={value}>{value}</option>
-                ))}
-              </select>
-            </label>
-          ) : (
-            <>
-              <div className="employee-form-grid">
-                <label className="em-field">
-                  First name
-                  <input
-                    name="firstName"
-                    defaultValue={employee?.name.split(' ')[0]}
-                    required
-                    maxLength={50}
-                    autoComplete="given-name"
-                    placeholder="First name"
-                  />
-                </label>
-                <label className="em-field">
-                  Last name
-                  <input
-                    name="lastName"
-                    defaultValue={employee?.name.split(' ').slice(1).join(' ')}
-                    required
-                    maxLength={50}
-                    autoComplete="family-name"
-                    placeholder="Last name"
-                  />
-                </label>
-                <label className="em-field">
-                  Email address
-                  <input
-                    name="email"
-                    aria-label="Email address"
-                    type="email"
-                    defaultValue={employee?.email}
-                    required
-                    maxLength={200}
-                    autoComplete="email"
-                    placeholder="Employee email address"
-                    aria-invalid={error?.field === 'email'}
-                    aria-describedby={
-                      error?.field === 'email'
-                        ? 'employee-email-error'
-                        : undefined
-                    }
-                    onChange={() => setError(null)}
-                  />
-                  {error?.field === 'email' && (
-                    <span
-                      id="employee-email-error"
-                      className="em-form-error"
-                      role="alert"
-                    >
-                      <TriangleAlert size={12} />
-                      {error.message}
-                    </span>
-                  )}
-                </label>
-                <label className="em-field">
-                  Phone number
-                  <input
-                    name="phone"
-                    type="tel"
-                    defaultValue={employee?.phone}
-                    autoComplete="tel"
-                    maxLength={40}
-                    placeholder="Phone number"
-                  />
-                </label>
-                <label className="em-field">
-                  Employee ID
-                  <input
-                    name="id"
-                    aria-label="Employee ID"
-                    defaultValue={employee?.id}
-                    placeholder="Employee ID"
-                    required
-                    maxLength={30}
-                    aria-invalid={error?.field === 'id'}
-                    onChange={() => setError(null)}
-                  />
-                  {error?.field === 'id' && (
-                    <span className="em-form-error" role="alert">
-                      {error.message}
-                    </span>
-                  )}
-                </label>
-                <label className="em-field">
-                  Department
-                  <select
-                    name="department"
-                    defaultValue={employee?.department || 'Engineering'}
+                  <span>{active ? 'Active' : 'Inactive'}</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={active}
+                    aria-label="Account active"
+                    className={`status-switch ${active ? 'on' : ''}`}
+                    disabled
                   >
-                    {employeeDepartments.map((value) => (
-                      <option key={value}>{value}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="em-field">
-                  Role
-                  <select
-                    name="role"
-                    defaultValue={employee?.role || 'Employee'}
-                  >
-                    {employeeRoles.map((value) => (
-                      <option key={value}>{value}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="em-field">
-                  Manager
-                  <select name="manager" defaultValue={employee?.manager || ''}>
-                    <option value="">Not assigned</option>
-                    {employees
-                      .filter(
-                        (row) =>
-                          row.id !== employee?.id &&
-                          row.status === 'Active' &&
-                          ['Admin', 'Manager'].includes(row.role),
-                      )
-                      .map((row) => (
-                        <option key={row.id} value={row.id}>
-                          {row.name} ({row.id})
-                        </option>
-                      ))}
-                  </select>
-                </label>
-              </div>
-              {!employee && (
-                <div className="temporary-password">
-                  <div>
-                    <label htmlFor="temporary-password">
-                      Temporary Password
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setPassword(generatePassword())}
-                    >
-                      <RefreshCw size={12} />
-                      Generate
-                    </button>
-                  </div>
-                  <div className="temporary-password-input">
-                    <input
-                      id="temporary-password"
-                      name="temporaryPassword"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      minLength={12}
-                      autoComplete="new-password"
-                      placeholder="Generate a temporary password"
-                    />
-                    <button
-                      type="button"
-                      aria-label={
-                        showPassword
-                          ? 'Hide temporary password'
-                          : 'Show temporary password'
-                      }
-                      onClick={() => setShowPassword((previous) => !previous)}
-                    >
-                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                    </button>
-                  </div>
-                  <small>
-                    Preview only. This password is not saved or used to create
-                    credentials.
-                  </small>
+                    <span />
+                  </button>
                 </div>
-              )}
-              <div className="account-status-control">
-                <div>
-                  <strong>Account Status</strong>
+                <div className="agent-install-note">
+                  <Info size={18} />
                   <p>
-                    {active
-                      ? 'Active immediately upon provisioning'
-                      : 'Account will be deactivated'}
+                    The WorkPulse agent must be installed on the employee’s PC.
+                    Monitoring starts after the employee gives consent.
                   </p>
                 </div>
-                <span>{active ? 'Active' : 'Inactive'}</span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={active}
-                  aria-label="Account active"
-                  className={`status-switch ${active ? 'on' : ''}`}
-                  onClick={() => setActive((previous) => !previous)}
-                >
-                  <span />
-                </button>
-              </div>
-              <div className="agent-install-note">
-                <Info size={18} />
-                <p>
-                  The WorkPulse agent must be installed on the employee’s PC.
-                  Monitoring starts after the employee gives consent.
-                </p>
-              </div>
-            </>
-          )}
-          {error && !error.field && (
-            <p className="em-form-error" role="alert">
-              {error.message}
-            </p>
-          )}
-          <div className="dialog-actions">
-            <button type="button" className="em-button" onClick={onClose}>
-              Cancel
-            </button>
-            <button
-              className={`em-button ${deactivate ? 'danger-solid' : 'primary'}`}
-              type="submit"
-            >
-              {deactivate ? (
-                <>
-                  <UserRoundX size={16} />
-                  Deactivate
-                </>
-              ) : (
-                <>
-                  <Check size={16} />
-                  {bulk ? 'Save changes' : 'Save Employee'}
-                </>
-              )}
-            </button>
-          </div>
+              </>
+            )}
+            {error && !error.field && (
+              <p className="em-form-error" role="alert">
+                {error.message}
+              </p>
+            )}
+            <div className="dialog-actions">
+              <button type="button" className="em-button" onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                className={`em-button ${deactivate ? 'danger-solid' : 'primary'}`}
+                type="submit"
+                disabled={saving}
+              >
+                {deactivate ? (
+                  <>
+                    <UserRoundX size={16} />
+                    Deactivate
+                  </>
+                ) : (
+                  <>
+                    <Check size={16} />
+                    {saving
+                      ? 'Saving…'
+                      : bulk
+                        ? 'Save changes'
+                        : 'Save Employee'}
+                  </>
+                )}
+              </button>
+            </div>
+          </fieldset>
         </form>
       )}
     </Modal>

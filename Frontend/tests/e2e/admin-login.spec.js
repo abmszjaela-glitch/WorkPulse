@@ -29,7 +29,13 @@ test('root and protected URLs require login; verified Admin login opens dashboar
   // Synthetic HTTP fixtures are test-only; application code never fakes authentication.
   await page.unroute('**/api/v1/auth/login')
   await page.route('**/api/v1/auth/login', (route) =>
-    route.fulfill({ json: { accessToken: 'test-only-token', expiresIn: 900 } }),
+    route.fulfill({
+      json: {
+        accessToken: 'test-only-token',
+        refreshToken: 'test-refresh-token',
+        expiresIn: 900,
+      },
+    }),
   )
   await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({
@@ -62,7 +68,13 @@ test('root and protected URLs require login; verified Admin login opens dashboar
 
 test('non-admin sessions cannot enter admin pages', async ({ page }) => {
   await page.route('**/api/v1/auth/login', (route) =>
-    route.fulfill({ json: { accessToken: 'test-only-token', expiresIn: 900 } }),
+    route.fulfill({
+      json: {
+        accessToken: 'test-only-token',
+        refreshToken: 'test-refresh-token',
+        expiresIn: 900,
+      },
+    }),
   )
   await page.route('**/api/v1/auth/me', (route) =>
     route.fulfill({ json: { user: { role: 'M' } } }),

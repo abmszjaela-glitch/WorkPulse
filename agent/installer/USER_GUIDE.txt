@@ -18,10 +18,28 @@ Read PRIVACY.txt before use. Counts are anonymous input-event totals, not key
 contents or text. No screenshots, window titles, URLs or document names are
 collected. Application usage tracks process names and durations only.
 
+EMPLOYEE SIGN-IN
+Start the configured WorkPulse backend, open Sign in and use the account your
+administrator created. The default development API is http://localhost:5000/api/v1.
+Set SERVER_URL to the actual HTTPS API base for another computer/deployment;
+localhost refers to this computer, not your administrator's computer. HTTP is
+allowed only on loopback for local development. Redirects are not followed.
+The server verifies the JWT through /auth/me before the app reports Signed in.
+Access tokens are saved only in Windows Credential Manager. Passwords are not
+saved or logged. Cached access tokens are reverified on launch. Expiry pauses
+tracking and requires sign-in again. Sign out pauses listeners, removes the
+local token and attempts server session revocation. If offline, remote logout
+cannot be confirmed and the UI says so.
+
+New accounts require a temporary-password change: enter the current temporary
+password, choose/confirm a new password, update, then sign in again. Tracking
+does not start on login or password change. Accept the notice and explicitly
+authorize Start / resume under the applicable policy.
+
 CURRENT RELEASE LIMITATIONS
-This build is local mode. Backend employee login/JWT verification and backend
-synchronization are not connected. Do not treat it as a production-authenticated
-employee deployment or bypass organization authorization. The About menu shows
+Monitoring is local; device-authenticated backend synchronization is not connected
+by employee sign-in. An employee JWT is not a device upload credential. Do not
+bypass organization authorization. The About menu shows
 the Agent version and provisional publisher display. No digital signing or
 verified publisher identity is claimed.
 

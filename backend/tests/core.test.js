@@ -199,6 +199,20 @@ test('own profile updates cannot change identity, role or another employee',asyn
   for(const body of [{userId:O.id},{role:'A'},{departmentId:otherDept.id},{timezone:'Not/AZone'}])await call('PUT','/profile',E,body,400);
 });
 
+test('new employee creation atomically stores a bcrypt credential and linked personal data with a temporary-password requirement',async()=>{
+  const email=randomUUID()+'@example.test',code='TEST-'+randomUUID(),password='Synthetic-Password-123!';
+  const body={firstName:'Created',lastName:'Employee Family',email,employeeCode:code,phone:'+94112345678',departmentId:dept.id,role:'E',password,temporary:true};
+  const created=await(await call('POST','/employees',A,body,201)).json();
+  const stored=(await db.query('select u.password_hash,u.must_change_password,p.first_name,p.last_name,p.employee_code,p.phone,p.department_id from wp_auth_users u join wp_employee_profiles p on p.user_id=u.id where u.id=$1',[created.id])).rows[0];
+  assert.ok(stored.password_hash.startsWith('$2'));assert.notEqual(stored.password_hash,password);
+  assert.equal(stored.must_change_password,true);assert.equal(stored.last_name,body.lastName);assert.equal(stored.employee_code,code);assert.equal(stored.department_id,dept.id);assert.equal(stored.phone,body.phone);
+  assert.equal((await auth.login(email,password)).user.mustChangePassword,true);
+  const read=await(await call('GET','/employees/'+created.id,A,undefined,200)).json();assert.equal(read.employee_code,code);assert.equal(read.first_name,body.firstName);
+  const count=Number((await db.query('select count(*) as n from wp_auth_users')).rows[0].n);
+  await call('POST','/employees',A,{...body,email:randomUUID()+'@example.test'},409);
+  assert.equal(Number((await db.query('select count(*) as n from wp_auth_users')).rows[0].n),count,'Employee code conflict must roll back the account insert');
+});
+
 test('personal information persists across reads in the existing profile table and is owner-only',async()=>{
   const otherBefore=(await db.query('select first_name,last_name,phone,language,timezone from wp_employee_profiles where user_id=$1',[O.id])).rows[0];
   const values={firstName:'Saved',lastName:'Person',phone:'+94112345678',language:'si',timezone:'Asia/Colombo'};

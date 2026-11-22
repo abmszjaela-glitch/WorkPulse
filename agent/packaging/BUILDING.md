@@ -96,9 +96,9 @@ sizes, Windows build and per-check PASS/FAIL. Keep them with the build inputs.
 The verifier's temporary relocated copies and log files are removed afterward.
 
 The smoke reports do not replace native input/long-soak/backend/clean-VM tests.
-Windows 10 is NOT TESTED unless executed on Windows 10. This checkout's backend
-authentication and synchronization are still unavailable; packaging does not
-make the agent production-authorized. Follow WINDOWS_COMPATIBILITY_TEST_PLAN.md
+Windows 10 is NOT TESTED unless executed on Windows 10. Employee authentication
+uses the backend; device synchronization remains unconnected. Packaging does not
+grant tracking authorization. Follow WINDOWS_COMPATIBILITY_TEST_PLAN.md
 on clean standard-user Windows 10 and 11 systems without a Python installation.
 
 ## Debugging and release cautions

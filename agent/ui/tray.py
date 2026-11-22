@@ -1,6 +1,6 @@
 """Visible Windows tray. Run python -m agent.ui.tray; starts paused.
 
-Local tracking only: backend authentication/synchronization are not implemented.
+Employee sign-in uses the backend; tracking is local until device sync is wired.
 Optional current-user logon launch opens paused; no hidden tracking.
 """
 from datetime import datetime, timezone
@@ -14,6 +14,7 @@ from PIL import Image, ImageDraw
 from ..core.agent import ActivityAgent
 from ..config import config
 from ..auth.token_store import WindowsTokenStore
+from ..auth.session import AgentAuthentication, AuthJob
 from ..core.working_hours import WorkingHoursPolicy
 from ..core.windows_startup import WindowsStartup, StartupError
 from ..utils.logger import get_logger, configure_logging, shutdown_logging
@@ -64,10 +65,11 @@ def tray_image(active=False, idle=False):
 
 class WorkPulseTray:
     """Tray callbacks enqueue work; listener startup/shutdown runs off the UI thread."""
-    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, policy=None, startup=None, open_window=None, show_summary=None, privacy_policy=None):
+    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, authentication=None, policy=None, startup=None, open_window=None, show_summary=None, privacy_policy=None):
         self.state = TrayState()
         self._factory = agent_factory
         self._tokens = token_store or WindowsTokenStore(config.SERVER_URL)
+        self.authentication = authentication or AgentAuthentication(self._tokens)
         self._startup = WindowsStartup() if startup is None else startup
         self._startup_status = "Not checked"
         self._commands = Queue()
@@ -109,7 +111,7 @@ class WorkPulseTray:
                 item("Disable / remove Windows startup entry", command("startup_remove")),
                 item("Refresh Windows startup status", command("startup_status")),
                 pystray.Menu.SEPARATOR,
-                item("Logout (local)", command("logout")),
+                item("Sign out", command("logout")),
                 item("Exit", command("exit")),
             ))
 
@@ -123,7 +125,16 @@ class WorkPulseTray:
         result["policy_open"] = self._policy_open
         result["automatic_resume"] = self._requested and not self._manual_stop.is_set()
         result["tray_visible"] = bool(self.icon.visible)
+        result["auth"] = self.authentication.snapshot()
         return result
+
+    def request_auth(self, action, *values):
+        """Pause first; run bounded authentication work on the existing worker."""
+        job = self.authentication.begin(action, *values)
+        if job is not None:
+            if action != "restore":
+                self.request("pause")
+            self._commands.put(job)
 
     def _cache_metrics(self):
         if self._agent is None:
@@ -140,6 +151,8 @@ class WorkPulseTray:
 
     def request(self, command):
         """Emergency/manual stop vetoes queued starts before worker cleanup."""
+        if command in ("logout", "exit"):
+            self.authentication.cancel()
         with self._control_lock:
             if command in ("start", "pause", "emergency", "logout", "exit"):
                 self._generation += 1
@@ -192,10 +205,13 @@ class WorkPulseTray:
         self.state.set_tracking("Tracking PAUSED")
 
     def _handle(self, command):
+        if isinstance(command, AuthJob):
+            self.authentication.perform(command)
+            return
         generation = None
         if isinstance(command, tuple):
             generation, command = command
-            if generation != self._generation:
+            if generation != self._generation and command not in ("logout", "exit"):
                 return
         if command in ("startup_enable", "startup_remove", "startup_status"):
             # Registry failures do not change tracking state or manual-stop intent.
@@ -215,6 +231,9 @@ class WorkPulseTray:
                 self.icon.notify(str(error), "WorkPulse startup settings")
             self.icon.update_menu()
         elif command == "start" and self._agent is None:
+            if self.authentication.snapshot()["state"] in ("password_required", "changing_password", "signing_in", "checking_session"):
+                self.icon.notify("Complete employee authentication/password change before starting a session.", "WorkPulse")
+                return
             # Serialize this short local-only startup against an emergency veto.
             # Never perform network/storage calls while holding this lock.
             with self._control_lock:
@@ -243,9 +262,8 @@ class WorkPulseTray:
             if command == "emergency":
                 self.state.set_tracking("Tracking STOPPED: explicit restart required")
             if command == "logout":
-                self._tokens.clear()
-                get_logger().info("local_logout")
-                self.icon.notify("Tracking paused; local token removed. Server logout is unavailable until backend integration.", "WorkPulse")
+                self.authentication.logout()
+                self.icon.notify(self.authentication.snapshot()["message"], "WorkPulse sign out")
             elif command == "exit":
                 self._closing.set()
                 self.icon.stop()
@@ -279,6 +297,9 @@ class WorkPulseTray:
                 command = None
             try:
                 self._handle(command)
+                if self.authentication.expire():
+                    self._handle("pause")
+                    self.icon.notify("Your employee session expired. Tracking paused; sign in again.", "WorkPulse")
                 self._policy_open = self.policy.allows()
                 self._schedule()
                 if self._open_window is not None:

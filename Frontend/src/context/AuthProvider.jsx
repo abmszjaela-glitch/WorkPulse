@@ -74,14 +74,16 @@ export default function AuthProvider({ children }) {
       refreshing = false,
       idleTimer,
       refreshTimer
+    const expected = generation.current
     let lastActivityAt = session.lastActivityAt,
       lastWrittenAt = 0
     const finish = (reason) => {
-      if (!active || ended) return
+      if (!active || ended || generation.current !== expected) return
       ended = true
       endSession(reason, session.accessToken)
     }
     function persist() {
+      if (!active || ended || generation.current !== expected) return false
       try {
         writeSession(window.sessionStorage, { ...session, lastActivityAt })
         lastWrittenAt = Date.now()
@@ -92,7 +94,8 @@ export default function AuthProvider({ children }) {
       }
     }
     async function refresh() {
-      if (!active || ended || refreshing) return
+      if (!active || ended || refreshing || generation.current !== expected)
+        return
       if (isIdle(lastActivityAt, Date.now())) {
         finish('idle')
         return
@@ -100,20 +103,21 @@ export default function AuthProvider({ children }) {
       refreshing = true
       try {
         const renewed = await refreshAdminSession(session)
-        if (!active || ended) return
+        if (!active || ended || generation.current !== expected) return
         if (isIdle(lastActivityAt, Date.now())) {
           finish('idle')
           return
         }
         const next = { ...renewed, lastActivityAt }
         writeSession(window.sessionStorage, next)
+        generation.current += 1
         setState({ session: next, initializing: false, logoutReason: '' })
       } catch {
         finish('expired')
       }
     }
     function check() {
-      if (!active || ended) return false
+      if (!active || ended || generation.current !== expected) return false
       if (isIdle(lastActivityAt, Date.now())) {
         finish('idle')
         return false
@@ -127,7 +131,13 @@ export default function AuthProvider({ children }) {
       return true
     }
     function activity(event) {
-      if (!event.isTrusted || !active || ended) return
+      if (
+        !event.isTrusted ||
+        !active ||
+        ended ||
+        generation.current !== expected
+      )
+        return
       const now = Date.now()
       // Late browser timers must expire before a new input can reset the clock.
       if (isIdle(lastActivityAt, now)) {

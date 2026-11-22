@@ -37,16 +37,22 @@ def _positive_seconds(name: str, default: int) -> int:
 
 # Backend API base URL. Override this with the deployed API address in production.
 # No authentication tokens, API keys, or credentials belong in this module.
-SERVER_URL: str = os.environ.get("SERVER_URL", "http://localhost:5000/api").strip().rstrip("/")
+SERVER_URL: str = os.environ.get("SERVER_URL", "http://localhost:5000/api/v1").strip().rstrip("/")
 
 try:
     _server_url = urlsplit(SERVER_URL)
-    if _server_url.scheme not in ("http", "https") or not _server_url.hostname:
+    if (_server_url.scheme not in ("http", "https") or not _server_url.hostname
+            or _server_url.username is not None or _server_url.password is not None
+            or _server_url.query or _server_url.fragment):
         raise ValueError
     # Accessing port also rejects malformed or out-of-range port overrides.
     _server_url.port
 except ValueError:
     raise ValueError("SERVER_URL must be a valid absolute HTTP or HTTPS URL.") from None
+
+# Bounded network waits run on the control worker, never Tk or input listeners.
+AUTH_CONNECT_TIMEOUT: int = _positive_seconds("AUTH_CONNECT_TIMEOUT", 3)
+AUTH_READ_TIMEOUT: int = _positive_seconds("AUTH_READ_TIMEOUT", 10)
 
 # Default sampling cadence: once per minute. This module does not start tracking.
 TRACKING_INTERVAL: int = _positive_seconds("TRACKING_INTERVAL", 60)

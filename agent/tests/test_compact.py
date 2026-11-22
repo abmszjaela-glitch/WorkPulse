@@ -3,7 +3,7 @@ from datetime import datetime, time, timezone
 import gc
 import tkinter as tk
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 from agent.core.working_hours import WorkingHoursPolicy
 from agent.ui.compact import CompactDesktop, short_duration
@@ -15,6 +15,8 @@ class CompactTests(unittest.TestCase):
         self.root = tk.Tk()
         self.root.withdraw()
         self.controller = FakeController()
+        self.controller.request_auth = Mock()
+        self.controller.view["auth"] = {"state": "signed_out", "signed_in": False, "email": "", "revision": 0, "message": "Sign in with your registered employee account."}
         self.controller.policy = WorkingHoursPolicy(zone="UTC", days=range(7))
         self.app = CompactDesktop(self.root, controller=self.controller)
         self.addCleanup(self.cleanup)
@@ -41,14 +43,52 @@ class CompactTests(unittest.TestCase):
             self.app.start_tracking()
         self.assertEqual(self.controller.commands, ["start"])
 
-    def test_unavailable_login_does_not_collect_passwords_or_fake_success(self):
+    def test_login_is_enabled_submits_to_controller_and_clears_password(self):
         self.app._show_page("signin")
+        self.assertEqual(self.app.signin_button.cget("state"), "normal")
+        self.assertEqual(self.app.email_entry.cget("state"), "normal")
+        self.app._email.set(" employee@example.test ")
+        self.app._password.set("Synthetic-password-123!")
+        self.app._submit_login()
+        self.controller.request_auth.assert_called_once_with("login", "employee@example.test", "Synthetic-password-123!")
+        self.assertEqual(self.app._password.get(), "")
         self.assertEqual(self.app.signin_button.cget("state"), "disabled")
-        self.assertEqual(self.app.email_entry.cget("state"), "disabled")
-        self.app._password.set("synthetic-password")
         self.app.show_summary()
         self.assertEqual(self.app._password.get(), "")
         self.assertEqual(self.controller.commands, [])
+
+    def test_verified_login_updates_identity_without_starting_tracking(self):
+        self.app._show_page("signin")
+        self.controller.view["auth"].update(state="signed_in", signed_in=True, email="employee@example.test", revision=1)
+        with patch("agent.ui.desktop.logging_available", return_value=True):
+            self.app._poll()
+        self.assertEqual(self.app._page, "summary")
+        self.assertIn("employee@example.test", self.app._sync_heading.get())
+        self.assertEqual(self.controller.commands, [])
+
+    def test_failed_login_reenables_fields_and_preserves_safe_feedback(self):
+        self.app._render_auth(dict(state="signing_in", revision=1, message="Signing in…"))
+        self.app._render_auth(dict(state="signed_out", revision=1, message="Invalid email or password."))
+        self.assertEqual(self.app.signin_button.cget("state"), "normal")
+        self.assertEqual(self.app.email_entry.cget("state"), "normal")
+        self.assertIn("Invalid", self.app._auth_message.get())
+
+    def test_temporary_password_flow_never_starts_or_retains_passwords(self):
+        auth = self.controller.view["auth"]
+        auth.update(state="password_required", revision=1, message="Change temporary password.")
+        self.app._render_auth(auth)
+        self.assertEqual(self.app._page, "password")
+        self.app.start_tracking()
+        self.assertEqual(self.controller.commands, [])
+        self.app._current_password.set("Temporary-password-123!")
+        self.app._new_password.set("New-private-password-123!")
+        self.app._confirm_password.set("mismatch")
+        self.app._submit_password_change()
+        self.controller.request_auth.assert_not_called()
+        self.app._confirm_password.set("New-private-password-123!")
+        self.app._submit_password_change()
+        self.controller.request_auth.assert_called_once_with("change_password", "Temporary-password-123!", "New-private-password-123!")
+        self.assertEqual(self.app._current_password.get() + self.app._new_password.get() + self.app._confirm_password.get(), "")
 
     def test_summary_uses_actual_values_and_does_not_claim_queued_uploads(self):
         self.controller.view["active_seconds"] = 3660

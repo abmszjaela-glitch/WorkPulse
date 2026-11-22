@@ -14,11 +14,12 @@ also shows tracking status and emergency controls. Errors are logged; startup
 failure uses a visible error notice. Windows may put tray icons in its overflow area.
 
 CURRENT APPLICATION CAPABILITIES
-The existing build runs in disclosed local mode. Backend login, cryptographic
-JWT/session verification and backend synchronization are not implemented in this
-checkout. Installing it does not grant a verified employee session or bypass
-backend authorization. Do not treat this initial installer as production
-authentication or full deployment acceptance.
+Employee sign-in uses the existing WorkPulse backend. JWT signature, expiry,
+account and session validity are verified by the server through /auth/me.
+Temporary-password accounts must change their password and sign in again.
+Sign-in and installation do not authorize tracking. Monitoring remains local;
+device-authenticated synchronization is not enabled by employee sign-in.
+No employee token is treated as an unrestricted agent upload credential.
 
 When explicitly enabled, activity tracking counts mouse movement/click and
 anonymous keyboard presses, determines foreground process names, calculates
@@ -29,9 +30,12 @@ Operational logs contain fixed event messages rather than activity payloads.
 
 LOCAL DATA AND UNINSTALL
 The current-user offline queue component encrypts aggregate payloads using
-Windows DPAPI and applies restricted ACLs. Already-verified tokens, when backend
-integration is supplied, belong in Windows Credential Manager; passwords must
-never be saved in plaintext. Normal data/log locations are within the user's
+Windows DPAPI and applies restricted ACLs. Verified access tokens are stored in
+Windows Credential Manager. Passwords and refresh tokens are not saved. Cached
+access tokens are reverified before use; expiry pauses tracking. Sign-out stops
+listeners, removes the local credential and attempts backend logout. Network
+failures may prevent remote revocation; the UI reports that limitation.
+Normal data/log locations are within the user's
 WorkPulse AppData directory or explicitly configured paths.
 
 Uninstall removes installed application files and shortcuts. It DOES NOT delete

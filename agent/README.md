@@ -193,37 +193,44 @@ errors rather than clearing/replacing the database or logging record contents.
 
 ## Authentication integration status
 
-The checked-out `backend` has package files but no implemented routes,
-controllers, JWT middleware or API response contract. The frontend login also
-explicitly reports that backend authentication is unavailable. No login URL,
-JWT algorithm/issuer/audience/key source, refresh flow or logout URL is assumed.
-The agent is therefore **not yet authenticated or gated by a backend session**.
-Do not treat the support components below as completed backend authentication.
+The compact desktop Sign In form is connected to the existing custom-JWT backend:
+POST `/api/v1/auth/login` accepts email/password, followed by GET `/auth/me` with
+the returned bearer token. The server verifies its signature, expiry, session and
+account status. Only the verified `/me` identity is displayed; the agent does not
+decode/trust unsigned claims or ship a signing secret. Device-token responses are
+not accepted as employee sessions. No backend or frontend code is changed here.
 
-- `ui/login.py` provides a masked email/password form. Without a real controller,
-  the form disables credential entry and submission. It never starts tracking.
-  A future adapter must perform the real HTTP request and verified authentication
-  before closing/replacing the form. Error categories are sanitized; raw backend
-  exceptions and response bodies are never shown or printed by the view.
-- `auth/token_store.py` stores an already-verified access token and authoritative
-  expiry in current-user Windows Credential Manager, scoped to the backend URL.
-  It stores no passwords, employee profile, refresh token or plaintext file.
-  Cached entries are not authentication proof, and no JWT claims are trusted or
-  decoded by the cache. Signature/session verification requires the real backend
-  contract. Expired/malformed entries are removed; local clear is idempotent.
-- Credential Manager capacity errors fail closed without a file fallback. Token
-  bytes are omitted from object representations and native errors are sanitized.
-  As with DPAPI, a process controlling the same Windows account remains within
-  the account's trust boundary.
+`SERVER_URL` defaults to `http://localhost:5000/api/v1`. The backend must be running
+on that computer. Override it with the actual HTTPS API base for remote deployment;
+HTTP is accepted only on loopback for development. The legacy `/api` base is not
+the implemented API. Redirects are rejected to avoid forwarding credentials.
+`AUTH_CONNECT_TIMEOUT` (3 seconds) and `AUTH_READ_TIMEOUT` (10 seconds) bound network
+waits on the existing tray control worker, outside Tk and input listeners.
 
-Preview the disabled form with `python -m agent.ui.login` from the repository
-root. To complete actual authentication, provide the implemented backend source
-or API specification covering login payload/response, JWT verification or session
-validation and logout/revocation. No new JWT library or guessed endpoint is added.
+`auth/client.py` implements the actual API contract; `auth/session.py` maintains
+thread-safe state and cancels late login results after logout/shutdown. Only a
+verified access token and expiry are saved in server-scoped Windows Credential
+Manager through `auth/token_store.py`. There is no plaintext fallback. Passwords,
+refresh tokens and employee profiles are not persisted. Cached tokens are verified
+on normal GUI launch without starting tracking. Expiration pauses tracking and
+requires sign-in again; this release does not rotate refresh tokens automatically.
 
-Authentication support tests use fabricated values. One integration test writes,
-reads and deletes a synthetic Credential Manager entry under a fresh unique test
-namespace; no existing credential targets are enumerated or read.
+Temporary-password accounts open a change-password screen using the existing
+PUT `/auth/change-password` contract. They are not cached or authorized to start
+tracking until the required change is completed. The backend revokes sessions;
+the employee then signs in again with their new password. Sign out pauses input
+listeners before clearing the credential and attempting POST `/auth/logout`.
+Offline remote logout cannot be guaranteed and is reported without claiming it
+succeeded. Local tracking still requires explicit authorization and work-hours
+checks. Employee sign-in does not enable device authentication or upload data.
+
+`ui/login.py` remains a reusable standalone form/preview; the installed entry
+point is `start_agent.py` and uses the connected `ui/compact.py` screens. Do not
+use `python -m agent.ui.login` as the full application launch command.
+
+Tests use fabricated values and mocks for backend authentication. The existing
+Credential Manager test writes/reads/deletes only a unique synthetic test entry.
+No real employee password, token or account was used to claim a successful login.
 
 Run the synthetic test suite without recording real input:
 
@@ -246,9 +253,8 @@ Lifecycle commands execute on a worker, separate from the tray and input callbac
 Pause stops the listeners; starting again creates a fresh in-memory tracking
 session, so previous console session totals are not carried forward.
 
-This is explicitly local mode, not authenticated employee deployment. Logout
-stops tracking and removes the server-scoped cached token; server revocation
-cannot run until the real backend authentication contract is supplied. No data
+Monitoring remains local; employee authentication uses the backend. Logout
+stops tracking, removes the server-scoped cached token and attempts revocation. No data
 is uploaded. Sync initially says unavailable and last successful sync is Never.
 A future sender can call `tray.state.update_sync(offline=True)` after network
 failure, and pass an aware `acknowledged_at` datetime only after server success.
@@ -344,11 +350,12 @@ the installation; uninstallers should remove the named current-user value.
 
 Launches at sign-in always open the visible tray **Tracking PAUSED**, display a
 notification, and leave scheduled tracking disabled until the employee explicitly
-chooses Start. `--startup` identifies the launch origin only: it does not restore
-tracking consent, authenticate, upload, or start listeners. Working-hours checks
-still apply to Start. The existing backend authorization integration remains
-unavailable; auto-start does not grant authorization or enable a production
-employee session. Emergency Stop and manual-stop behavior are unchanged.
+chooses Start. `--startup` identifies the launch origin: it does not restore
+tracking consent, upload, or start listeners. The normal desktop may verify a
+cached employee token, while keeping monitoring paused. Working-hours checks
+still apply to Start. Auto-start and employee authentication do not grant tracking
+authorization or device upload permissions. Emergency Stop and manual-stop
+behavior are unchanged.
 
 WorkPulse reports whether its expected entry is **registered**, rather than
 claiming Windows will execute it. Windows Settings / Task Manager, organization

@@ -23,7 +23,13 @@ test('personal information uses authenticated API writes, survives re-login and 
     r.fulfill({ status: 200, contentType: 'text/css', body: '' }),
   )
   await page.route('**/api/v1/auth/login', (r) =>
-    r.fulfill({ json: { accessToken: 'isolated-test-token', expiresIn: 900 } }),
+    r.fulfill({
+      json: {
+        accessToken: 'isolated-test-token',
+        refreshToken: 'isolated-refresh-token',
+        expiresIn: 900,
+      },
+    }),
   )
   await page.route('**/api/v1/auth/me', (r) =>
     r.fulfill({
@@ -108,7 +114,7 @@ test('personal information uses authenticated API writes, survives re-login and 
       localStorage.getItem('workpulse.profile.draft.v2'),
     ),
   ).toBeNull()
-  await openProfile() // Full navigation clears the in-memory session and reloads server records.
+  await page.reload() // Session is restored and profile data is fetched again from the server.
   await expect(page.getByLabel('First name', { exact: true })).toHaveValue(
     'Saved',
   )

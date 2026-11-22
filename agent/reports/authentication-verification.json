@@ -1,0 +1,35 @@
+{
+  "generated_at_utc": "2026-11-22T14:24:54.9656342Z",
+  "unit_tests": {
+    "failed": 0,
+    "passed": 199,
+    "command": "agent/venv/Scripts/python.exe -m unittest discover -s agent/tests"
+  },
+  "gui_startup": {
+    "window_title": "WorkPulse Agent 1.0.0",
+    "window_was_visible": true,
+    "tray_was_visible": true,
+    "tracking_never_started": true,
+    "callback_error_seen": false,
+    "tracking": "Tracking PAUSED",
+    "employee_status": "signed_out"
+  },
+  "gui_error_handling": {
+    "window_title": "WorkPulse Agent 1.0.0",
+    "window_was_visible": true,
+    "tray_was_visible": true,
+    "tracking_never_started": true,
+    "callback_error_seen": true,
+    "tracking": "Tracking PAUSED",
+    "employee_status": "signed_out"
+  },
+  "installer": {
+    "sha256": "1b3249662991b98da410e2fec5fa7f416a0fbcab887863300f76ac2724949c8b",
+    "installed_upgrade": "NOT TESTED",
+    "compilation": "PASS",
+    "path": "agent/release/WorkPulseAgentSetup.exe"
+  },
+  "live_employee_login": "NOT TESTED - no employee credentials used",
+  "windows_10": "NOT TESTED",
+  "sandbox_note": "GUI startup failed inside the restricted desktop sandbox; normal Windows GUI smoke passed outside it."
+}

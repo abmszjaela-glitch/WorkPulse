@@ -1,2 +1,0 @@
-var e=[],t=[`Admin`,`Manager`,`Employee`],n=[];function r(e,t,n,r,i){let a=t.trim().toLowerCase();return e.filter(e=>`${e.name} ${e.email} ${e.id} ${e.role} ${e.department}`.toLowerCase().includes(a)&&(!n||e.department===n)&&(!r||e.role===r)&&(!i||e.status===i))}function i(e){let t=[`id`,`name`,`email`,`department`,`role`,`agent`,`lastActive`,`status`],n=e=>`"${String(e).replace(/^[=+@\-\t\r]/,`'$&`).replaceAll(`"`,`""`)}"`;return[t,...e.map(e=>t.map(t=>e[t]))].map(e=>e.map(n).join(`,`)).join(`\r
-`)}export{n as a,r as i,e as n,t as r,i as t};

@@ -128,7 +128,12 @@ class DesktopApplication:
     def start_tracking(self):
         if self._closing or self._error_message:
             return
-        if messagebox.askyesno("Authorize local tracking", "You are not signed in to a backend employee session.\n\nAuthorize this local session to count mouse/key events and application usage during configured working hours?\n\nNo typed text, screenshots or window titles are collected. You can pause or stop at any time.", parent=self.root):
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if auth.get("state") in ("password_required", "changing_password", "signing_in", "checking_session"):
+            self.feedback.set("Complete employee authentication before authorizing tracking.")
+            return
+        identity = "You are signed in to your employee account." if auth.get("signed_in") else "You are not signed in to a backend employee session."
+        if messagebox.askyesno("Authorize local tracking", identity + "\n\nAuthorize this local session to count mouse/key events and application usage during configured working hours?\n\nNo typed text, screenshots or window titles are collected. You can pause or stop at any time. Device synchronization is not enabled by sign-in.", parent=self.root):
             self.feedback.set("Local session explicitly authorized; checking working-hours policy.")
             self.controller.request("start")
 
@@ -222,6 +227,8 @@ class DesktopApplication:
         get_logger().info("desktop_started")
         self._thread = Thread(target=self._tray_run, name="WorkPulse visible tray")
         self._thread.start()
+        if not self.diagnostic and hasattr(self.controller, "request_auth"):
+            self.controller.request_auth("restore")
         previous_thread_hook = threading.excepthook
         def worker_error(_args):
             from ..desktop_bootstrap import record_failure
@@ -243,7 +250,7 @@ class DesktopApplication:
         return {"window_title": f"{APP_NAME} {APP_VERSION}", "window_was_visible": self._was_visible,
                 "tray_was_visible": self._tray_ready, "tracking_never_started": self.controller._agent is None and not self.controller._requested,
                 "callback_error_seen": self._callback_error_seen, "tracking": self._last_view["tracking"],
-                "employee_status": "Not signed in; backend authentication unavailable"}
+                "employee_status": self.controller.desktop_snapshot().get("auth", {}).get("state", "signed_out")}
 
 
 def run_desktop(*, diagnostic=False, exercise_error=False, diagnostics_file=None):
