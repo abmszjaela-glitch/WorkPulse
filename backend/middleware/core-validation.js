@@ -5,8 +5,10 @@ import { ApiError } from '../utils/api-error.js';
 const invalid = () => { throw new ApiError(400, 'Invalid request fields'); };
 export const required = (parse) => ({ parse, required: true });
 export const text = (max, min = 0) => (value) => {
-  if (typeof value !== 'string' || value.trim().length < min || value.length > max) invalid();
-  return value.trim();
+  if (typeof value !== 'string' || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(value)) invalid();
+  const normalized=value.trim().normalize('NFC');
+  if ([...normalized].length < min || [...normalized].length > max) invalid();
+  return normalized;
 };
 export const uuid = (value) => { if (typeof value !== 'string' || !isUUID(value)) invalid(); return value; };
 export const nullableUuid = (value) => value === null ? null : uuid(value);

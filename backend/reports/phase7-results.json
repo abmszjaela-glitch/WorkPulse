@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-22",
+  "endpoints": 10,
+  "reportIntegrationTests": {"passed": 9, "failed": 0},
+  "finalFullRegression": {"passed": 122, "failed": 0},
+  "productionDependencyAudit": {"reportedVulnerabilities": 0},
+  "postCorrectionReportTests": {"passed": 9, "failed": 0},
+  "pdfVisualQA": {"volumeSamplePages": 7, "allHeadersAndPageNumbers": "PASS", "firstAndLastPages": "VISUALLY INSPECTED"},
+  "samples": ["samples/WorkPulse-report.csv", "samples/WorkPulse-report.pdf", "samples/WorkPulse-large-report.pdf"],
+  "dataSource": "Isolated PostgreSQL, exact proposed migrations 001-006, synthetic identities and monitoring records",
+  "history": "Generated metadata only; owner-only with current employee-scope revalidation",
+  "library": "PDFKit",
+  "supabaseInspection": {"status": 200, "exposedTables": [], "paths": ["/"]},
+  "liveMigration": "NOT APPLIED; explicit approval required",
+  "liveFrontendAndProductionLoad": "NOT TESTED",
+  "productivityAttendanceOvertimeRules": "UNAVAILABLE; no formulas invented",
+  "frontendAndAgentChanged": false
+}

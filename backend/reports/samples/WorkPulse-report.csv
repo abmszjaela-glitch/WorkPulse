@@ -1,0 +1,5 @@
+﻿"Employee","Employee code","Email","Department","Role","Monitored seconds","Active seconds","Idle seconds","Productive app seconds","Neutral app seconds","Unproductive app seconds","Unclassified app seconds","Productivity score (unavailable)","Observed activity days","Top application"
+"Synthetic Employee","WP-345b75c8-c22b-47c9-a323-0629124db16e","345b75c8-c22b-47c9-a323-0629124db16e@example.test","","A","0","0","0","0","0","0","0","","0",""
+"Synthetic Employee","WP-36925b81-ec8b-4ab8-8e4b-945bc61e1546","36925b81-ec8b-4ab8-8e4b-945bc61e1546@example.test","","E","0","0","0","0","0","0","0","","0",""
+"Synthetic Employee","WP-83292e1c-8401-4510-9a2c-d10da6f24a0d","83292e1c-8401-4510-9a2c-d10da6f24a0d@example.test","","M","0","0","0","0","0","0","0","","0",""
+"Synthetic Employee","WP-cde3006f-8673-4806-8eb1-1d431410fa63","cde3006f-8673-4806-8eb1-1d431410fa63@example.test","Synthetic engineering","E","60","50","10","0","0","0","45","","1","code.exe"

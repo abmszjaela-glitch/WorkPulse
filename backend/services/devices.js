@@ -15,6 +15,6 @@ export function createDeviceService({ repository, config, policy }) {
         refreshToken, tokenType:'Bearer', expiresIn:config.accessSeconds };
     },
     heartbeat: (actor) => repository.devices(actor,'heartbeat'),
-    async agentConfig(actor) { return { ...await repository.devices(actor,'agent-config'), ...policy }; },
+    async agentConfig(actor) { return { ...policy, ...await repository.devices(actor,'agent-config') }; },
   };
 }

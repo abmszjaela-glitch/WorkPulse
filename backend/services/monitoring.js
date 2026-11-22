@@ -1,16 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import isUUID from 'validator/lib/isUUID.js';
 import { ApiError } from '../utils/api-error.js';
-import { validateMonitoringRecord } from './monitoring-validation.js';
+import { validateMonitoringBatch } from '../validators/monitoring.js';
 
 export function createMonitoringService({repository,config}) {
-  const recordId=value=>typeof value?.record_id==='string'&&isUUID(value.record_id)?value.record_id.toLowerCase():null;
   async function upload(actor,kind,values) {
-    const valid=[],results=[];
-    values.forEach((value,index)=>{
-      try{valid.push({index,record:validateMonitoringRecord(value,actor,config)});}
-      catch(error){if(!(error instanceof ApiError))throw error;results.push({index,record_id:recordId(value),status:'rejected',http_status:error.status,error:{message:error.safeMessage}});}
-    });
+    const {valid,results}=validateMonitoringBatch(values,actor,config);
     // No acknowledgment is constructed before the database transaction commits.
     if(valid.length)results.push(...await repository.batch(actor,kind,valid,config));
     results.sort((a,b)=>a.index-b.index);

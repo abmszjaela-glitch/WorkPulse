@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { createAuthController } from '../controllers/auth-controller.js';
 import { authenticate } from '../middleware/auth.js';
-import { emailField, passwordField, tokenField, validate } from '../middleware/validation.js';
+import {loginValidators,refreshValidators,forgotPasswordValidators,resetPasswordValidators,changePasswordValidators} from '../validators/auth.js';
 
 export function createAuthRouter(service) {
   const router = Router();
@@ -15,12 +15,12 @@ export function createAuthRouter(service) {
   const credentialsLimit = limit(20);
   const recoveryLimit = limit(5);
   router.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
-  router.post('/login', credentialsLimit, emailField(), passwordField('password'), validate, controller.login);
+  router.post('/login', credentialsLimit, ...loginValidators(), controller.login);
   router.post('/logout', requireAuth, controller.logout);
-  router.post('/refresh', limit(60), tokenField('refreshToken'), validate, controller.refresh);
+  router.post('/refresh', limit(60), ...refreshValidators(), controller.refresh);
   router.get('/me', requireAuth, controller.me);
-  router.post('/forgot-password', recoveryLimit, emailField(), validate, controller.forgotPassword);
-  router.post('/reset-password', recoveryLimit, tokenField('token'), passwordField('newPassword'), validate, controller.resetPassword);
-  router.put('/change-password', credentialsLimit, requireAuth, passwordField('currentPassword'), passwordField('newPassword'), validate, controller.changePassword);
+  router.post('/forgot-password', recoveryLimit, ...forgotPasswordValidators(), controller.forgotPassword);
+  router.post('/reset-password', recoveryLimit, ...resetPasswordValidators(), controller.resetPassword);
+  router.put('/change-password', credentialsLimit, requireAuth, ...changePasswordValidators(), controller.changePassword);
   return router;
 }

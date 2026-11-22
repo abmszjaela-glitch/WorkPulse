@@ -3,32 +3,19 @@ import { rateLimit } from 'express-rate-limit';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { validateCore, required, text, uuid, nullableUuid, boolean, choice, email, ids, timezone,
   integer, pagination, filters } from '../middleware/core-validation.js';
-import { ApiError } from '../utils/api-error.js';
+import {idParams as id,employeeFields,departmentFields,employeeFilters as listFilters,employeeCreate,deviceRegistration} from '../validators/management.js';
+import {date} from '../validators/report-filters.js';
 import { createEmployeeController } from '../controllers/employee-controller.js';
 import { createDepartmentController } from '../controllers/department-controller.js';
 import { createDeviceController } from '../controllers/device-controller.js';
 import { createProfileController } from '../controllers/profile-controller.js';
 import { createConsentController } from '../controllers/consent-controller.js';
 
-const id = { id: required(uuid) };
 const human = () => authorize('A','M','E');
 const readManagement = () => authorize('A','M');
 const admin = () => authorize('A');
 const agent = () => authorize('Agent');
 const validate = (body = {}, query = {}, params = {}, nonEmptyBody = false) => validateCore({ body,query,params },{nonEmptyBody});
-const employeeFields = { firstName:text(100,1),lastName:text(100,1),phone:text(32),employeeCode:text(64,1),
-  email,role:choice('A','M','E'),departmentId:nullableUuid };
-const departmentFields = { name:text(100,1),description:text(2000),managerId:nullableUuid,active:boolean };
-const listFilters = {...filters,departmentId:uuid,role:choice('A','M','E')};
-const date = (value) => {
-  if (typeof value!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)
-    || !Number.isFinite(Date.parse(value)) || new Date(value).toISOString().slice(0,10)!==value) throw new ApiError(400,'Invalid date');
-  return value;
-};
-const password = value => {
-  if (typeof value!=='string' || Buffer.byteLength(value)>72) throw new ApiError(400,'Invalid password');
-  return value;
-};
 const limit = (max) => rateLimit({windowMs:15*60*1000,limit:max,standardHeaders:'draft-8',legacyHeaders:false,
   message:{error:{message:'Too many sensitive requests; try again later'}}});
 
@@ -49,8 +36,7 @@ export function createCoreRouter({ auth, employees, departments, devices, profil
   employee.get('/export',readManagement(),validate({},listFilters),employeeController.exportCsv);
   employee.post('/bulk-deactivate',admin(),validate({ids:required(ids)}),employeeController.bulkDeactivate);
   employee.get('/',readManagement(),validate({},listFilters),employeeController.list);
-  employee.post('/',admin(),validate({...employeeFields,firstName:required(employeeFields.firstName),lastName:required(employeeFields.lastName),
-    email:required(email),password:required(password),temporary:boolean}),employeeController.create);
+  employee.post('/',admin(),validate(employeeCreate),employeeController.create);
   employee.post('/:id/reset-password',admin(),limit(10),validate({},{},id),employeeController.resetPassword);
   employee.patch('/:id/status',admin(),validate({active:required(boolean)},{},id),employeeController.setStatus);
   employee.patch('/:id/department',admin(),validate({departmentId:required(nullableUuid)},{},id),employeeController.setDepartment);
@@ -71,9 +57,7 @@ export function createCoreRouter({ auth, employees, departments, devices, profil
   root.use('/departments',department);
 
   const device=secure();
-  device.post('/register',agent(),limit(20),validate({name:required(text(100,1)),platform:required(text(100,1)),deviceCredential:required(value=>{
-    if(typeof value!=='string'||!/^[A-Za-z0-9_-]{43}$/.test(value))throw new ApiError(400,'Invalid device credential');return value;
-  })}),deviceController.register);
+  device.post('/register',agent(),limit(20),validate(deviceRegistration),deviceController.register);
   device.post('/heartbeat',agent(),validate(),deviceController.heartbeat);
   device.get('/agent-config',agent(),validate(),deviceController.agentConfig);
   device.get('/',readManagement(),validate({},{...pagination,employeeId:uuid,status:choice('active','inactive')}),deviceController.list);

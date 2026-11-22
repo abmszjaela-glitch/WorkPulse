@@ -205,7 +205,7 @@ domain verification is claimed until configured and tested with an authorized re
 
 ## Verification
 
-Latest combined run: **82 passed, 0 failed**. Configured-backend health and 404 checks
+Latest combined run before Phase 5: **82 passed, 0 failed**. Configured-backend health and 404 checks
 passed; authentication correctly returned 503 with no signing secret configured.
 Production dependency audit reported 0 vulnerabilities. The development-only
 Nodemon/minimatch chain has 2 moderate advisories; no forced dependency downgrade
@@ -228,3 +228,22 @@ See [Phase 4 agent data APIs and compatibility report](AGENT_DATA_APIS.md),
 [Phase 4 verification results](reports/phase4-results.json). The agent's existing
 queue envelope is supported; its missing network/auth integration is not silently
 implemented or claimed working.
+
+See [Phase 5 validation, categories and daily processing](PROCESSING.md). Productivity
+scores remain null under the confirmed temporary business rule. The proposed 004
+migration is not applied and the summary worker defaults to disabled.
+
+See [Phase 6 dashboard and analytics APIs](ANALYTICS.md),
+[observed analytics HTTP examples](reports/phase6-http-examples.json) and
+[proposed analytics migration](migrations/005_analytics.proposed.sql).
+
+See [Phase 7 reporting and exports](REPORTING.md), including scoped report APIs,
+CSV/PDF downloads, export history, synthetic samples and pending deployment requirements.
+## Phase 8 system and real-time APIs
+
+See [SYSTEM_APIS.md](SYSTEM_APIS.md) for endpoints, Socket.IO authentication,
+event scoping, proposed migration 007 and deployment requirements. Verification:
+[reports/phase8-results.json](reports/phase8-results.json). No live schema changes
+are applied by application startup. Real-time database sweeping is opt-in after
+migration review/application; frontend and Agent sources are unchanged.
+

@@ -30,12 +30,15 @@ export function utcTimestamp(value) {
   return { micros, value:new Date(Number(micros/1000n)).toISOString().slice(0,19)+'.'+String(micros%1000000n).padStart(6,'0')+'Z' };
 }
 
+export function processName(name) {
+  if(typeof name!=='string'||!name.trim()||[...name].length>255||/[\x00-\x1f<>:"/\\|?*]/.test(name))invalid('Only application process names are allowed');
+  return name.toLowerCase();
+}
 function applications(value) {
   if(!object(value)||Object.keys(value).length>256)invalid('Application usage must be a bounded process-name mapping');
   const result=Object.create(null);
   for(const [name,duration]of Object.entries(value)) {
-    if(!name.trim()||[...name].length>255||/[\x00-\x1f<>:"/\\|?*]/.test(name))invalid('Only application process names are allowed');
-    const normalized=name.toLowerCase();
+    const normalized=processName(name);
     if(Object.hasOwn(result,normalized))invalid('Duplicate application process name');
     result[normalized]=seconds(duration);
   }

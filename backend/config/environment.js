@@ -19,4 +19,4 @@ export const supabaseKey = process.env.SUPABASE_SECRET_KEY?.trim() || required('
 export const port = Number(process.env.PORT || 5000);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be an integer between 1 and 65535');
 
-export const corsOrigin = process.env.CORS_ORIGIN?.trim() || false;
+export const corsOrigin = process.env.CORS_ORIGIN?.split(',').map(origin=>origin.trim()).filter(Boolean) || false;
