@@ -1,4 +1,5 @@
 import {Server} from 'socket.io';
+import isUUID from 'validator/lib/isUUID.js';
 
 // Rooms are server-owned. Delivery is individually re-authorized to reflect
 // revocation and Manager reassignment without waiting for a reconnect.
@@ -9,14 +10,21 @@ export function attachRealtime(httpServer,{auth,repository,config,log=console}){
   });
   const sessions=new Map(),cleanup=new Set();let timer,validationTimer,stopped=false,busy=false,validating=false,cursor=null;
   let pollDone=Promise.resolve(),validationDone=Promise.resolve(),finishPoll,finishValidation;
+  const attempts=new Map();let pruneAt=0;
   io.use(async(socket,next)=>{
     let issued;
     try{
+      const now=Date.now(),address=socket.handshake.address;
+      if(now>=pruneAt){for(const [key,entry]of attempts)if(entry.until<=now)attempts.delete(key);pruneAt=now+60000;}
+      let entry=attempts.get(address);
+      if(!entry||entry.until<=now){if(attempts.size>=10000&&!entry)throw new Error('Rate limited');entry={count:0,until:now+60000};attempts.set(address,entry);}
+      if(++entry.count>config.authAttempts)throw new Error('Rate limited');
       if(!auth)throw new Error('Unavailable');
       const credentials=socket.handshake.auth||{};
       let token=credentials.token;
       if(Object.keys(credentials).some(key=>!['token','deviceId','deviceCredential'].includes(key)))throw new Error('Invalid fields');
       if(!token&&typeof credentials.deviceId==='string'&&typeof credentials.deviceCredential==='string'){
+        if(!isUUID(credentials.deviceId)||!/^[A-Za-z0-9_-]{43}$/.test(credentials.deviceCredential))throw new Error('Invalid device credentials');
         issued=await auth.loginDevice(credentials.deviceId,credentials.deviceCredential);token=issued.accessToken;
       }else if(credentials.deviceId||credentials.deviceCredential)throw new Error('Ambiguous credentials');
       if(typeof token!=='string'||token.length>8192)throw new Error('Invalid token');
@@ -84,7 +92,7 @@ export function attachRealtime(httpServer,{auth,repository,config,log=console}){
   }
   async function stop(){
     stopped=true;clearInterval(timer);clearInterval(validationTimer);
-    await Promise.all([pollDone,validationDone]);await new Promise(resolve=>io.close(resolve));await Promise.all([...cleanup]);
+    await Promise.all([pollDone,validationDone]);await new Promise(resolve=>io.close(resolve));await Promise.all([...cleanup]);attempts.clear();
   }
   return {io,start,stop,poll,revalidate};
 }

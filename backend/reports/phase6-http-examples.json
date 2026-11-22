@@ -3,7 +3,7 @@
   "examples": [
     {
       "method": "GET",
-      "path": "/activity/employee/cb076dc1-4ce4-47cd-bdb1-2f9c53377eac?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9?from=2026-11-21&to=2026-11-21&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -12,9 +12,9 @@
           {
             "status": "ACTIVE",
             "fraction": 1,
-            "device_id": "563aa5eb-53b3-4ad2-9782-02018d040e62",
-            "record_id": "5eaa2ff0-34d1-4b57-8117-cc2ba8f37d5e",
-            "employee_id": "cb076dc1-4ce4-47cd-bdb1-2f9c53377eac",
+            "device_id": "38a3907c-1fc5-4f00-9578-4796fd608ee6",
+            "record_id": "d7c7d2aa-e185-4eba-b771-f13f4cb26a86",
+            "employee_id": "797141e8-d53c-40b8-8b48-1469079acfa9",
             "key_presses": 50,
             "idle_seconds": 900,
             "interval_end": "2026-11-21T11:00:00+00:00",
@@ -42,7 +42,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/cb076dc1-4ce4-47cd-bdb1-2f9c53377eac/timeline?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/timeline?from=2026-11-21&to=2026-11-21&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -204,7 +204,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/cb076dc1-4ce4-47cd-bdb1-2f9c53377eac/log?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/log?from=2026-11-21&to=2026-11-21&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -213,9 +213,9 @@
           {
             "status": "ACTIVE",
             "fraction": 1,
-            "device_id": "563aa5eb-53b3-4ad2-9782-02018d040e62",
-            "record_id": "5eaa2ff0-34d1-4b57-8117-cc2ba8f37d5e",
-            "employee_id": "cb076dc1-4ce4-47cd-bdb1-2f9c53377eac",
+            "device_id": "38a3907c-1fc5-4f00-9578-4796fd608ee6",
+            "record_id": "d7c7d2aa-e185-4eba-b771-f13f4cb26a86",
+            "employee_id": "797141e8-d53c-40b8-8b48-1469079acfa9",
             "key_presses": 50,
             "idle_seconds": 900,
             "interval_end": "2026-11-21T11:00:00+00:00",
@@ -243,7 +243,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/cb076dc1-4ce4-47cd-bdb1-2f9c53377eac/summary?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/summary?from=2026-11-21&to=2026-11-21&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -286,7 +286,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/cb076dc1-4ce4-47cd-bdb1-2f9c53377eac/trend?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/trend?from=2026-11-21&to=2026-11-21&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -318,9 +318,9 @@
           {
             "status": "ACTIVE",
             "fraction": 1,
-            "device_id": "563aa5eb-53b3-4ad2-9782-02018d040e62",
-            "record_id": "5eaa2ff0-34d1-4b57-8117-cc2ba8f37d5e",
-            "employee_id": "cb076dc1-4ce4-47cd-bdb1-2f9c53377eac",
+            "device_id": "38a3907c-1fc5-4f00-9578-4796fd608ee6",
+            "record_id": "d7c7d2aa-e185-4eba-b771-f13f4cb26a86",
+            "employee_id": "797141e8-d53c-40b8-8b48-1469079acfa9",
             "key_presses": 50,
             "idle_seconds": 900,
             "interval_end": "2026-11-21T11:00:00+00:00",
@@ -543,7 +543,7 @@
     },
     {
       "method": "GET",
-      "path": "/app-usage/employee/cb076dc1-4ce4-47cd-bdb1-2f9c53377eac?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/app-usage/employee/797141e8-d53c-40b8-8b48-1469079acfa9?from=2026-11-21&to=2026-11-21&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -688,8 +688,8 @@
         "message": "Analytics retrieved",
         "data": [
           {
-            "id": "08f2c442-3a03-4ebe-aea6-f7b86ed6aec0",
-            "email": "08f2c442-3a03-4ebe-aea6-f7b86ed6aec0@example.test",
+            "id": "1998e1db-167b-4290-9a84-e5d6f958b8a0",
+            "email": "1998e1db-167b-4290-9a84-e5d6f958b8a0@example.test",
             "status": "OFFLINE",
             "last_name": "",
             "last_seen": null,
@@ -698,34 +698,34 @@
             "department_name": null
           },
           {
-            "id": "5e9092af-b26d-40d6-a952-2cc5e6329d7a",
-            "email": "5e9092af-b26d-40d6-a952-2cc5e6329d7a@example.test",
-            "status": "OFFLINE",
-            "last_name": "",
-            "last_seen": null,
-            "first_name": "",
-            "department_id": null,
-            "department_name": null
-          },
-          {
-            "id": "c762aaa4-87e7-45a4-8bba-940b43ea15a6",
-            "email": "c762aaa4-87e7-45a4-8bba-940b43ea15a6@example.test",
-            "status": "OFFLINE",
-            "last_name": "",
-            "last_seen": null,
-            "first_name": "",
-            "department_id": null,
-            "department_name": null
-          },
-          {
-            "id": "cb076dc1-4ce4-47cd-bdb1-2f9c53377eac",
-            "email": "cb076dc1-4ce4-47cd-bdb1-2f9c53377eac@example.test",
+            "id": "797141e8-d53c-40b8-8b48-1469079acfa9",
+            "email": "797141e8-d53c-40b8-8b48-1469079acfa9@example.test",
             "status": "ACTIVE",
             "last_name": "",
-            "last_seen": "2026-11-22T07:52:26.133+00:00",
+            "last_seen": "2026-11-22T08:02:05.564+00:00",
             "first_name": "",
-            "department_id": "ade06cbb-75a4-405b-b882-d86729925bd8",
+            "department_id": "593eaba9-5b68-4341-8ce1-66db35ec6f29",
             "department_name": "Synthetic engineering"
+          },
+          {
+            "id": "b92d60c3-bb38-4022-8bb6-ee8c30784c00",
+            "email": "b92d60c3-bb38-4022-8bb6-ee8c30784c00@example.test",
+            "status": "OFFLINE",
+            "last_name": "",
+            "last_seen": null,
+            "first_name": "",
+            "department_id": null,
+            "department_name": null
+          },
+          {
+            "id": "bcfcd822-d946-4c01-b5e9-1bce60a622ce",
+            "email": "bcfcd822-d946-4c01-b5e9-1bce60a622ce@example.test",
+            "status": "OFFLINE",
+            "last_name": "",
+            "last_seen": null,
+            "first_name": "",
+            "department_id": null,
+            "department_name": null
           }
         ],
         "pagination": {
@@ -794,7 +794,7 @@
         "message": "Analytics retrieved",
         "data": [
           {
-            "id": "ade06cbb-75a4-405b-b882-d86729925bd8",
+            "id": "593eaba9-5b68-4341-8ce1-66db35ec6f29",
             "name": "Synthetic engineering",
             "idle_seconds": 900,
             "active_seconds": 2700,

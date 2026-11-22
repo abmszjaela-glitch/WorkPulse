@@ -1,4 +1,4 @@
-import {boolean,choice,integer,text} from '../middleware/core-validation.js';
+import {boolean,choice,integer} from '../middleware/core-validation.js';
 import {ApiError} from '../utils/api-error.js';
 
 // Shared allowlists use the existing dashboard settings field names.
@@ -18,5 +18,3 @@ export const monitoringSettings={idleMinutes:strictInteger(1,30),evaluationSecon
 export const workingHoursSettings={schedule};
 export const retentionSettings={retentionDays:choice(30,60,90,180,365),requireConsent:boolean};
 export const notificationSettings={notifyIdle:boolean,notifyAgentOffline:boolean,weeklyDigest:boolean};
-export const securitySettings={sessionMinutes:choice(15,30,60,120),requireMfa:boolean};
-export const policySettings={policy:text(50000,1)};

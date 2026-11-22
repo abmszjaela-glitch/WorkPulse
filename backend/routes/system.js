@@ -3,9 +3,9 @@ import {authenticate,authorize} from '../middleware/auth.js';
 import {validateCore,uuid,pagination,text,timezone} from '../middleware/core-validation.js';
 import {monitoringSettings,workingHoursSettings,retentionSettings,notificationSettings} from '../validators/settings.js';
 import {createSystemController} from '../controllers/system-controller.js';
-import {ApiError} from '../utils/api-error.js';
+import {utcTimestamp} from '../services/monitoring-validation.js';
 
-const date=value=>{if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/.test(value)||!Number.isFinite(Date.parse(value)))throw new ApiError(400,'Invalid timestamp');return value;};
+const date=value=>utcTimestamp(value).value;
 export const systemEndpoints=[
   ['get','/settings',['A'],'settings'],['put','/settings/monitoring',['A'],'monitoring',monitoringSettings],
   ['get','/settings/working-hours',['A','Agent'],'working-hours'],['put','/settings/working-hours',['A'],'working-hours-write',{...workingHoursSettings,timezone}],

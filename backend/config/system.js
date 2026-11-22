@@ -14,5 +14,5 @@ export function loadSystemConfig(env=process.env){
     if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash||!semver(env.AGENT_LATEST_VERSION)||!/^[a-f\d]{64}$/i.test(env.AGENT_INSTALLER_SHA256||'')||!Number.isSafeInteger(size)||size<1)throw new Error('Invalid agent release configuration');
     latestAgent={version:env.AGENT_LATEST_VERSION,url:url.href,sha256:env.AGENT_INSTALLER_SHA256.toLowerCase(),bytes:size};
   }
-  return {version,minimumAgentVersion,latestAgent,origins,enabled:env.REALTIME_WORKER_ENABLED==='true',pollMs:number('REALTIME_POLL_MS',2000,250,60000),revalidateMs:number('SOCKET_REVALIDATE_MS',10000,250,60000),offlineSeconds:number('DEVICE_OFFLINE_TIMEOUT_SECONDS',300,30,86400)};
+  return {version,minimumAgentVersion,latestAgent,origins,authAttempts:number('SOCKET_AUTH_ATTEMPTS_PER_MINUTE',60,1,6000),enabled:env.REALTIME_WORKER_ENABLED==='true',pollMs:number('REALTIME_POLL_MS',2000,250,60000),revalidateMs:number('SOCKET_REVALIDATE_MS',10000,250,60000),offlineSeconds:number('DEVICE_OFFLINE_TIMEOUT_SECONDS',300,30,86400)};
 }

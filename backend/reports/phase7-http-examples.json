@@ -9,65 +9,11 @@
         "message": "Report generated",
         "data": [
           {
-            "role": "A",
-            "email": "345b75c8-c22b-47c9-a323-0629124db16e@example.test",
-            "employee_id": "345b75c8-c22b-47c9-a323-0629124db16e",
-            "idle_seconds": 0,
-            "employee_code": "WP-345b75c8-c22b-47c9-a323-0629124db16e",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
             "role": "E",
-            "email": "36925b81-ec8b-4ab8-8e4b-945bc61e1546@example.test",
-            "employee_id": "36925b81-ec8b-4ab8-8e4b-945bc61e1546",
-            "idle_seconds": 0,
-            "employee_code": "WP-36925b81-ec8b-4ab8-8e4b-945bc61e1546",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
-            "role": "M",
-            "email": "83292e1c-8401-4510-9a2c-d10da6f24a0d@example.test",
-            "employee_id": "83292e1c-8401-4510-9a2c-d10da6f24a0d",
-            "idle_seconds": 0,
-            "employee_code": "WP-83292e1c-8401-4510-9a2c-d10da6f24a0d",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
-            "role": "E",
-            "email": "cde3006f-8673-4806-8eb1-1d431410fa63@example.test",
-            "employee_id": "cde3006f-8673-4806-8eb1-1d431410fa63",
+            "email": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8@example.test",
+            "employee_id": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "idle_seconds": 10,
-            "employee_code": "WP-cde3006f-8673-4806-8eb1-1d431410fa63",
+            "employee_code": "WP-127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "employee_name": "Synthetic Employee",
             "active_seconds": 50,
             "department_name": "Synthetic engineering",
@@ -79,6 +25,60 @@
             "unproductive_seconds": 0,
             "observed_activity_days": 1,
             "total_monitored_seconds": 60
+          },
+          {
+            "role": "M",
+            "email": "1be7ed2c-3989-4d42-ad47-436c4c61f5cf@example.test",
+            "employee_id": "1be7ed2c-3989-4d42-ad47-436c4c61f5cf",
+            "idle_seconds": 0,
+            "employee_code": "WP-1be7ed2c-3989-4d42-ad47-436c4c61f5cf",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
+          },
+          {
+            "role": "A",
+            "email": "324e704d-bcb4-43d4-b2fb-b303fb3610bb@example.test",
+            "employee_id": "324e704d-bcb4-43d4-b2fb-b303fb3610bb",
+            "idle_seconds": 0,
+            "employee_code": "WP-324e704d-bcb4-43d4-b2fb-b303fb3610bb",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
+          },
+          {
+            "role": "E",
+            "email": "4ea9810b-d111-4377-b0be-7c4041677c23@example.test",
+            "employee_id": "4ea9810b-d111-4377-b0be-7c4041677c23",
+            "idle_seconds": 0,
+            "employee_code": "WP-4ea9810b-d111-4377-b0be-7c4041677c23",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
           }
         ],
         "kpis": {
@@ -114,7 +114,7 @@
           "timezone": "UTC",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:28.003Z",
+          "generatedAt": "2026-11-22T08:02:08.609Z",
           "productivity_score": null
         }
       }
@@ -127,65 +127,11 @@
         "message": "Report generated",
         "data": [
           {
-            "role": "A",
-            "email": "345b75c8-c22b-47c9-a323-0629124db16e@example.test",
-            "employee_id": "345b75c8-c22b-47c9-a323-0629124db16e",
-            "idle_seconds": 0,
-            "employee_code": "WP-345b75c8-c22b-47c9-a323-0629124db16e",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
             "role": "E",
-            "email": "36925b81-ec8b-4ab8-8e4b-945bc61e1546@example.test",
-            "employee_id": "36925b81-ec8b-4ab8-8e4b-945bc61e1546",
-            "idle_seconds": 0,
-            "employee_code": "WP-36925b81-ec8b-4ab8-8e4b-945bc61e1546",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
-            "role": "M",
-            "email": "83292e1c-8401-4510-9a2c-d10da6f24a0d@example.test",
-            "employee_id": "83292e1c-8401-4510-9a2c-d10da6f24a0d",
-            "idle_seconds": 0,
-            "employee_code": "WP-83292e1c-8401-4510-9a2c-d10da6f24a0d",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
-            "role": "E",
-            "email": "cde3006f-8673-4806-8eb1-1d431410fa63@example.test",
-            "employee_id": "cde3006f-8673-4806-8eb1-1d431410fa63",
+            "email": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8@example.test",
+            "employee_id": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "idle_seconds": 10,
-            "employee_code": "WP-cde3006f-8673-4806-8eb1-1d431410fa63",
+            "employee_code": "WP-127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "employee_name": "Synthetic Employee",
             "active_seconds": 50,
             "department_name": "Synthetic engineering",
@@ -197,6 +143,60 @@
             "unproductive_seconds": 0,
             "observed_activity_days": 1,
             "total_monitored_seconds": 60
+          },
+          {
+            "role": "M",
+            "email": "1be7ed2c-3989-4d42-ad47-436c4c61f5cf@example.test",
+            "employee_id": "1be7ed2c-3989-4d42-ad47-436c4c61f5cf",
+            "idle_seconds": 0,
+            "employee_code": "WP-1be7ed2c-3989-4d42-ad47-436c4c61f5cf",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
+          },
+          {
+            "role": "A",
+            "email": "324e704d-bcb4-43d4-b2fb-b303fb3610bb@example.test",
+            "employee_id": "324e704d-bcb4-43d4-b2fb-b303fb3610bb",
+            "idle_seconds": 0,
+            "employee_code": "WP-324e704d-bcb4-43d4-b2fb-b303fb3610bb",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
+          },
+          {
+            "role": "E",
+            "email": "4ea9810b-d111-4377-b0be-7c4041677c23@example.test",
+            "employee_id": "4ea9810b-d111-4377-b0be-7c4041677c23",
+            "idle_seconds": 0,
+            "employee_code": "WP-4ea9810b-d111-4377-b0be-7c4041677c23",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
           }
         ],
         "kpis": {
@@ -232,7 +232,7 @@
           "timezone": "UTC",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:28.244Z",
+          "generatedAt": "2026-11-22T08:02:08.747Z",
           "productivity_score": null
         }
       }
@@ -245,65 +245,11 @@
         "message": "Report generated",
         "data": [
           {
-            "role": "A",
-            "email": "345b75c8-c22b-47c9-a323-0629124db16e@example.test",
-            "employee_id": "345b75c8-c22b-47c9-a323-0629124db16e",
-            "idle_seconds": 0,
-            "employee_code": "WP-345b75c8-c22b-47c9-a323-0629124db16e",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
             "role": "E",
-            "email": "36925b81-ec8b-4ab8-8e4b-945bc61e1546@example.test",
-            "employee_id": "36925b81-ec8b-4ab8-8e4b-945bc61e1546",
-            "idle_seconds": 0,
-            "employee_code": "WP-36925b81-ec8b-4ab8-8e4b-945bc61e1546",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
-            "role": "M",
-            "email": "83292e1c-8401-4510-9a2c-d10da6f24a0d@example.test",
-            "employee_id": "83292e1c-8401-4510-9a2c-d10da6f24a0d",
-            "idle_seconds": 0,
-            "employee_code": "WP-83292e1c-8401-4510-9a2c-d10da6f24a0d",
-            "employee_name": "Synthetic Employee",
-            "active_seconds": 0,
-            "department_name": null,
-            "neutral_seconds": 0,
-            "top_application": null,
-            "productive_seconds": 0,
-            "productivity_score": null,
-            "unclassified_seconds": 0,
-            "unproductive_seconds": 0,
-            "observed_activity_days": 0,
-            "total_monitored_seconds": 0
-          },
-          {
-            "role": "E",
-            "email": "cde3006f-8673-4806-8eb1-1d431410fa63@example.test",
-            "employee_id": "cde3006f-8673-4806-8eb1-1d431410fa63",
+            "email": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8@example.test",
+            "employee_id": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "idle_seconds": 10,
-            "employee_code": "WP-cde3006f-8673-4806-8eb1-1d431410fa63",
+            "employee_code": "WP-127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "employee_name": "Synthetic Employee",
             "active_seconds": 50,
             "department_name": "Synthetic engineering",
@@ -315,6 +261,60 @@
             "unproductive_seconds": 0,
             "observed_activity_days": 1,
             "total_monitored_seconds": 60
+          },
+          {
+            "role": "M",
+            "email": "1be7ed2c-3989-4d42-ad47-436c4c61f5cf@example.test",
+            "employee_id": "1be7ed2c-3989-4d42-ad47-436c4c61f5cf",
+            "idle_seconds": 0,
+            "employee_code": "WP-1be7ed2c-3989-4d42-ad47-436c4c61f5cf",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
+          },
+          {
+            "role": "A",
+            "email": "324e704d-bcb4-43d4-b2fb-b303fb3610bb@example.test",
+            "employee_id": "324e704d-bcb4-43d4-b2fb-b303fb3610bb",
+            "idle_seconds": 0,
+            "employee_code": "WP-324e704d-bcb4-43d4-b2fb-b303fb3610bb",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
+          },
+          {
+            "role": "E",
+            "email": "4ea9810b-d111-4377-b0be-7c4041677c23@example.test",
+            "employee_id": "4ea9810b-d111-4377-b0be-7c4041677c23",
+            "idle_seconds": 0,
+            "employee_code": "WP-4ea9810b-d111-4377-b0be-7c4041677c23",
+            "employee_name": "Synthetic Employee",
+            "active_seconds": 0,
+            "department_name": null,
+            "neutral_seconds": 0,
+            "top_application": null,
+            "productive_seconds": 0,
+            "productivity_score": null,
+            "unclassified_seconds": 0,
+            "unproductive_seconds": 0,
+            "observed_activity_days": 0,
+            "total_monitored_seconds": 0
           }
         ],
         "kpis": {
@@ -350,13 +350,13 @@
           "timezone": "UTC",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:28.471Z",
+          "generatedAt": "2026-11-22T08:02:08.853Z",
           "productivity_score": null
         }
       }
     },
     {
-      "path": "/department/7fd80b56-a611-43ba-9542-7a393de68a02",
+      "path": "/department/08cd824c-027f-4b73-96e8-7c26b58e7b78",
       "status": 200,
       "response": {
         "success": true,
@@ -364,10 +364,10 @@
         "data": [
           {
             "role": "E",
-            "email": "cde3006f-8673-4806-8eb1-1d431410fa63@example.test",
-            "employee_id": "cde3006f-8673-4806-8eb1-1d431410fa63",
+            "email": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8@example.test",
+            "employee_id": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "idle_seconds": 10,
-            "employee_code": "WP-cde3006f-8673-4806-8eb1-1d431410fa63",
+            "employee_code": "WP-127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "employee_name": "Synthetic Employee",
             "active_seconds": 50,
             "department_name": "Synthetic engineering",
@@ -412,16 +412,16 @@
           "from": "2026-11-21",
           "to": "2026-11-21",
           "timezone": "UTC",
-          "departmentId": "7fd80b56-a611-43ba-9542-7a393de68a02",
+          "departmentId": "08cd824c-027f-4b73-96e8-7c26b58e7b78",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:28.620Z",
+          "generatedAt": "2026-11-22T08:02:08.992Z",
           "productivity_score": null
         }
       }
     },
     {
-      "path": "/employee/cde3006f-8673-4806-8eb1-1d431410fa63",
+      "path": "/employee/127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
       "status": 200,
       "response": {
         "success": true,
@@ -429,10 +429,10 @@
         "data": [
           {
             "role": "E",
-            "email": "cde3006f-8673-4806-8eb1-1d431410fa63@example.test",
-            "employee_id": "cde3006f-8673-4806-8eb1-1d431410fa63",
+            "email": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8@example.test",
+            "employee_id": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "idle_seconds": 10,
-            "employee_code": "WP-cde3006f-8673-4806-8eb1-1d431410fa63",
+            "employee_code": "WP-127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
             "employee_name": "Synthetic Employee",
             "active_seconds": 50,
             "department_name": "Synthetic engineering",
@@ -477,10 +477,10 @@
           "from": "2026-11-21",
           "to": "2026-11-21",
           "timezone": "UTC",
-          "employeeId": "cde3006f-8673-4806-8eb1-1d431410fa63",
+          "employeeId": "127c8bcc-8ed8-4e45-90d2-783c5a40e0c8",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:28.784Z",
+          "generatedAt": "2026-11-22T08:02:09.123Z",
           "productivity_score": null
         }
       }
@@ -516,7 +516,7 @@
           "timezone": "UTC",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:28.928Z",
+          "generatedAt": "2026-11-22T08:02:09.242Z",
           "productivity_score": null
         }
       }
@@ -530,7 +530,7 @@
         "data": {
           "departments": [
             {
-              "id": "7fd80b56-a611-43ba-9542-7a393de68a02",
+              "id": "08cd824c-027f-4b73-96e8-7c26b58e7b78",
               "name": "Synthetic engineering",
               "idle_seconds": 10,
               "active_seconds": 50,
@@ -579,7 +579,7 @@
           "timezone": "UTC",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:29.313Z",
+          "generatedAt": "2026-11-22T08:02:09.680Z",
           "productivity_score": null
         }
       }
@@ -603,7 +603,7 @@
           "timezone": "UTC",
           "reportType": "summary",
           "offlineTimeoutSeconds": 300,
-          "generatedAt": "2026-11-22T07:52:29.360Z",
+          "generatedAt": "2026-11-22T08:02:09.749Z",
           "productivity_score": null
         }
       }
@@ -618,7 +618,7 @@
       "path": "/export/pdf",
       "status": 200,
       "contentType": "application/pdf",
-      "bytes": 2326
+      "bytes": 2321
     }
   ]
 }

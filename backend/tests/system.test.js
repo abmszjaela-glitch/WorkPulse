@@ -16,6 +16,13 @@ import {createSystemRouter,systemEndpoints} from '../routes/system.js';
 import {attachRealtime} from '../services/realtime.js';
 import {errorHandler} from '../middleware/error-handler.js';
 import {logFailure} from '../utils/server-logger.js';
+import {createCoreRouter} from '../routes/core.js';
+import {createCoreRepository} from '../services/core-repository.js';
+import {createEmployeeService} from '../services/employees.js';
+import {createDepartmentService} from '../services/departments.js';
+import {createDeviceService} from '../services/devices.js';
+import {createProfileService} from '../services/profile.js';
+import {createConsentService} from '../services/consent.js';
 const db=new PGlite(),client=postgresClient(db),repository=createSystemRepository(client);
 const config=loadSystemConfig({CORS_ORIGIN:'https://dashboard.example.test'});
 const auth=createAuthService({repository:createAuthRepository(client),mailer:{},config:{secret:randomBytes(48).toString('hex'),issuer:'test',userAudience:'users',agentAudience:'devices',accessSeconds:900,refreshSeconds:86400,bcryptRounds:10}});
@@ -32,7 +39,10 @@ before(async()=>{
  await db.query('insert into wp_auth_manager_assignments(manager_id,employee_id) values($1,$2)',[M.id,E.id]);
  device=await auth.provisionDevice(A.context,E.id);await db.query('update wp_auth_devices set registered_at=now(),last_seen=now() where id=$1',[device.deviceId]);
  const login=await auth.loginDevice(device.deviceId,device.credential);D={token:login.accessToken,context:await auth.authenticate(login.accessToken)};
- const app=express();app.use(express.json());app.get('/api/v1/health',(req,res)=>res.json({status:'ok'}));app.use('/api/v1',createSystemRouter({auth,repository,config}));app.use(errorHandler);
+ const core=createCoreRepository(client),mailer={async sendAccountCreated(){},async sendPasswordChanged(){}};
+ const services={auth,employees:createEmployeeService({repository:core,config:{bcryptRounds:10,temporarySeconds:3600},mailer}),departments:createDepartmentService({repository:core}),
+   devices:createDeviceService({repository:core,config:{},policy:{}}),profile:createProfileService({repository:core}),consent:createConsentService({repository:core})};
+ const app=express();app.use(express.json());app.get('/api/v1/health',(req,res)=>res.json({status:'ok'}));app.use('/api/v1',createSystemRouter({auth,repository,config}));app.use('/api/v1',createCoreRouter(services));app.use(errorHandler);
  server=createServer(app);realtime=attachRealtime(server,{auth,repository,config,log:{error(){},warn(){}}});await new Promise(r=>server.listen(0,'127.0.0.1',r));base=`http://127.0.0.1:${server.address().port}`;
 });
 after(async()=>{for(const s of sockets)s.disconnect();await realtime.stop();await db.close();});
@@ -69,10 +79,13 @@ test('audit is Admin-only, records actor/resource without credentials, supports 
  assert.equal((await request('/audit-logs',M)).status,403);assert.equal((await request('/audit-logs?actorId=bad')).status,400);
  const csv=await request('/audit-logs/export');assert.equal(csv.status,200);const text=await csv.text();assert.ok(text.includes('settings.update'));assert.ok(!text.includes(device.credential));
  assert.equal((await request('/audit-logs?from=2026-11-23T00:00:00Z&to=2026-11-22T00:00:00Z')).status,400);
+ assert.equal((await request('/audit-logs?from=2026-02-30T00:00:00Z')).status,400);
 });
 test('health/version are public; release metadata is fail-closed and Agent-only',async()=>{
  assert.equal((await request('/health',null)).status,200);assert.equal((await(await request('/version',null)).json()).data.version,'1.0.0');
  assert.equal((await request('/agent/latest',A)).status,403);assert.equal((await request('/agent/latest',D)).status,503);
+ config.latestAgent={version:'1.0.0',url:'https://downloads.example.test/WorkPulseAgentSetup.exe',sha256:'a'.repeat(64),bytes:12345};
+ assert.deepEqual((await(await request('/agent/latest',D)).json()).data,config.latestAgent);config.latestAgent=null;
  assert.throws(()=>loadSystemConfig({AGENT_INSTALLER_URL:'http://bad.test'}));assert.throws(()=>loadSystemConfig({AGENT_MIN_VERSION:'no'}));
 });
 test('socket handshake rejects invalid tokens and unauthorized Origins',async()=>{
@@ -123,6 +136,18 @@ test('storage failures fail closed and logs never serialize exception text or cr
  const output=[];logFailure('test.failure',new Error('JWT secret-value'),value=>output.push(value));assert.ok(!output[0].includes('secret-value'));
  assert.doesNotThrow(()=>logFailure('test.failure',new Error(),()=>{throw new Error();}));
 });
+test('core HTTP CRUD remains functional with all seven migrations composed',async()=>{
+ const department=await request('/departments',A,'POST',{name:'Phase 9 composed schema',description:'Synthetic fixture'});assert.equal(department.status,201);const dept=await department.json();
+ const created=await request('/employees',A,'POST',{firstName:'Synthetic',lastName:'Final review',email:randomUUID()+'@example.test',password:'Synthetic-password-123!',temporary:false,departmentId:dept.id});assert.equal(created.status,201);const employee=await created.json();
+ assert.equal((await request('/employees/'+employee.id)).status,200);
+ assert.equal((await request('/employees/'+employee.id,A,'PUT',{firstName:'Updated'})).status,200);
+ assert.equal((await request('/departments/'+dept.id,A,'DELETE')).status,409);
+ assert.equal((await request('/employees/'+employee.id+'/department',A,'PATCH',{departmentId:null})).status,200);
+ assert.equal((await request('/employees/'+employee.id+'/status',A,'PATCH',{active:false})).status,200);
+ assert.equal((await request('/employees/'+employee.id,A,'DELETE')).status,204);
+ assert.equal((await request('/departments/'+dept.id,A,'DELETE')).status,204);
+ const audit=await(await request('/audit-logs?resource=employee&actorId='+A.id)).json();assert.ok(audit.data.some(row=>row.resource_id===employee.id&&row.action==='employee.create'));
+});
 test('heartbeat expiry emits offline then renewed presence emits online without marking pause idle',async()=>{
  const a=socket({token:A.token});await connected(a);const off=event(a,'device:offline');
  await db.query("update wp_auth_devices set last_seen=now()-interval '10 minutes' where id=$1",[device.deviceId]);await realtime.poll();assert.equal((await off).connectionState,'OFFLINE');
@@ -137,4 +162,11 @@ test('revoked sessions and disabled devices disconnect and cannot reconnect',asy
 test('new tables deny browser roles and no secrets are copied into outbox/audit',async()=>{
  const rows=await db.query('select payload from wp_realtime_events');assert.ok(!JSON.stringify(rows.rows).includes(device.credential));
  await db.exec('set role anon');try{await assert.rejects(db.query('select * from wp_notifications'));await assert.rejects(db.query('select wp_system(null,null,null,\'settings\',null,\'{}\')'));}finally{await db.exec('set role service_role');}
+});
+test('socket authentication attempts are rate-limited before credential verification',async()=>{
+ const http=createServer(),limited=attachRealtime(http,{auth,repository,config:{...config,authAttempts:1}});
+ await new Promise(resolve=>http.listen(0,'127.0.0.1',resolve));
+ const url=`http://127.0.0.1:${http.address().port}`,first=io(url,{auth:{token:A.token},transports:['websocket'],reconnection:false}),second=io(url,{auth:{token:A.token},transports:['websocket'],reconnection:false,autoConnect:false});
+ try{await connected(first);const denied=connected(second);second.connect();await assert.rejects(denied,/Authentication failed/);}
+ finally{first.disconnect();second.disconnect();await limited.stop();}
 });

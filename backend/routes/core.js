@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { validateCore, required, text, uuid, nullableUuid, boolean, choice, email, ids, timezone,
+import { validateCore, required, text, uuid, nullableUuid, boolean, choice, ids, timezone,
   integer, pagination, filters } from '../middleware/core-validation.js';
 import {idParams as id,employeeFields,departmentFields,employeeFilters as listFilters,employeeCreate,deviceRegistration} from '../validators/management.js';
 import {date} from '../validators/report-filters.js';

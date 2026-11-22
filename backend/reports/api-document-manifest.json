@@ -1,0 +1,698 @@
+{
+  "endpoints": [
+    {
+      "roles": "Public",
+      "purpose": "Email + password → JWT (dashboard saha agent dekatama)",
+      "path": "/auth/login",
+      "method": "POST",
+      "section": "1. Auth"
+    },
+    {
+      "roles": "All",
+      "purpose": "Token invalidate / logout",
+      "path": "/auth/logout",
+      "method": "POST",
+      "section": "1. Auth"
+    },
+    {
+      "roles": "All",
+      "purpose": "Refresh token eken aluth JWT",
+      "path": "/auth/refresh",
+      "method": "POST",
+      "section": "1. Auth"
+    },
+    {
+      "roles": "All",
+      "purpose": "Login wela inna user ge details",
+      "path": "/auth/me",
+      "method": "GET",
+      "section": "1. Auth"
+    },
+    {
+      "roles": "Public",
+      "purpose": "Reset link/OTP yawanna",
+      "path": "/auth/forgot-password",
+      "method": "POST",
+      "section": "1. Auth"
+    },
+    {
+      "roles": "Public",
+      "purpose": "Aluth password set karanna",
+      "path": "/auth/reset-password",
+      "method": "POST",
+      "section": "1. Auth"
+    },
+    {
+      "roles": "All",
+      "purpose": "Current + new password",
+      "path": "/auth/change-password",
+      "method": "PUT",
+      "section": "1. Auth"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "List (search, filter: department, role, status, pagination)",
+      "path": "/employees",
+      "method": "GET",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A",
+      "purpose": "Aluth employee add",
+      "path": "/employees",
+      "method": "POST",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Employee details",
+      "path": "/employees/:id",
+      "method": "GET",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A",
+      "purpose": "Edit",
+      "path": "/employees/:id",
+      "method": "PUT",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A",
+      "purpose": "Activate / deactivate",
+      "path": "/employees/:id/status",
+      "method": "PATCH",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A",
+      "purpose": "Department change",
+      "path": "/employees/:id/department",
+      "method": "PATCH",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A",
+      "purpose": "Selected employees deactivate",
+      "path": "/employees/bulk-deactivate",
+      "method": "POST",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A",
+      "purpose": "Temporary password generate",
+      "path": "/employees/:id/reset-password",
+      "method": "POST",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A",
+      "purpose": "Delete (soft delete)",
+      "path": "/employees/:id",
+      "method": "DELETE",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Total / active / deactivated / agent not installed counts",
+      "path": "/employees/summary",
+      "method": "GET",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "CSV export",
+      "path": "/employees/export",
+      "method": "GET",
+      "section": "2. Users / Employees"
+    },
+    {
+      "roles": "All",
+      "purpose": "Own profile",
+      "path": "/profile",
+      "method": "GET",
+      "section": "3. Profile"
+    },
+    {
+      "roles": "All",
+      "purpose": "Name, phone, language, timezone update",
+      "path": "/profile",
+      "method": "PUT",
+      "section": "3. Profile"
+    },
+    {
+      "roles": "All",
+      "purpose": "Photo upload",
+      "path": "/profile/avatar",
+      "method": "POST",
+      "section": "3. Profile"
+    },
+    {
+      "roles": "All",
+      "purpose": "Recent logins",
+      "path": "/profile/login-history",
+      "method": "GET",
+      "section": "3. Profile"
+    },
+    {
+      "roles": "All",
+      "purpose": "Notification settings",
+      "path": "/profile/notification-preferences",
+      "method": "GET",
+      "section": "3. Profile"
+    },
+    {
+      "roles": "All",
+      "purpose": "Update",
+      "path": "/profile/notification-preferences",
+      "method": "PUT",
+      "section": "3. Profile"
+    },
+    {
+      "roles": "All",
+      "purpose": "Okkoma devices walin sign out",
+      "path": "/profile/logout-all",
+      "method": "POST",
+      "section": "3. Profile"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "List + stats",
+      "path": "/departments",
+      "method": "GET",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "A",
+      "purpose": "Create",
+      "path": "/departments",
+      "method": "POST",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Details",
+      "path": "/departments/:id",
+      "method": "GET",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "A",
+      "purpose": "Edit",
+      "path": "/departments/:id",
+      "method": "PUT",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "A",
+      "purpose": "Delete (employees reassign wenna ona)",
+      "path": "/departments/:id",
+      "method": "DELETE",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Department eke employees",
+      "path": "/departments/:id/employees",
+      "method": "GET",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Department productivity stats",
+      "path": "/departments/:id/productivity",
+      "method": "GET",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "A",
+      "purpose": "CSV",
+      "path": "/departments/export",
+      "method": "GET",
+      "section": "4. Departments"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "PC eka register karanna (login passe)",
+      "path": "/devices/register",
+      "method": "POST",
+      "section": "5. Devices (Agent registration)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Devices list",
+      "path": "/devices",
+      "method": "GET",
+      "section": "5. Devices (Agent registration)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Device details + last seen",
+      "path": "/devices/:id",
+      "method": "GET",
+      "section": "5. Devices (Agent registration)"
+    },
+    {
+      "roles": "A",
+      "purpose": "Enable / disable device",
+      "path": "/devices/:id/status",
+      "method": "PATCH",
+      "section": "5. Devices (Agent registration)"
+    },
+    {
+      "roles": "A",
+      "purpose": "Device remove",
+      "path": "/devices/:id",
+      "method": "DELETE",
+      "section": "5. Devices (Agent registration)"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "\"Agent online\" ping (hama 1–5 min)",
+      "path": "/devices/heartbeat",
+      "method": "POST",
+      "section": "5. Devices (Agent registration)"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "Idle threshold, interval, working hours download",
+      "path": "/devices/agent-config",
+      "method": "GET",
+      "section": "5. Devices (Agent registration)"
+    },
+    {
+      "roles": "Agent, All",
+      "purpose": "Current privacy policy text + version",
+      "path": "/consent/policy",
+      "method": "GET",
+      "section": "6. Consent / Privacy"
+    },
+    {
+      "roles": "Agent, E",
+      "purpose": "Employee consent record karanna",
+      "path": "/consent/accept",
+      "method": "POST",
+      "section": "6. Consent / Privacy"
+    },
+    {
+      "roles": "A",
+      "purpose": "Consent given ද kiyala",
+      "path": "/consent/status/:employeeId",
+      "method": "GET",
+      "section": "6. Consent / Privacy"
+    },
+    {
+      "roles": "A",
+      "purpose": "Policy update",
+      "path": "/consent/policy",
+      "method": "PUT",
+      "section": "6. Consent / Privacy"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "Single interval data (mouse count, key count, active/idle seconds)",
+      "path": "/activity",
+      "method": "POST",
+      "section": "7. Activity Data (Agent → Server)"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "Offline buffer eken batch upload",
+      "path": "/activity/batch",
+      "method": "POST",
+      "section": "7. Activity Data (Agent → Server)"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "App name, duration, timestamp",
+      "path": "/app-usage",
+      "method": "POST",
+      "section": "7. Activity Data (Agent → Server)"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "Batch upload",
+      "path": "/app-usage/batch",
+      "method": "POST",
+      "section": "7. Activity Data (Agent → Server)"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "Status change (active / idle / paused)",
+      "path": "/status",
+      "method": "POST",
+      "section": "7. Activity Data (Agent → Server)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Employee activity (date range)",
+      "path": "/activity/employee/:id",
+      "method": "GET",
+      "section": "8. Activity Views (Dashboard)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Hourly timeline",
+      "path": "/activity/employee/:id/timeline",
+      "method": "GET",
+      "section": "8. Activity Views (Dashboard)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Activity log table (filter, pagination)",
+      "path": "/activity/employee/:id/log",
+      "method": "GET",
+      "section": "8. Activity Views (Dashboard)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "KPI cards (total, active, idle, productivity)",
+      "path": "/activity/employee/:id/summary",
+      "method": "GET",
+      "section": "8. Activity Views (Dashboard)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Weekly trend",
+      "path": "/activity/employee/:id/trend",
+      "method": "GET",
+      "section": "8. Activity Views (Dashboard)"
+    },
+    {
+      "roles": "E",
+      "purpose": "Own activity",
+      "path": "/activity/me",
+      "method": "GET",
+      "section": "8. Activity Views (Dashboard)"
+    },
+    {
+      "roles": "E, Agent",
+      "purpose": "Own today summary (agent status window ekata)",
+      "path": "/activity/me/summary",
+      "method": "GET",
+      "section": "8. Activity Views (Dashboard)"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Overall app usage (filters)",
+      "path": "/app-usage",
+      "method": "GET",
+      "section": "9. Application Usage"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Top 10 apps",
+      "path": "/app-usage/top",
+      "method": "GET",
+      "section": "9. Application Usage"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Productive / neutral / unproductive %",
+      "path": "/app-usage/categories-breakdown",
+      "method": "GET",
+      "section": "9. Application Usage"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Usage trend",
+      "path": "/app-usage/trend",
+      "method": "GET",
+      "section": "9. Application Usage"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Employee wise app usage",
+      "path": "/app-usage/employee/:id",
+      "method": "GET",
+      "section": "9. Application Usage"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "CSV",
+      "path": "/app-usage/export",
+      "method": "GET",
+      "section": "9. Application Usage"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Rules list",
+      "path": "/app-categories",
+      "method": "GET",
+      "section": "10. Application Categories"
+    },
+    {
+      "roles": "A",
+      "purpose": "Rule add (app → category)",
+      "path": "/app-categories",
+      "method": "POST",
+      "section": "10. Application Categories"
+    },
+    {
+      "roles": "A",
+      "purpose": "Category change",
+      "path": "/app-categories/:id",
+      "method": "PUT",
+      "section": "10. Application Categories"
+    },
+    {
+      "roles": "A",
+      "purpose": "Rule delete",
+      "path": "/app-categories/:id",
+      "method": "DELETE",
+      "section": "10. Application Categories"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "Agent ekata rules download (optional)",
+      "path": "/app-categories/lookup",
+      "method": "GET",
+      "section": "10. Application Categories"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Total / active / idle / offline counts",
+      "path": "/dashboard/stats",
+      "method": "GET",
+      "section": "11. Dashboard"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "7 day bar chart",
+      "path": "/dashboard/active-vs-idle",
+      "method": "GET",
+      "section": "11. Dashboard"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Donut chart",
+      "path": "/dashboard/app-usage-summary",
+      "method": "GET",
+      "section": "11. Dashboard"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Employee live status table",
+      "path": "/dashboard/live-status",
+      "method": "GET",
+      "section": "11. Dashboard"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Top applications today",
+      "path": "/dashboard/top-apps",
+      "method": "GET",
+      "section": "11. Dashboard"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Department bar chart",
+      "path": "/dashboard/department-productivity",
+      "method": "GET",
+      "section": "11. Dashboard"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Daily report",
+      "path": "/reports/daily",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Weekly report",
+      "path": "/reports/weekly",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Monthly report",
+      "path": "/reports/monthly",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Department report",
+      "path": "/reports/department/:id",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Employee report",
+      "path": "/reports/employee/:id",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Report KPI cards",
+      "path": "/reports/kpis",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Chart data (all)",
+      "path": "/reports/charts",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "CSV download",
+      "path": "/reports/export/csv",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "PDF download",
+      "path": "/reports/export/pdf",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A, M",
+      "purpose": "Recent exports list",
+      "path": "/reports/recent-exports",
+      "method": "GET",
+      "section": "12. Reports"
+    },
+    {
+      "roles": "A",
+      "purpose": "Okkoma settings",
+      "path": "/settings",
+      "method": "GET",
+      "section": "13. Settings"
+    },
+    {
+      "roles": "A",
+      "purpose": "Idle threshold, interval, sync interval, toggles",
+      "path": "/settings/monitoring",
+      "method": "PUT",
+      "section": "13. Settings"
+    },
+    {
+      "roles": "A, Agent",
+      "purpose": "Working hours",
+      "path": "/settings/working-hours",
+      "method": "GET",
+      "section": "13. Settings"
+    },
+    {
+      "roles": "A",
+      "purpose": "Update",
+      "path": "/settings/working-hours",
+      "method": "PUT",
+      "section": "13. Settings"
+    },
+    {
+      "roles": "A",
+      "purpose": "Retention days",
+      "path": "/settings/data-retention",
+      "method": "PUT",
+      "section": "13. Settings"
+    },
+    {
+      "roles": "A",
+      "purpose": "System notification rules",
+      "path": "/settings/notifications",
+      "method": "PUT",
+      "section": "13. Settings"
+    },
+    {
+      "roles": "A",
+      "purpose": "Roles & permissions",
+      "path": "/settings/roles",
+      "method": "GET",
+      "section": "13. Settings"
+    },
+    {
+      "roles": "All",
+      "purpose": "Own notifications",
+      "path": "/notifications",
+      "method": "GET",
+      "section": "14. Notifications / Alerts"
+    },
+    {
+      "roles": "All",
+      "purpose": "Mark as read",
+      "path": "/notifications/:id/read",
+      "method": "PATCH",
+      "section": "14. Notifications / Alerts"
+    },
+    {
+      "roles": "All",
+      "purpose": "Okkoma read",
+      "path": "/notifications/read-all",
+      "method": "PATCH",
+      "section": "14. Notifications / Alerts"
+    },
+    {
+      "roles": "All",
+      "purpose": "Delete",
+      "path": "/notifications/:id",
+      "method": "DELETE",
+      "section": "14. Notifications / Alerts"
+    },
+    {
+      "roles": "A",
+      "purpose": "Who did what (filters)",
+      "path": "/audit-logs",
+      "method": "GET",
+      "section": "15. Audit Logs"
+    },
+    {
+      "roles": "A",
+      "purpose": "CSV",
+      "path": "/audit-logs/export",
+      "method": "GET",
+      "section": "15. Audit Logs"
+    },
+    {
+      "roles": "Public",
+      "purpose": "Server status check",
+      "path": "/health",
+      "method": "GET",
+      "section": "16. System"
+    },
+    {
+      "roles": "Public",
+      "purpose": "API + minimum agent version (auto-update check)",
+      "path": "/version",
+      "method": "GET",
+      "section": "16. System"
+    },
+    {
+      "roles": "Agent",
+      "purpose": "Latest agent installer info",
+      "path": "/agent/latest",
+      "method": "GET",
+      "section": "16. System"
+    }
+  ],
+  "source": "WorkPulse API Endpoints.docx"
+}
