@@ -258,10 +258,10 @@ export default function SettingsPage() {
                   </span>
                 </div>
                 <p className="mt-2 text-[11px] text-ink">
-                  Preview configuration only
+                  Draft defaults · not backend policy
                 </p>
                 <p className="mt-1 text-[10px] text-muted">
-                  No telemetry nodes connected
+                  Agent connectivity has not been loaded
                 </p>
               </div>
             </aside>

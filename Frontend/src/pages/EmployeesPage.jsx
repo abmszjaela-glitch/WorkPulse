@@ -200,7 +200,7 @@ export default function EmployeesPage() {
             </div>
           </div>
           <p className="em-preview-label">
-            Preview data · Changes are temporary and reset when this page
+            No backend employee data loaded · Local drafts reset when this page
             reloads.
           </p>
           <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
@@ -219,7 +219,9 @@ export default function EmployeesPage() {
               {
                 label: 'Active Accounts',
                 count: active,
-                detail: `${Math.round((active / Math.max(1, rows.length)) * 100)}% active rate`,
+                detail: rows.length
+                  ? `${Math.round((active / rows.length) * 100)}% active rate`
+                  : 'Not available',
                 Icon: ShieldCheck,
                 tone: 'green',
               },
@@ -242,7 +244,7 @@ export default function EmployeesPage() {
               <article className={`management-stat ${tone}`} key={label}>
                 <div>
                   <h2>{label}</h2>
-                  <strong>{count}</strong>
+                  <strong>{rows.length ? count : '—'}</strong>
                   <p>
                     <i />
                     {detail}

@@ -1,0 +1,1 @@
+import{t as e}from"./index-BeXau2jE.js";var t=e();function n({variant:e=`secondary`,type:n=`button`,className:r=``,children:i,...a}){return(0,t.jsx)(`button`,{type:n,className:`em-button ${{secondary:``,primary:`primary`,danger:`danger`,destructive:`danger-solid`}[e]||``} disabled:cursor-not-allowed disabled:opacity-40 ${r}`,...a,children:i})}export{n as t};

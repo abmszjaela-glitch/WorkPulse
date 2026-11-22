@@ -1,3 +1,4 @@
+import EmptyDataPage from '../components/layout/EmptyDataPage.jsx'
 import useMediaQuery from '../hooks/useMediaQuery.js'
 import { downloadCsv } from '../utils/download.js'
 import Button from '../components/ui/Button.jsx'
@@ -76,19 +77,23 @@ export default function ActivityDetailsPage() {
   const shown = printMode
     ? filtered
     : filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-  const currentInterval = hourlyActivity[interval]
-  const trend =
-    period === 'This week'
-      ? activityTrend
-      : activityTrend.map((day) => ({
-          ...day,
-          active: +(day.active * 0.92).toFixed(1),
-          idle: +(day.idle * 1.08).toFixed(1),
-        }))
+  const currentInterval = hourlyActivity[interval] || {
+    hour: 'No interval selected',
+    active: null,
+    idle: null,
+  }
+  const trend = activityTrend
   const exportCsv = () => {
-    downloadCsv(activityLogsCsv(filtered), 'nimal-perera-activity-preview.csv')
+    downloadCsv(activityLogsCsv(filtered), 'employee-activity.csv')
     setNotice(`Exported ${filtered.length} preview activity records.`)
   }
+  if (!employee.id)
+    return (
+      <EmptyDataPage
+        title="Activity Details"
+        message="No employee activity has been loaded. Select a real employee after the employee data source is connected."
+      />
+    )
   return (
     <div className="dashboard-shell activity-details">
       <Sidebar
@@ -150,8 +155,7 @@ export default function ActivityDetailsPage() {
             </div>
           </div>
           <p className="em-preview-label">
-            Sample employee · Illustrative telemetry only · Backend not
-            connected
+            No activity data loaded · Backend not connected
           </p>
           <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
           <section
@@ -168,9 +172,9 @@ export default function ActivityDetailsPage() {
                   <h2>{employee.name}</h2>
                   <span className="management-status active">
                     <i />
-                    ACTIVE
+                    UNKNOWN
                   </span>
-                  <small>Last activity: 2 minutes ago</small>
+                  <small>Last activity: Not available</small>
                 </div>
                 <p>
                   {employee.title}
@@ -194,14 +198,14 @@ export default function ActivityDetailsPage() {
                 <Radio size={18} />
                 <span>
                   <small>TELEMETRY AGENT</small>
-                  <strong className="connected-text">● Connected</strong>
+                  <strong className="connected-text">Not available</strong>
                 </span>
               </div>
               <div>
                 <Clock3 size={18} />
                 <span>
                   <small>ASSIGNED SHIFT</small>
-                  <strong>09:00 - 17:30</strong>
+                  <strong>—</strong>
                 </span>
               </div>
             </div>
@@ -213,29 +217,29 @@ export default function ActivityDetailsPage() {
             {[
               {
                 title: 'Total Work Time',
-                value: '7h 42m',
-                detail: '+12m vs yesterday',
+                value: '—',
+                detail: '—',
                 Icon: Clock3,
                 tone: 'blue',
               },
               {
                 title: 'Active Time',
-                value: '6h 18m',
-                detail: '+4% vs yesterday',
+                value: '—',
+                detail: '—',
                 Icon: Timer,
                 tone: 'green',
               },
               {
                 title: 'Idle Time',
-                value: '1h 24m',
-                detail: '-8% vs yesterday',
+                value: '—',
+                detail: '—',
                 Icon: Moon,
                 tone: 'orange',
               },
               {
                 title: 'Productivity Score',
-                value: '82%',
-                detail: '+3% vs team avg',
+                value: '—',
+                detail: '—',
                 Icon: TrendingUp,
                 tone: 'blue',
               },
@@ -266,13 +270,12 @@ export default function ActivityDetailsPage() {
                 </span>
               </div>
               <strong>
-                12,480 <small>KEYS</small>
-                <i />
-                8,214 <small>CLICKS</small>
+                — <small>KEYS</small>
+                <i />— <small>CLICKS</small>
               </strong>
               <p>
                 <TrendingUp size={13} />
-                Normal continuous pace
+                No activity metrics available
               </p>
             </article>
           </section>
@@ -332,9 +335,9 @@ export default function ActivityDetailsPage() {
               <div className="timeline-insights">
                 <span>
                   <CheckCircle2 size={14} />
-                  Core active interval: 09:12 - 12:04
+                  Core active interval: —
                 </span>
-                <span>Peak input: 10:24 AM (82 keystrokes/min)</span>
+                <span>Peak input: —</span>
               </div>
             </section>
             <section className="dashboard-panel distribution-panel">
@@ -362,7 +365,7 @@ export default function ActivityDetailsPage() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div>
-                  <strong>7h 42m</strong>
+                  <strong>—</strong>
                   <small>TOTAL TRACKED</small>
                 </div>
               </div>
@@ -372,7 +375,20 @@ export default function ActivityDetailsPage() {
                     <i style={{ background: item.color }} />
                     <span>{item.name}</span>
                     <strong>{formatMinutes(item.minutes)}</strong>
-                    <small>{Math.round((item.minutes / 462) * 100)}%</small>
+                    <small>
+                      {Math.round(
+                        (item.minutes /
+                          Math.max(
+                            1,
+                            timeDistribution.reduce(
+                              (sum, row) => sum + row.minutes,
+                              0,
+                            ),
+                          )) *
+                          100,
+                      )}
+                      %
+                    </small>
                   </div>
                 ))}
               </div>
@@ -406,7 +422,17 @@ export default function ActivityDetailsPage() {
                       <div className="progress-track">
                         <span
                           style={{
-                            width: `${(app.minutes / 462) * 100}%`,
+                            width: `${
+                              (app.minutes /
+                                Math.max(
+                                  1,
+                                  activityApps.reduce(
+                                    (sum, row) => sum + row.minutes,
+                                    0,
+                                  ),
+                                )) *
+                              100
+                            }%`,
                             background: app.color,
                           }}
                         />
@@ -508,8 +534,7 @@ export default function ActivityDetailsPage() {
                   h)
                 </span>
                 <strong>
-                  <TrendingUp size={14} />
-                  +8.2% vs last week
+                  <TrendingUp size={14} />—
                 </strong>
               </div>
             </section>
@@ -662,7 +687,7 @@ export default function ActivityDetailsPage() {
             <Shield size={22} />
             <p>
               <strong>Data Privacy</strong> · This preview displays aggregate
-              input counts and sample application durations. It does not capture
+              input counts and application durations. It does not capture
               keystroke content, screenshots or messages.
             </p>
             <button onClick={() => setPrivacyOpen((value) => !value)}>

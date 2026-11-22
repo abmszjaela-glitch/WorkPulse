@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "node --test tests/*.test.js",
+    "bootstrap:admin": "node scripts/bootstrap-admin.js",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },

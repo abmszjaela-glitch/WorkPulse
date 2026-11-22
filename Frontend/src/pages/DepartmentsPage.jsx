@@ -77,6 +77,8 @@ function Manager({ department, compact = false }) {
   )
 }
 function Productivity({ value, compact = false }) {
+  if (value == null)
+    return <span className="text-xs text-muted">Not available</span>
   return (
     <div className={compact ? 'flex items-center gap-2' : ''}>
       {!compact && (
@@ -155,7 +157,7 @@ export default function DepartmentsPage() {
               id: crypto.randomUUID(),
               employees: 0,
               active: 0,
-              productivity: 0,
+              productivity: null,
               avgMinutes: 0,
             },
           ],
@@ -234,8 +236,8 @@ export default function DepartmentsPage() {
             </div>
           </div>
           <p className="em-preview-label">
-            Sample department aggregates · Changes are temporary and reset on
-            reload · Backend not connected
+            No backend department data loaded · Local drafts reset on reload ·
+            Backend not connected
           </p>
           <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
           <section
@@ -245,24 +247,27 @@ export default function DepartmentsPage() {
             {[
               {
                 label: 'Total Departments',
-                value: summary.departments,
+                value: departments.length ? summary.departments : '—',
                 Icon: Building2,
                 detail: `${departments.filter((department) => department.status === 'Active').length} active departments`,
                 extra: 'in this preview',
               },
               {
                 label: 'Total Employees',
-                value: summary.employees,
+                value: departments.length ? summary.employees : '—',
                 Icon: UsersRound,
                 detail: `${summary.active} active now`,
                 extra: `${summary.employees ? ((summary.active / summary.employees) * 100).toFixed(1) : 0}% online`,
               },
               {
                 label: 'Avg Productivity',
-                value: `${summary.productivity}%`,
+                value:
+                  summary.productivity == null
+                    ? '—'
+                    : `${summary.productivity}%`,
                 Icon: TrendingUp,
-                detail: 'Employee-weighted average',
-                extra: 'sample metrics',
+                detail: 'No approved calculation',
+                extra: 'Not available',
                 green: true,
               },
             ].map(({ label, value, Icon, detail, extra, green }) => (
@@ -410,7 +415,9 @@ export default function DepartmentsPage() {
                         <strong
                           className={`mt-1 block text-sm font-semibold ${department.productivity >= 80 ? 'text-success-strong' : 'text-primary'}`}
                         >
-                          {department.productivity}%
+                          {department.productivity == null
+                            ? '—'
+                            : `${department.productivity}%`}
                         </strong>
                       </div>
                     </div>
@@ -449,7 +456,7 @@ export default function DepartmentsPage() {
                   All Department Details
                 </h2>
                 <p className="mt-1 text-xs text-muted">
-                  Sample organizational telemetry and workforce status
+                  No organizational telemetry loaded
                 </p>
               </div>
               <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto">

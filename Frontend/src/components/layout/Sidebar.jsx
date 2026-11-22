@@ -15,6 +15,7 @@ import Logo from '../auth/Logo.jsx'
 import ProfileLink from './ProfileLink.jsx'
 import useProfile from '../../hooks/useProfile.js'
 import useMobileNavigation from '../../hooks/useMobileNavigation.js'
+import useAuth from '../../hooks/useAuth.js'
 
 const navigation = [
   ['Dashboard', LayoutDashboard, '/dashboard'],
@@ -26,6 +27,7 @@ const navigation = [
   ['Settings', Settings, '/settings'],
 ]
 export default function Sidebar({ open, onClose }) {
+  const { logout } = useAuth()
   const { pathname } = useLocation()
   const { profile } = useProfile()
   const mobile = useMobileNavigation()
@@ -117,13 +119,20 @@ export default function Sidebar({ open, onClose }) {
           <ProfileLink />
           <Link to="/profile" className="min-w-0 !ml-0 !p-0">
             <strong className="truncate">
-              {profile.firstName} {profile.lastName}
+              {[profile.firstName, profile.lastName]
+                .filter(Boolean)
+                .join(' ') || 'Account'}
             </strong>
-            <small>Administrator · Preview</small>
+            <small>Account details not loaded</small>
           </Link>
-          <Link to="/login" aria-label="Go to login">
+          <button
+            type="button"
+            className="icon-button ml-auto"
+            onClick={logout}
+            aria-label="Sign out"
+          >
             <LogOut size={18} />
-          </Link>
+          </button>
         </div>
       </aside>
     </>

@@ -94,7 +94,7 @@ export default function DeleteDepartmentDialog({
               ? 'Employee totals will transfer to the selected department. '
               : ''}
             No historical records, live monitoring rules or real accounts are
-            changed. Reloading restores the sample data.
+            changed. Reloading clears unsaved local changes.
           </p>
         </div>
         {error && (

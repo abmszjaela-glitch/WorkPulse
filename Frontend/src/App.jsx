@@ -2,6 +2,8 @@ import { lazy, Suspense } from 'react'
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import ProfileProvider from './context/ProfileProvider.jsx'
 import RouteFocus from './components/layout/RouteFocus.jsx'
+import AuthProvider from './context/AuthProvider.jsx'
+import RequireAdmin from './components/auth/RequireAdmin.jsx'
 
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'))
 const EmployeesPage = lazy(() => import('./pages/EmployeesPage.jsx'))
@@ -37,38 +39,48 @@ function NotFound() {
 }
 export default function App() {
   return (
-    <ProfileProvider>
-      <a
-        href="#main-content"
-        className="sr-only z-50 rounded-lg bg-primary p-3 text-sm text-white focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
-      >
-        Skip to content
-      </a>
-      <RouteFocus />
-      <Suspense
-        fallback={
-          <div
-            className="grid min-h-svh place-content-center text-sm text-muted"
-            role="status"
-          >
-            Loading WorkPulse…
-          </div>
-        }
-      >
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/employees" element={<EmployeesPage />} />
-          <Route path="/activity-details" element={<ActivityDetailsPage />} />
-          <Route path="/application-usage" element={<ApplicationUsagePage />} />
-          <Route path="/departments" element={<DepartmentsPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </ProfileProvider>
+    <AuthProvider>
+      <ProfileProvider>
+        <a
+          href="#main-content"
+          className="sr-only z-50 rounded-lg bg-primary p-3 text-sm text-white focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+        >
+          Skip to content
+        </a>
+        <RouteFocus />
+        <Suspense
+          fallback={
+            <div
+              className="grid min-h-svh place-content-center text-sm text-muted"
+              role="status"
+            >
+              Loading WorkPulse…
+            </div>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route element={<RequireAdmin />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/employees" element={<EmployeesPage />} />
+              <Route
+                path="/activity-details"
+                element={<ActivityDetailsPage />}
+              />
+              <Route
+                path="/application-usage"
+                element={<ApplicationUsagePage />}
+              />
+              <Route path="/departments" element={<DepartmentsPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </ProfileProvider>
+    </AuthProvider>
   )
 }

@@ -1,4 +1,4 @@
-export const PROFILE_KEY = 'workpulse.profile.preview.v1'
+export const PROFILE_KEY = 'workpulse.profile.draft.v2'
 export const profileLanguages = [
   'English (United States)',
   'English (United Kingdom)',
@@ -14,19 +14,19 @@ export const profileTimezones = [
 ]
 export const defaultProfile = {
   version: 1,
-  firstName: 'Admin',
-  lastName: 'User',
-  phone: '+1 (555) 234-5678',
+  firstName: '',
+  lastName: '',
+  phone: '',
   language: 'English (United States)',
   timezone: 'Asia/Colombo',
   photo: '',
-  notifications: { daily: true, idle: true, weekly: false },
+  notifications: { daily: false, idle: false, weekly: false },
 }
 export const profileAccount = {
-  email: 'admin@workpulse.io',
-  employeeId: 'EMP-0001',
-  department: 'IT & Operations',
-  role: 'Admin',
+  email: '',
+  employeeId: '',
+  department: '',
+  role: '',
 }
 export const copyProfile = (profile = defaultProfile) =>
   JSON.parse(JSON.stringify(profile))
@@ -35,23 +35,30 @@ export function validateProfile(profile) {
   if (
     typeof profile.firstName !== 'string' ||
     !profile.firstName.trim() ||
-    profile.firstName.length > 50 ||
+    profile.firstName.length > 100 ||
     typeof profile.lastName !== 'string' ||
     !profile.lastName.trim() ||
-    profile.lastName.length > 50
+    profile.lastName.length > 100
   )
-    return 'Enter first and last names, each up to 50 characters.'
+    return 'Enter first and last names, each up to 100 characters.'
   if (
     typeof profile.phone !== 'string' ||
-    profile.phone.length > 40 ||
-    (profile.phone && !/^[+\d\s().-]{5,40}$/.test(profile.phone))
+    profile.phone.length > 32 ||
+    (profile.phone && !/^[+\d\s().-]{5,32}$/.test(profile.phone))
   )
     return 'Enter a valid phone number, or leave it blank.'
   if (
-    !profileLanguages.includes(profile.language) ||
-    !profileTimezones.includes(profile.timezone)
+    typeof profile.language !== 'string' ||
+    !profile.language.trim() ||
+    profile.language.length > 35 ||
+    typeof profile.timezone !== 'string'
   )
     return 'Select a supported language and time zone.'
+  try {
+    new Intl.DateTimeFormat('en', { timeZone: profile.timezone })
+  } catch {
+    return 'Select a valid time zone.'
+  }
   if (
     typeof profile.photo !== 'string' ||
     profile.photo.length > 710000 ||

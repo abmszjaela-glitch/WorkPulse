@@ -41,7 +41,6 @@ const initialFilters = {
 const panel = 'rounded-2xl border border-line/70 bg-white shadow-card'
 const control =
   'rounded-lg border border-line/70 bg-white px-3 py-2.5 text-xs text-ink outline-none focus:border-primary/40 focus:ring-4 focus:ring-primary/10'
-const categoryColors = ['#00652b', '#2563eb', '#c5161d']
 
 export default function ReportsPage() {
   const printMode = useMediaQuery('print')
@@ -64,7 +63,7 @@ export default function ReportsPage() {
       `${row.name} ${row.department || ''} ${row.role || ''} ${row.id || ''}`
         .toLowerCase()
         .includes(search.trim().toLowerCase()) &&
-      (!onlyBelow || row.productivity < 75),
+      (!onlyBelow || row.productivity != null),
   )
   const pages = Math.max(1, Math.ceil(rows.length / pageSize))
   const currentPage = Math.min(page, pages)
@@ -75,23 +74,7 @@ export default function ReportsPage() {
   const employeeOptions = reportEmployees.filter(
     (person) => !draft.department || person.department === draft.department,
   )
-  const categories = [
-    {
-      name: 'Productive',
-      value: report.activeMinutes,
-      color: categoryColors[0],
-    },
-    {
-      name: 'Neutral / Communication',
-      value: Math.round(report.idleMinutes * 0.62),
-      color: categoryColors[1],
-    },
-    {
-      name: 'Unproductive / Flagged',
-      value: report.idleMinutes - Math.round(report.idleMinutes * 0.62),
-      color: categoryColors[2],
-    },
-  ]
+  const categories = []
   const pending = JSON.stringify(draft) !== JSON.stringify(applied)
   const setFilter = (field, value) =>
     setDraft((previous) => ({
@@ -111,6 +94,10 @@ export default function ReportsPage() {
     setGeneratedAt(null)
   }
   const generate = () => {
+    if (!report.rows.length) {
+      setNotice('No telemetry data is available to generate a report.')
+      return
+    }
     if (tab !== 'Department' && tab !== 'Employee')
       setTab(
         draft.days === 1 ? 'Daily' : draft.days === 30 ? 'Monthly' : 'Weekly',
@@ -118,9 +105,7 @@ export default function ReportsPage() {
     setApplied({ ...draft })
     setPage(1)
     setGeneratedAt(new Date())
-    setNotice(
-      'Report generated from the selected sample telemetry. No live data source is connected.',
-    )
+    setNotice('Report generated from loaded records.')
   }
   const reset = () => {
     setDraft(initialFilters)
@@ -132,6 +117,10 @@ export default function ReportsPage() {
     setGeneratedAt(null)
   }
   const exportCsv = () => {
+    if (!rows.length) {
+      setNotice('No report records are available to export.')
+      return
+    }
     const time = new Date()
     const content = reportCsv(rows, grouping)
     const filename = `workpulse-${grouping.toLowerCase()}-report-${time.getTime()}.csv`
@@ -202,7 +191,7 @@ export default function ReportsPage() {
             </nav>
             <span className="mb-2 flex items-center gap-1.5 text-[10px] text-muted">
               <i className="size-1.5 rounded-full bg-warning" />
-              Preview telemetry · No live sync
+              No report telemetry loaded
             </span>
           </div>
           <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
@@ -221,9 +210,9 @@ export default function ReportsPage() {
                     setFilter('days', Number(event.target.value))
                   }
                 >
-                  <option value={1}>Today · Sample day</option>
-                  <option value={7}>Last 7 Days · Sample week</option>
-                  <option value={30}>Last 30 Days · Sample month</option>
+                  <option value={1}>Today</option>
+                  <option value={7}>Last 7 Days</option>
+                  <option value={30}>Last 30 Days</option>
                 </select>
               </label>
               <label>
@@ -305,8 +294,8 @@ export default function ReportsPage() {
               {pending
                 ? 'Filters changed. Select Generate Report to apply them.'
                 : generatedAt
-                  ? `Generated ${stamp(generatedAt)} · ${applied.type} · Sample telemetry only`
-                  : 'Sample report · Category split and chart series are illustrative · Exports include the current table filters.'}
+                  ? `Generated ${stamp(generatedAt)} · ${applied.type} · Loaded records`
+                  : 'No report data loaded · Metrics remain unavailable.'}
             </p>
           </section>
           <section
@@ -330,23 +319,25 @@ export default function ReportsPage() {
               },
               {
                 title: 'Productivity Score',
-                value: `${report.productivity}%`,
+                value:
+                  report.productivity == null ? '—' : `${report.productivity}%`,
                 Icon: TrendingUp,
-                detail: 'Active / total tracked time',
+                detail: 'Awaiting an approved calculation',
                 tone: 'text-success-strong bg-green-50',
               },
               {
                 title: 'Attendance Rate',
-                value: `${report.attendance}%`,
+                value:
+                  report.attendance == null ? '—' : `${report.attendance}%`,
                 Icon: UsersRound,
-                detail: `${report.workDays} scheduled workdays`,
+                detail: 'Not available',
                 tone: 'text-primary bg-soft',
               },
               {
                 title: 'Overtime Hours',
                 value: formatReportTime(report.overtime),
                 Icon: Clock3,
-                detail: 'Tracked time above 8h / present day',
+                detail: 'Not available',
                 tone: 'text-error bg-red-50',
               },
             ].map(({ title, value, Icon, detail, tone }) => (
@@ -415,7 +406,7 @@ export default function ReportsPage() {
                   }}
                 >
                   <Filter size={14} />
-                  {onlyBelow ? 'Below 75%' : 'Filter'}
+                  {onlyBelow ? 'Filtered' : 'Filter'}
                 </button>
               </div>
             </div>

@@ -1,8 +1,16 @@
 import BrandPanel from '../components/auth/BrandPanel.jsx'
 import LoginForm from '../components/auth/LoginForm.jsx'
 import Logo from '../components/auth/Logo.jsx'
+import { useNavigate } from 'react-router-dom'
+import useAuth from '../hooks/useAuth.js'
 
 export default function LoginPage() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const signIn = async (credentials) => {
+    await login(credentials)
+    navigate('/dashboard', { replace: true })
+  }
   return (
     <div className="flex min-h-svh bg-background">
       <BrandPanel />
@@ -14,7 +22,7 @@ export default function LoginPage() {
       >
         {/* Logo shown only when the brand panel is hidden (tablet / mobile) */}
         <Logo className="md:hidden" />
-        <LoginForm />
+        <LoginForm onSubmit={signIn} />
       </main>
     </div>
   )

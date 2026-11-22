@@ -198,6 +198,17 @@ test('own profile updates cannot change identity, role or another employee',asyn
   const changed=await(await call('PUT','/profile',E,{firstName:'OwnName',phone:'+94',language:'en',timezone:'Asia/Colombo'},200)).json();assert.equal(changed.first_name,'OwnName');
   for(const body of [{userId:O.id},{role:'A'},{departmentId:otherDept.id},{timezone:'Not/AZone'}])await call('PUT','/profile',E,body,400);
 });
+
+test('personal information persists across reads in the existing profile table and is owner-only',async()=>{
+  const otherBefore=(await db.query('select first_name,last_name,phone,language,timezone from wp_employee_profiles where user_id=$1',[O.id])).rows[0];
+  const values={firstName:'Saved',lastName:'Person',phone:'+94112345678',language:'si',timezone:'Asia/Colombo'};
+  await call('PUT','/profile',E,values,200);
+  const read=await(await call('GET','/profile',E,undefined,200)).json();
+  assert.equal(read.id,E.id);assert.equal(read.first_name,values.firstName);assert.equal(read.last_name,values.lastName);assert.equal(read.phone,values.phone);assert.equal(read.language,'si');assert.equal(read.timezone,values.timezone);
+  const stored=(await db.query('select first_name,last_name,phone,language,timezone from wp_employee_profiles where user_id=$1',[E.id])).rows[0];
+  assert.deepEqual(stored,{first_name:values.firstName,last_name:values.lastName,phone:values.phone,language:'si',timezone:values.timezone});
+  assert.deepEqual((await db.query('select first_name,last_name,phone,language,timezone from wp_employee_profiles where user_id=$1',[O.id])).rows[0],otherBefore);
+});
 test('avatar endpoint sanitizes real images and rejects invalid content',async()=>{
   const png=await sharp({create:{width:16,height:16,channels:3,background:'#2563eb'}}).png().toBuffer();
   const result=await(await call('POST','/profile/avatar',E,{imageBase64:png.toString('base64')},200)).json();assert.ok(result.avatar.startsWith('data:image/png;base64,'));

@@ -210,7 +210,7 @@ export default function ApplicationUsagePage() {
             </nav>
             <span className="flex items-center gap-1.5 text-[10px] text-muted">
               <i className="size-1.5 rounded-full bg-warning" />
-              Preview data · {usageEmployees.length} sample employees
+              No backend application usage data loaded
             </span>
           </div>
           <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
@@ -329,7 +329,7 @@ export default function ApplicationUsagePage() {
             {[
               {
                 label: 'Total Apps Tracked',
-                value: summary.length,
+                value: summary.length || '—',
                 detail: 'Applications in selected scope',
                 Icon: Grid3X3,
                 tone: 'text-primary bg-primary/10',
@@ -337,22 +337,28 @@ export default function ApplicationUsagePage() {
               {
                 label: 'Most Used App',
                 value: summary[0]?.shortName || summary[0]?.name || 'No data',
-                detail: `${formatUsageTime(summary[0]?.averageMinutes || 0)} avg per user`,
+                detail: summary.length
+                  ? `${formatUsageTime(summary[0].averageMinutes)} avg per user`
+                  : 'Not available',
                 Icon: Globe,
                 tone: 'text-primary bg-primary/10',
               },
               {
                 label: 'Productive Time',
-                value: `${Math.round(productive)}%`,
-                detail: `${formatUsageTime(categories[0].minutes)} total productive time`,
+                value: summary.length ? `${Math.round(productive)}%` : '—',
+                detail: summary.length
+                  ? `${formatUsageTime(categories[0].minutes)} total productive time`
+                  : 'Not available',
                 Icon: TrendingUp,
                 tone: 'text-success-strong bg-success/10',
                 valueTone: 'text-success-strong',
               },
               {
                 label: 'Unproductive Time',
-                value: `${Math.round(unproductive)}%`,
-                detail: `${formatUsageTime(categories[2].minutes)} total unproductive time`,
+                value: summary.length ? `${Math.round(unproductive)}%` : '—',
+                detail: summary.length
+                  ? `${formatUsageTime(categories[2].minutes)} total unproductive time`
+                  : 'Not available',
                 Icon: TriangleAlert,
                 tone: 'text-error bg-error/10',
                 valueTone: 'text-error',
@@ -455,10 +461,12 @@ export default function ApplicationUsagePage() {
                     AVG PER USER
                   </small>
                   <strong className="text-xl font-bold tracking-tight">
-                    {formatUsageTime(average)}
+                    {summary.length ? formatUsageTime(average) : '—'}
                   </strong>
                   <span className="mt-1 text-[10px] text-success-strong">
-                    {cohort} employees in scope
+                    {summary.length
+                      ? `${cohort} employees in scope`
+                      : 'No records loaded'}
                   </span>
                 </div>
               </div>
@@ -782,10 +790,10 @@ export default function ApplicationUsagePage() {
                 <p>
                   Productive applications support work, Neutral applications
                   depend on context, and Unproductive applications are outside
-                  work scope. Use Change to update a sample classification. Your
-                  changes recalculate the selected scope’s totals and charts.
-                  This preview does not apply monitoring policies to real
-                  employees.
+                  work scope. Use Change to update a local draft classification.
+                  Your changes recalculate the selected scope’s totals and
+                  charts. This preview does not apply monitoring policies to
+                  real employees.
                 </p>
               </div>
             </section>

@@ -196,7 +196,7 @@ export default function EmployeeDialog({
                     required
                     maxLength={50}
                     autoComplete="given-name"
-                    placeholder="Jonathan"
+                    placeholder="First name"
                   />
                 </label>
                 <label className="em-field">
@@ -207,19 +207,20 @@ export default function EmployeeDialog({
                     required
                     maxLength={50}
                     autoComplete="family-name"
-                    placeholder="Miller"
+                    placeholder="Last name"
                   />
                 </label>
                 <label className="em-field">
                   Email address
                   <input
-                    name="email" aria-label="Email address"
+                    name="email"
+                    aria-label="Email address"
                     type="email"
                     defaultValue={employee?.email}
                     required
                     maxLength={200}
                     autoComplete="email"
-                    placeholder="j.miller@workpulse.io"
+                    placeholder="Employee email address"
                     aria-invalid={error?.field === 'email'}
                     aria-describedby={
                       error?.field === 'email'
@@ -247,15 +248,16 @@ export default function EmployeeDialog({
                     defaultValue={employee?.phone}
                     autoComplete="tel"
                     maxLength={40}
-                    placeholder="+1 (555) 382-9102"
+                    placeholder="Phone number"
                   />
                 </label>
                 <label className="em-field">
                   Employee ID
                   <input
-                    name="id" aria-label="Employee ID"
+                    name="id"
+                    aria-label="Employee ID"
                     defaultValue={employee?.id}
-                    placeholder="WP-1129"
+                    placeholder="Employee ID"
                     required
                     maxLength={30}
                     aria-invalid={error?.field === 'id'}

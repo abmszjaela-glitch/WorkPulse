@@ -37,11 +37,7 @@ import {
   weeklyActivity,
 } from '../data/dashboard.js'
 
-const categories = [
-  { name: 'Productive', value: 62, color: '#00652b', time: '4h 46m' },
-  { name: 'Neutral', value: 24, color: '#2563eb', time: '1h 51m' },
-  { name: 'Unproductive', value: 14, color: '#c5161d', time: '1h 05m' },
-]
+const categories = []
 const appIcons = [Code2, Globe, MessageSquare, Sheet, Palette]
 
 export default function DashboardPage() {
@@ -57,14 +53,7 @@ export default function DashboardPage() {
         .includes(search.toLowerCase()) &&
       (status === 'All' || employee.status === status),
   )
-  const chartData =
-    period === 'This week'
-      ? weeklyActivity
-      : weeklyActivity.map((day) => ({
-          ...day,
-          active: +(day.active * 0.88).toFixed(1),
-          idle: +(day.idle * 1.2).toFixed(1),
-        }))
+  const chartData = weeklyActivity
 
   return (
     <div className="dashboard-shell">
@@ -91,7 +80,7 @@ export default function DashboardPage() {
           <div className="preview-notice">
             <span>
               <span className="preview-dot" />
-              Preview data · Backend not connected
+              No backend data loaded
             </span>
             <Link to="/login">
               Back to login <ArrowRight size={13} />
@@ -102,31 +91,31 @@ export default function DashboardPage() {
             {[
               {
                 title: 'Total Employees',
-                value: '128',
+                value: '—',
                 Icon: UsersRound,
                 detail: 'All registered team members',
-                extra: '+2 this month',
+                extra: 'Not available',
                 tone: '',
               },
               {
                 title: 'Active Now',
-                value: '94',
+                value: '—',
                 Icon: Zap,
-                detail: '+6% vs yesterday',
+                detail: 'Not available',
                 tone: 'green',
               },
               {
                 title: 'Idle Now',
-                value: '21',
+                value: '—',
                 Icon: Hourglass,
-                detail: 'Below idle threshold',
+                detail: 'Not available',
                 tone: 'orange',
               },
               {
                 title: 'Offline',
-                value: '13',
+                value: '—',
                 Icon: CloudOff,
-                detail: 'Not logged in',
+                detail: 'Not available',
                 tone: 'gray',
               },
             ].map(({ title, value, Icon, detail, extra, tone }) => (
@@ -241,7 +230,7 @@ export default function DashboardPage() {
               <div
                 className="donut-chart"
                 role="img"
-                aria-label="Application usage: 62 percent productive, 24 percent neutral, 14 percent unproductive"
+                aria-label="No application usage data loaded"
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -261,7 +250,7 @@ export default function DashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="donut-label">
-                  <strong>7h 42m</strong>
+                  <strong>—</strong>
                   <span>Daily avg / user</span>
                 </div>
               </div>
@@ -281,7 +270,7 @@ export default function DashboardPage() {
             <section className="dashboard-panel employee-panel" id="employees">
               <PanelHeading title="Employee Live Status">
                 <div className="employee-controls">
-                  <span className="active-badge">94 Active</span>
+                  <span className="active-badge">Active count unavailable</span>
                   <label>
                     <span className="sr-only">Filter by status</span>
                     <select
@@ -357,7 +346,7 @@ export default function DashboardPage() {
                 )}
               </div>
               <p className="table-caption">
-                Showing {filtered.length} of {employees.length} preview
+                Showing {filtered.length} of {employees.length}
                 employees
               </p>
             </section>
@@ -399,7 +388,7 @@ export default function DashboardPage() {
               title="Department Productivity"
               subtitle="Average productive time index across teams relative to standard working quota"
             >
-              <span className="benchmark-label">┄ Org Benchmark: 75%</span>
+              <span className="benchmark-label">Benchmark not configured</span>
             </PanelHeading>
             <div className="department-list">
               {departments.map((department) => (
@@ -409,7 +398,6 @@ export default function DashboardPage() {
                     <span style={{ width: `${department.value}%` }}>
                       {department.value}%
                     </span>
-                    <i title="Organization benchmark: 75%" />
                   </div>
                   <b>{department.hours}h avg</b>
                 </div>
@@ -417,7 +405,7 @@ export default function DashboardPage() {
             </div>
           </section>
           <footer className="dashboard-footer">
-            <Check size={13} /> Design preview · All metrics are sample data
+            <Check size={13} /> Waiting for backend data
           </footer>
         </main>
       </div>

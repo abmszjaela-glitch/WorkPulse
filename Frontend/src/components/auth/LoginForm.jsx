@@ -4,11 +4,10 @@ import InputField from './InputField.jsx'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// onSubmit({ email, password, remember }) can be wired to the backend /auth/login later.
+// Credentials are sent only through the existing backend authentication contract.
 export default function LoginForm({ onSubmit }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [remember, setRemember] = useState(false)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [recoveryNotice, setRecoveryNotice] = useState(false)
@@ -29,9 +28,9 @@ export default function LoginForm({ onSubmit }) {
     setError('')
     setSubmitting(true)
     try {
-      await onSubmit({ email, password, remember })
-    } catch {
-      setError('Unable to sign in. Please try again.')
+      await onSubmit({ email, password })
+    } catch (error) {
+      setError(error.message || 'Unable to sign in. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -43,7 +42,7 @@ export default function LoginForm({ onSubmit }) {
         Welcome back
       </h2>
       <p className="mt-1 text-sm text-primary-dark/60">
-        Sign in to your WorkPulse account
+        Sign in with your WorkPulse administrator account
       </p>
 
       <form onSubmit={handleSubmit} noValidate className="mt-7">
@@ -83,15 +82,7 @@ export default function LoginForm({ onSubmit }) {
         )}
 
         <div className="mt-5 flex items-center justify-between gap-3">
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-primary-dark">
-            <input
-              type="checkbox"
-              checked={remember}
-              onChange={(e) => setRemember(e.target.checked)}
-              className="h-4 w-4 rounded border-line accent-primary focus:ring-primary"
-            />
-            Remember me
-          </label>
+          <span className="text-xs text-muted">Administrator access</span>
           <button
             type="button"
             onClick={() => setRecoveryNotice((value) => !value)}

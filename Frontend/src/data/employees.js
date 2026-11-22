@@ -1,48 +1,6 @@
-import { employees } from './dashboard.js'
-export const employeeDepartments = [
-  'Engineering',
-  'Marketing',
-  'Design',
-  'Sales',
-  'Support',
-  'HR',
-]
+export const employeeDepartments = []
 export const employeeRoles = ['Admin', 'Manager', 'Employee']
-export const managementEmployees = [
-  ...employees.map((employee, index) => ({
-    ...employee,
-    id: ['WP-1001', 'WP-1042', 'WP-1088', 'WP-1104', 'WP-1025', 'WP-1150'][
-      index
-    ],
-    role: ['Admin', 'Manager', 'Employee', 'Employee', 'Manager', 'Employee'][
-      index
-    ],
-    status: 'Active',
-    agent:
-      index === 3 ? 'Not installed' : index === 4 ? 'Offline' : 'Connected',
-    lastActive: index === 3 ? 'Never' : employee.activity,
-  })),
-  {
-    id: 'WP-1012',
-    name: 'Thomas Wright',
-    email: 'thomas.w@workpulse.io',
-    department: 'HR',
-    role: 'Admin',
-    status: 'Active',
-    agent: 'Connected',
-    lastActive: '22m ago',
-  },
-  {
-    id: 'WP-1077',
-    name: 'Claire Dubois',
-    email: 'claire.d@workpulse.io',
-    department: 'Marketing',
-    role: 'Employee',
-    status: 'Deactivated',
-    agent: 'Offline',
-    lastActive: '14d ago',
-  },
-]
+export const managementEmployees = []
 export function filterEmployees(rows, search, department, role, status) {
   const term = search.trim().toLowerCase()
   return rows.filter(
