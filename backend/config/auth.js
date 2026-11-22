@@ -1,16 +1,16 @@
 import './environment.js';
+import {readJwtSecret} from './credentials.js';
+import {ConfigurationError} from './configuration-error.js';
 
 function seconds(name, fallback, min, max) {
   const value = Number(process.env[name] || fallback);
-  if (!Number.isInteger(value) || value < min || value > max) throw new Error(`Invalid ${name}`);
+  if (!Number.isInteger(value) || value < min || value > max) throw new ConfigurationError(`Invalid ${name}`);
   return value;
 }
 
-// Absent configuration disables authentication; it never selects a default secret.
+// Environment is loaded first; absent/invalid configuration blocks startup.
 export function loadAuthConfig() {
-  const secret = process.env.AUTH_JWT_SECRET;
-  if (!secret || Buffer.byteLength(secret) < 32) throw new Error('AUTH_JWT_SECRET requires at least 32 bytes');
-  if (!process.env.SUPABASE_SECRET_KEY?.trim()) throw new Error('Authentication requires SUPABASE_SECRET_KEY');
+  const secret = readJwtSecret(process.env);
   return Object.freeze({
     secret,
     issuer: 'workpulse-api',

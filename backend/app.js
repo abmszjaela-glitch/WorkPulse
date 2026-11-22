@@ -6,7 +6,6 @@ import { corsOrigin } from './config/environment.js';
 import { notFound, errorHandler } from './middleware/error-handler.js';
 import { createAuthRouter } from './routes/auth.js';
 import { createConfiguredAuthService } from './config/auth-runtime.js';
-import { ApiError } from './utils/api-error.js';
 import { createCoreRouter } from './routes/core.js';
 import { createConfiguredCore } from './config/core-runtime.js';
 import { createMonitoringRouter } from './routes/monitoring.js';
@@ -34,29 +33,17 @@ app.use(express.json({ limit: '1mb' }));
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
 });
-// Keep health available during initial deployment; auth always fails closed until configured.
-export let authService;
+// Fail startup before listening if authentication cannot be configured.
+export const authService=createConfiguredAuthService();
 export const systemConfig=loadSystemConfig();
 export const systemRepository=createSystemRepository(supabase);
-try { authService = createConfiguredAuthService(); } catch {
-  console.error('Authentication unavailable: configure the signing secret and server-only Supabase key');
-}
-app.use('/api/v1/auth', authService ? createAuthRouter(authService) : (req, res, next) => {
-  next(new ApiError(503, 'Authentication is not configured'));
-});
-if (authService) {
+app.use('/api/v1/auth',createAuthRouter(authService));
   app.use('/api/v1',createSystemRouter({auth:authService,repository:systemRepository,config:systemConfig}));
   app.use('/api/v1',createCoreRouter(createConfiguredCore(authService)));
   app.use('/api/v1',createAnalyticsRouter({auth:authService,service:createAnalyticsService({client:supabase})}));
   app.use('/api/v1',createReportRouter({auth:authService,service:createReportService({client:supabase})}));
   app.use('/api/v1',createMonitoringRouter(createConfiguredMonitoring(authService)));
   app.use('/api/v1',createCategoryRouter({auth:authService,service:createConfiguredProcessing().categories}));
-} else {
-  app.get('/api/v1/version',(req,res)=>res.json({success:true,data:{version:systemConfig.version,minimumAgentVersion:systemConfig.minimumAgentVersion}}));
-  for (const resource of ['settings','notifications','audit-logs','agent','employees','departments','devices','profile','consent','activity','app-usage','status','app-categories','dashboard','reports']) {
-    app.use(`/api/v1/${resource}`,(req,res,next)=>next(new ApiError(503,'Authentication is not configured')));
-  }
-}
 app.use(notFound);
 app.use(errorHandler);
 
