@@ -25,6 +25,11 @@ Set SERVER_URL to the actual HTTPS API base for another computer/deployment;
 localhost refers to this computer, not your administrator's computer. HTTP is
 allowed only on loopback for local development. Redirects are not followed.
 The server verifies the JWT through /auth/me before the app reports Signed in.
+The green account card shows "Signed in successfully" and your verified email.
+The main summary shows account status, local activity totals and tracking controls.
+Sync and last-upload diagnostics are available through Details. This build's
+device uploader is not connected; default sync values are not login errors or
+evidence of a failed network connection.
 Access tokens are saved only in Windows Credential Manager. Passwords are not
 saved or logged. Cached access tokens are reverified on launch. Expiry pauses
 tracking and requires sign-in again. Sign out pauses listeners, removes the

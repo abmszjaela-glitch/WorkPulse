@@ -63,7 +63,9 @@ class CompactTests(unittest.TestCase):
         with patch("agent.ui.desktop.logging_available", return_value=True):
             self.app._poll()
         self.assertEqual(self.app._page, "summary")
-        self.assertIn("employee@example.test", self.app._sync_heading.get())
+        self.assertEqual(self.app._account_heading.get(), "Signed in successfully")
+        self.assertEqual(self.app._account_note.get(), "employee@example.test")
+        self.assertEqual(self.app._connection_card.cget("fg_color"), "#F0FDF4")
         self.assertEqual(self.controller.commands, [])
 
     def test_failed_login_reenables_fields_and_preserves_safe_feedback(self):
@@ -97,12 +99,43 @@ class CompactTests(unittest.TestCase):
             self.app._poll()
         self.assertEqual(self.app._duration_vars["total"].get(), "1h 03m")
         self.assertEqual(self.app._duration_vars["active"].get(), "1h 01m")
-        self.assertEqual(self.app._buffer.get(), "Not connected")
         self.assertEqual(self.app.values["mouse_movements"].get(), "12")
         self.assertEqual(self.app.values["mouse_clicks"].get(), "3")
         self.assertEqual(self.app.values["active_app"].get(), "synthetic.exe")
-        self.assertNotIn("Offline", self.app._sync_heading.get())
+        self.assertEqual(self.app._account_heading.get(), "Not signed in")
         self.assertEqual(short_duration(0), "0h 00m")
+
+    def test_signed_in_account_stays_successful_when_synchronization_is_offline(self):
+        self.controller.view["auth"].update(state="signed_in", signed_in=True, email="employee@example.test")
+        self.controller.view["sync"] = "Offline: synchronization pending"
+        with patch("agent.ui.desktop.logging_available", return_value=True):
+            self.app._poll()
+        self.assertEqual(self.app._account_heading.get(), "Signed in successfully")
+        self.assertEqual(self.app._connection_card.cget("fg_color"), "#F0FDF4")
+
+    def test_summary_omits_sync_panel_but_details_keep_the_actual_diagnostics(self):
+        def label_texts(widget):
+            values = []
+            try:
+                values.append(widget.cget("text"))
+            except (ValueError, tk.TclError):
+                pass
+            for child in widget.winfo_children():
+                values.extend(label_texts(child))
+            return values
+        labels = label_texts(self.app._pages["summary"])
+        for text in ("SYNCHRONIZATION", "Last successful sync", "Next work window", "Local cached buffer", "Not configured", "Not connected", "Never"):
+            self.assertNotIn(text, labels)
+        with patch("agent.ui.compact.messagebox.showinfo") as details:
+            self.app._show_details()
+        self.assertIn("Last successful synchronization: Never", details.call_args.args[1])
+        self.assertEqual(self.controller.view["last_sync"], "Never")
+
+    def test_authentication_in_progress_and_password_changes_are_not_shown_as_login_success(self):
+        for state, heading in (("checking_session", "Verifying employee account…"), ("password_required", "Password change required"), ("signed_out", "Not signed in")):
+            self.app._render_account(dict(state=state, signed_in=False, message="Synthetic status"))
+            self.assertEqual(self.app._account_heading.get(), heading)
+            self.assertNotEqual(self.app._connection_card.cget("fg_color"), "#F0FDF4")
 
     def test_sign_out_requests_safe_logout_and_shows_signin(self):
         self.app._sign_out()

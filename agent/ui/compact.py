@@ -3,8 +3,6 @@
 Employee identity is verified by the existing backend, never fabricated locally.
 Sign-in alone does not authorize tracking or enable device synchronization.
 """
-from datetime import datetime, timezone
-from time import monotonic
 import tkinter as tk
 from tkinter import messagebox
 
@@ -34,7 +32,6 @@ class CompactDesktop(DesktopApplication):
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.root.report_callback_exception = self._callback_error
         self._consent_accepted = False
-        self._schedule_checked = -60.0
         self._compact_vars = []
         self._auth_marker = None
         self._page = "summary"
@@ -101,12 +98,14 @@ class CompactDesktop(DesktopApplication):
         box = ctk.CTkFrame(content, corner_radius=8, fg_color="#F8FAFC", border_width=1, border_color="#E2E8F0")
         box.pack(fill="x", pady=(0, 12))
         self._text(box, variable=self._policy_note, size=12, color="#475569", wrap=310).pack(padx=14, pady=12, anchor="w")
-        self._sync_heading = self._var("Not signed in")
-        self._sync_note = self._var("Sign in with your employee account. Device synchronization is not enabled.")
-        self._connection_card = ctk.CTkFrame(content, corner_radius=8, fg_color="#FFFBEB", border_width=1, border_color="#FEF3C7")
+        self._account_heading = self._var("Not signed in")
+        self._account_note = self._var("Sign in with your registered employee account.")
+        self._connection_card = ctk.CTkFrame(content, corner_radius=8, fg_color="#F8FAFC", border_width=1, border_color="#E2E8F0")
         self._connection_card.pack(fill="x", pady=(0, 17))
-        self._text(self._connection_card, variable=self._sync_heading, size=12, bold=True, color="#B45309").pack(anchor="w", padx=14, pady=(10, 0))
-        self._text(self._connection_card, variable=self._sync_note, size=12, color="#B45309", wrap=310).pack(anchor="w", padx=14, pady=(2, 12))
+        self._account_heading_label = self._text(self._connection_card, variable=self._account_heading, size=13, bold=True, color=NAVY)
+        self._account_heading_label.pack(anchor="w", padx=14, pady=(10, 0))
+        self._account_note_label = self._text(self._connection_card, variable=self._account_note, size=12, color=MUTED, wrap=310)
+        self._account_note_label.pack(anchor="w", padx=14, pady=(2, 12))
         self._heading = self._var("Session paused")
         self._text(content, variable=self._heading, size=18, bold=True).pack(anchor="w")
         self._text(content, "Summary of this local session.", size=12, color=MUTED).pack(anchor="w", pady=(0, 12))
@@ -129,15 +128,6 @@ class CompactDesktop(DesktopApplication):
             row.grid_columnconfigure(1, weight=1)
             self._text(row, title, size=12, color=MUTED, wrap=155).grid(row=0, column=0, sticky="w", padx=(0, 10))
             self._text(row, variable=self.values[key], size=12, bold=True, wrap=165).grid(row=0, column=1, sticky="e")
-        rows = ctk.CTkFrame(content, corner_radius=8, fg_color="#FAFCFF", border_width=1, border_color="#EAF2FF")
-        rows.pack(fill="x", pady=(0, 12))
-        self._next_window = self._var("See working-hours policy")
-        self._buffer = self._var("Not connected")
-        for title, variable in (("Next work window", self._next_window), ("Local cached buffer", self._buffer)):
-            row = ctk.CTkFrame(rows, fg_color="transparent")
-            row.pack(fill="x", padx=12, pady=6)
-            self._text(row, title, size=12, color=MUTED, wrap=155).pack(side="left")
-            self._text(row, variable=variable, size=12, wrap=175).pack(side="right")
         controls = ctk.CTkFrame(content, fg_color="transparent")
         controls.pack(fill="x", pady=(0, 8))
         self.start_button = self._button(controls, "Start / resume", self.start_tracking, width=130)
@@ -331,7 +321,29 @@ class CompactDesktop(DesktopApplication):
 
     def _show_details(self):
         view = self._last_view
-        messagebox.showinfo("Activity details", f"Mouse movement events: {view['mouse_movements']}\nMouse clicks: {view['mouse_clicks']}\nAnonymous key presses: {view['key_presses']}\nForeground application: {view['active_app']}\n\nLast successful synchronization: {view['last_sync']}\n\n{self.controller.policy.describe()}", parent=self.root)
+        messagebox.showinfo("Activity details", f"Mouse movement events: {view['mouse_movements']}\nMouse clicks: {view['mouse_clicks']}\nAnonymous key presses: {view['key_presses']}\nForeground application: {view['active_app']}\n\nSynchronization: {view['sync']}\nLast successful synchronization: {view['last_sync']}\n\nEmployee sign-in and device synchronization are separate. Device-authenticated uploads are not connected in this build.\n\n{self.controller.policy.describe()}", parent=self.root)
+
+    def _render_account(self, auth):
+        """Login success is independent of device connectivity/acknowledgement."""
+        if auth.get("signed_in"):
+            self._account_heading.set("Signed in successfully")
+            self._account_note.set(auth["email"])
+            background, border, color = "#F0FDF4", "#BBF7D0", "#15803D"
+        elif auth.get("state") in ("password_required", "changing_password"):
+            self._account_heading.set("Password change required")
+            self._account_note.set(auth.get("message", ""))
+            background, border, color = "#FFFBEB", "#FDE68A", "#B45309"
+        elif auth.get("state") in ("checking_session", "signing_in"):
+            self._account_heading.set("Verifying employee account…")
+            self._account_note.set(auth.get("message", ""))
+            background, border, color = "#EFF6FF", "#DBEAFE", "#1D4ED8"
+        else:
+            self._account_heading.set("Not signed in")
+            self._account_note.set(auth.get("message", "Sign in with your registered employee account."))
+            background, border, color = "#F8FAFC", "#E2E8F0", MUTED
+        self._connection_card.configure(fg_color=background, border_color=border)
+        self._account_heading_label.configure(text_color=color)
+        self._account_note_label.configure(text_color=color)
 
     def _poll(self):
         super()._poll()
@@ -349,26 +361,10 @@ class CompactDesktop(DesktopApplication):
         self._duration_vars["total"].set(short_duration(view["active_seconds"] + view["idle_seconds"]))
         self._duration_vars["active"].set(short_duration(view["active_seconds"]))
         self._duration_vars["idle"].set(short_duration(view["idle_seconds"]))
-        if auth.get("signed_in"):
-            self._sync_heading.set("Signed in · " + auth["email"])
-            self._sync_note.set("Employee account verified. Device synchronization is not enabled; no upload is claimed.")
-        elif auth.get("state") in ("password_required", "changing_password"):
-            self._sync_heading.set("Password change required")
-            self._sync_note.set(auth.get("message", ""))
-        elif view["sync"].startswith("Offline"):
-            self._sync_heading.set("Offline Mode")
-            self._sync_note.set("The synchronization controller reported an offline state. Upload is not confirmed.")
-        else:
-            self._sync_heading.set("Not signed in")
-            self._sync_note.set(auth.get("message", "Sign in with your registered employee account. Device synchronization is not enabled."))
+        self._render_account(auth)
         self._policy_note.set("Tracking is paused outside your working hours. " + ("Your authorized session resumes automatically." if view.get("automatic_resume") else "Start explicitly during working hours.") if not view["policy_open"] else ("Tracking is active under your authorization. You can stop at any time." if active else "Tracking is paused. Starting requires your authorization."))
         if self._error_message:
             self._policy_note.set(self._error_message)
-        if monotonic() - self._schedule_checked >= 60:
-            self._schedule_checked = monotonic()
-            opening = self.controller.policy.next_start()
-            self._next_window.set("Available now" if view["policy_open"] else (opening.strftime("%a, %I:%M %p") if opening else "See working-hours policy"))
-        self._buffer.set("Not connected")
         if self._page == "summary":
             self.root.title(f"{APP_NAME} {APP_VERSION} — {state}")
 

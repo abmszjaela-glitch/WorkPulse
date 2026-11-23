@@ -103,6 +103,17 @@ on clean standard-user Windows 10 and 11 systems without a Python installation.
 
 ## Debugging and release cautions
 
+If the GUI bundle is running, build into another directory rather than replacing
+its loaded DLLs. The release installer accepts an explicit verified bundle:
+
+```powershell
+.\agent\venv\Scripts\python.exe -B -m PyInstaller --noconfirm --distpath agent/dist/status-ui --workpath agent/build/status-ui agent/packaging/WorkPulseAgent-gui.spec
+.\agent\venv\Scripts\python.exe -B agent/installer/build_release.py --bundle agent/dist/status-ui/WorkPulseAgent
+```
+
+Run the new bundle's `--gui-smoke-test` before compiling the installer. Close the
+older application explicitly before installing the resulting update.
+
 - **Console remains enabled in both specs.** Do not add `--noconsole`: the visible
   tray and operational logger exist, but pre-import/configuration/bootloader errors
   are not all captured by the privacy-restricted event logger. Console diagnostics

@@ -224,6 +224,12 @@ Offline remote logout cannot be guaranteed and is reported without claiming it
 succeeded. Local tracking still requires explicit authorization and work-hours
 checks. Employee sign-in does not enable device authentication or upload data.
 
+The summary shows a verified account in a green "Signed in successfully" card
+with its email, followed by local activity totals and tracking controls. Sync,
+last-upload and queue diagnostics are available under Details, outside the main
+summary. The device uploader remains unconnected; employee login never creates
+an upload acknowledgement or turns a default sync value into a network diagnosis.
+
 `ui/login.py` remains a reusable standalone form/preview; the installed entry
 point is `start_agent.py` and uses the connected `ui/compact.py` screens. Do not
 use `python -m agent.ui.login` as the full application launch command.

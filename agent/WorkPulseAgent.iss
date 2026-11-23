@@ -3,6 +3,9 @@
 #define AgentVersion "1.0.0"
 #define PublisherDisplayName "WorkPulse"
 #define AgentDescription "WorkPulse Employee Activity Tracking Agent"
+#ifndef AgentBundleDir
+  #define AgentBundleDir "..\dist\gui\WorkPulseAgent"
+#endif
 ; Compile this release entry point directly, or use installer/build_release.py.
 #ifndef AgentName
   #error AgentName must be supplied by build_installer.py
@@ -58,8 +61,8 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 Name: "startup"; Description: "Add current-user Windows startup (opens PAUSED; unchecked makes no startup changes)"; GroupDescription: "Optional startup:"; Flags: unchecked
 
 [Files]
-Source: "..\dist\gui\WorkPulseAgent\WorkPulseAgent.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\dist\gui\WorkPulseAgent\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#AgentBundleDir}\WorkPulseAgent.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#AgentBundleDir}\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "PRIVACY.txt"; DestDir: "{app}\documentation"; Flags: ignoreversion
 Source: "USER_GUIDE.txt"; DestDir: "{app}\documentation"; Flags: ignoreversion
 
