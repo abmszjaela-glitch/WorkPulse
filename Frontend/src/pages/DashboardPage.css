@@ -3,6 +3,9 @@
   --dash-navy: var(--color-sidebar);
   --dash-muted: var(--color-muted);
   @apply text-[var(--dash-navy)] bg-canvas min-h-svh text-sm;
+  background-image:
+    radial-gradient(circle at 100% 0, rgb(37 99 235 / 0.06), transparent 28rem),
+    linear-gradient(180deg, #f8fbff 0, #f5f8fe 16rem);
 }
 .dashboard-shell button,
 .dashboard-shell a,
@@ -16,10 +19,10 @@
   outline-offset: 4px;
 }
 .dashboard-sidebar {
-  @apply fixed inset-[0_auto_0_0] w-[240px] bg-[var(--dash-navy)] text-[#d8e2ff] flex flex-col z-[30];
+  @apply fixed inset-[0_auto_0_0] w-[240px] bg-[var(--dash-navy)] text-[#d8e2ff] flex flex-col z-[30] shadow-[12px_0_40px_-28px_rgb(3_23_71_/_0.8)];
 }
 .sidebar-brand {
-  @apply p-[20px_22px_16px];
+  @apply p-[22px_22px_18px];
 }
 .sidebar-brand img {
   @apply w-[190px];
@@ -29,12 +32,14 @@
 }
 .dashboard-sidebar nav a,
 .dashboard-sidebar nav button {
-  @apply flex items-center gap-2.5 p-[12px_16px] rounded-lg text-left text-[15px];
-  transition: background 0.15s;
+  @apply flex items-center gap-2.5 p-[12px_16px] rounded-lg text-left text-[15px] min-h-11;
+  transition:
+    background 0.15s,
+    transform 0.15s;
 }
 .dashboard-sidebar nav a:hover,
 .dashboard-sidebar nav button:hover {
-  @apply bg-[#ffffff12];
+  @apply bg-[#ffffff12] translate-x-0.5;
 }
 .dashboard-sidebar nav a.selected {
   @apply bg-primary text-white;
@@ -59,8 +64,9 @@
   @apply ml-[240px];
 }
 .dashboard-header {
-  @apply min-h-[72px] p-[12px_24px] flex items-center gap-4 bg-white;
+  @apply min-h-[72px] p-[12px_24px] flex items-center gap-4 bg-white/90;
   border-bottom: 1px solid #e0e7f4;
+  backdrop-filter: blur(16px);
 }
 .page-title h1 {
   @apply text-[25px] leading-[1.2] font-bold tracking-[-.7px];
@@ -70,6 +76,13 @@
 }
 .header-actions {
   @apply ml-auto flex items-center gap-4.5;
+}
+.header-actions > .account-avatar,
+.header-actions > .relative > .icon-button {
+  @apply w-10 h-10 rounded-xl;
+}
+.header-actions > .account-avatar {
+  @apply bg-soft text-primary;
 }
 .employee-search {
   @apply flex items-center gap-[9px] bg-[#f6f8fe];
@@ -126,7 +139,17 @@
   @apply bg-white rounded-[13px] shadow-[0_1px_1px_#17255409];
 }
 .summary-card {
-  @apply p-6 min-h-[174px];
+  @apply p-6 min-h-[174px] relative overflow-hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.summary-card::after {
+  content: '';
+  @apply absolute right-0 top-0 h-1 w-20 bg-primary/70;
+}
+.summary-card:hover {
+  @apply -translate-y-0.5 shadow-[0_12px_30px_-20px_rgb(23_37_84_/_0.45)];
 }
 .summary-top {
   @apply flex items-center justify-between gap-2;
@@ -164,7 +187,8 @@
   @apply grid grid-cols-[minmax(0,1.42fr)_minmax(0,1fr)] gap-6 mt-6;
 }
 .dashboard-panel {
-  @apply p-6 scroll-mt-[20px] min-w-0;
+  @apply p-6 scroll-mt-[92px] min-w-0;
+  box-shadow: 0 1px 2px rgb(23 37 84 / 0.04), 0 12px 30px -24px rgb(23 37 84 / 0.32);
 }
 .panel-heading {
   @apply flex items-center justify-between gap-3;
@@ -501,16 +525,28 @@
     @apply block fixed inset-0 bg-[#03174766] z-[25];
   }
   .dashboard-header {
-    @apply p-[14px_16px] gap-2.5;
+    @apply p-[12px_16px] gap-2.5 flex-wrap;
+    min-height: 64px;
+  }
+  .page-title {
+    @apply flex-1;
   }
   .page-title h1 {
     @apply text-[23px];
   }
+  .page-title p {
+    @apply truncate;
+  }
   .header-actions {
-    @apply w-full mt-1;
+    @apply w-full mt-1 gap-2;
+    flex-basis: 100%;
+  }
+  .header-actions > .account-avatar,
+  .header-actions > .relative > .icon-button {
+    @apply w-11 h-11;
   }
   .employee-search {
-    @apply flex-1;
+    @apply flex-1 min-h-11 rounded-xl;
   }
   .employee-search input {
     @apply w-full;
@@ -521,8 +557,14 @@
   .dashboard-content {
     @apply p-[0_16px_20px];
   }
+  .dashboard-panel {
+    @apply rounded-xl p-5;
+  }
+  .summary-grid {
+    @apply gap-3;
+  }
   .summary-card {
-    @apply min-h-[162px];
+    @apply min-h-[148px] p-4;
   }
   .summary-top h2 {
     @apply text-xs;
@@ -565,6 +607,44 @@
   }
   .bar-chart {
     @apply mt-5 h-[260px];
+  }
+  @media (max-width: 440px) {
+    .dashboard-header {
+      @apply items-start;
+    }
+    .mobile-menu {
+      @apply mt-0.5;
+    }
+    .page-title h1 {
+      @apply text-[21px];
+    }
+    .page-title p {
+      @apply text-[11px];
+    }
+    .header-actions {
+      @apply items-stretch;
+    }
+    .date-badge {
+      @apply px-2.5;
+    }
+    .summary-top > span {
+      @apply w-8 h-8;
+    }
+    .summary-value {
+      @apply mt-3 text-[27px];
+    }
+    .summary-detail {
+      @apply text-[10px];
+    }
+    .usage-panel {
+      @apply gap-3;
+    }
+    .usage-legend {
+      @apply min-w-0 w-full;
+    }
+    .department-row {
+      @apply grid-cols-[72px_minmax(0,1fr)_48px];
+    }
   }
 }
 @media (prefers-reduced-motion: reduce) {
