@@ -3,7 +3,7 @@ import { rateLimit } from 'express-rate-limit';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { validateCore, required, text, uuid, nullableUuid, boolean, choice, ids, timezone,
   integer, pagination, filters } from '../middleware/core-validation.js';
-import {idParams as id,employeeFields,departmentFields,employeeFilters as listFilters,employeeCreate,deviceRegistration} from '../validators/management.js';
+import {idParams as id,employeeFields,departmentFields,employeeFilters as listFilters,employeeCreate,deviceRegistration,deviceCredential} from '../validators/management.js';
 import {date} from '../validators/report-filters.js';
 import { createEmployeeController } from '../controllers/employee-controller.js';
 import { createDepartmentController } from '../controllers/department-controller.js';
@@ -23,7 +23,7 @@ export function createCoreRouter({ auth, employees, departments, devices, profil
   const root = Router();
   const employeeController = createEmployeeController(employees);
   const departmentController = createDepartmentController(departments);
-  const deviceController = createDeviceController(devices);
+  const deviceController = createDeviceController(devices,auth);
   const profileController = createProfileController(profile);
   const consentController = createConsentController(consent);
   const secure = () => {
@@ -56,7 +56,12 @@ export function createCoreRouter({ auth, employees, departments, devices, profil
   department.delete('/:id',admin(),validate({reassignToDepartmentId:uuid},{},id),departmentController.remove);
   root.use('/departments',department);
 
+  // Integration extensions: Admin provisions once; a device secret exchanges
+  // only for an employee-bound device JWT. Human JWTs cannot submit telemetry.
+  root.post('/devices/token',limit(20),validate({deviceId:required(uuid),deviceCredential:required(deviceCredential)}),
+    (req,res,next)=>{res.set('Cache-Control','no-store');next();},deviceController.token);
   const device=secure();
+  device.post('/provision',admin(),limit(20),validate({employeeId:required(uuid)}),deviceController.provision);
   device.post('/register',agent(),limit(20),validate(deviceRegistration),deviceController.register);
   device.post('/heartbeat',agent(),validate(),deviceController.heartbeat);
   device.get('/agent-config',agent(),validate(),deviceController.agentConfig);

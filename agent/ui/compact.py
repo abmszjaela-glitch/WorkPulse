@@ -50,13 +50,14 @@ class CompactDesktop(DesktopApplication):
         self.feedback = self._var("No input is being collected.")
         self._host = ctk.CTkFrame(self.root, fg_color="white", corner_radius=0)
         self._host.pack(fill="both", expand=True)
-        for name in ("summary", "signin", "password", "consent"):
+        for name in ("summary", "signin", "password", "consent", "device"):
             page = ctk.CTkScrollableFrame(self._host, fg_color="white", corner_radius=0, scrollbar_button_color="#E2E8F0", scrollbar_button_hover_color="#CBD5E1")
             self._pages[name] = page
         self._build_summary(self._pages["summary"])
         self._build_signin(self._pages["signin"])
         self._build_password_change(self._pages["password"])
         self._build_consent(self._pages["consent"])
+        self._build_device(self._pages["device"])
         self.show_summary()
 
     def _var(self, value):
@@ -140,6 +141,7 @@ class CompactDesktop(DesktopApplication):
         links.pack(fill="x")
         ctk.CTkButton(links, text="Sign in", command=self._open_signin, fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=80, height=25).pack(side="left")
         ctk.CTkButton(links, text="Details", command=self._show_details, fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=80, height=25).pack(side="left")
+        ctk.CTkButton(links, text="Connect device", command=lambda: self._show_page("device"), fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=100, height=25).pack(side="left")
         ctk.CTkButton(links, text="Privacy notice", command=lambda: self._show_page("consent"), fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=120, height=25).pack(side="right")
 
     def _build_signin(self, page):
@@ -235,7 +237,7 @@ class CompactDesktop(DesktopApplication):
         del current, new, confirm
 
     def _clear_password_fields(self):
-        for name in ("_password", "_current_password", "_new_password", "_confirm_password"):
+        for name in ("_password", "_current_password", "_new_password", "_confirm_password", "_activation_code"):
             variable = getattr(self, name, None)
             if variable is not None:
                 variable.set("")
@@ -272,6 +274,8 @@ class CompactDesktop(DesktopApplication):
         brand = ctk.CTkFrame(content, fg_color="transparent")
         brand.pack(fill="x", pady=(0, 16))
         self._brand(brand)
+        self._server_policy = self._var("Connect this device to load the current organization privacy policy.")
+        self._text(content, variable=self._server_policy, size=12, color=MUTED, wrap=335).pack(anchor="w", pady=(0, 12))
         self._text(content, "Before we start", size=19, bold=True).pack(anchor="w")
         self._text(content, "Understand exactly what WorkPulse records before authorizing a local session.", color=MUTED, wrap=335).pack(anchor="w", pady=(3, 18))
         for heading, rows, background, color, border in (
@@ -288,13 +292,40 @@ class CompactDesktop(DesktopApplication):
         self._text(content, f"WorkPulse Agent {APP_VERSION} · Transparent activity tracking", size=10, color=MUTED, wrap=335).pack(pady=(16, 0))
         self._text(content, "Consent alone does not start tracking or sign you in.", size=11, color=MUTED, wrap=335).pack()
 
+    def _build_device(self, page):
+        content = ctk.CTkFrame(page, fg_color="white")
+        content.pack(fill="both", expand=True, padx=14, pady=20)
+        self._text(content, "Connect this device", size=19, bold=True).pack(anchor="w")
+        self._text(content, "Ask your administrator to generate an Agent activation code for your employee account in Employees. Paste it here once. Connecting does not start tracking.", color=MUTED).pack(anchor="w", pady=(8, 18))
+        self._activation_code = self._var("")
+        self._device_message = self._var("")
+        self._text(content, "Activation code", size=12, bold=True).pack(anchor="w")
+        ctk.CTkEntry(content, textvariable=self._activation_code, show="●", height=38).pack(fill="x", pady=(6, 14))
+        self._button(content, "Connect device", self._activate_device).pack(fill="x")
+        self._text(content, variable=self._device_message, color=MUTED).pack(anchor="w", pady=14)
+        self._button(content, "Back to session", self.show_summary, secondary=True).pack(fill="x")
+
+    def _activate_device(self):
+        if not self.controller.desktop_snapshot().get("auth", {}).get("signed_in"):
+            self._show_page("signin")
+            return
+        code = self._activation_code.get()
+        self._activation_code.set("")
+        try:
+            self.controller.activate_device(code)
+            self._device_message.set("Connecting securely…")
+        except (ValueError, RuntimeError):
+            self._device_message.set("Enter a valid activation code from your administrator.")
+        finally:
+            del code
+
     def _show_page(self, page):
         self._clear_password_fields()
         for frame in self._pages.values():
             frame.pack_forget()
         self._pages[page].pack(fill="both", expand=True)
         self._page = page
-        self.root.title(f"{APP_NAME} {APP_VERSION} — " + {"summary": "Paused", "signin": "Sign In", "password": "Change Password", "consent": "Setup"}[page])
+        self.root.title(f"{APP_NAME} {APP_VERSION} — " + {"summary": "Paused", "signin": "Sign In", "password": "Change Password", "consent": "Setup", "device": "Connect Device"}[page])
 
     def show_summary(self):
         self._show_page("summary")
@@ -304,10 +335,8 @@ class CompactDesktop(DesktopApplication):
         if not auth.get("signed_in"):
             self._show_page("signin")
             return
-        self._consent_accepted = True
-        self._consent_owner = auth.get("user_id")
-        self.show_summary()
-        self.feedback.set("Privacy notice accepted. Start the session explicitly when authorized.")
+        self.controller.accept_consent()
+        self.feedback.set("Recording your consent with the server. Start explicitly after confirmation.")
 
     def start_tracking(self):
         auth = self.controller.desktop_snapshot().get("auth", {})
@@ -317,6 +346,9 @@ class CompactDesktop(DesktopApplication):
         if not auth.get("signed_in"):
             self.feedback.set("Sign in with a valid employee account before starting tracking.")
             self._show_page("signin")
+            return
+        if not self.controller.desktop_snapshot().get("synchronization", {}).get("ready"):
+            self._show_page("device")
             return
         if self._consent_owner != auth.get("user_id"):
             self._consent_accepted = False
@@ -333,11 +365,11 @@ class CompactDesktop(DesktopApplication):
         self._show_page("signin")
 
     def show_privacy(self):
-        messagebox.showinfo("WorkPulse privacy policy", "Recorded: aggregate mouse/key activity counts, active/idle time, application names and durations.\n\nNever recorded: key contents, passwords, screenshots, window titles, document names or browsing content.\n\nTracking requires explicit authorization and working-hours policy checks. Manual stop disables automatic restart.\n\nSign-in uses the WorkPulse backend. Access tokens are kept in Windows Credential Manager; passwords are never saved. Device synchronization is not connected by sign-in. No offline saving/upload promise is made by this UI. Uninstall retains local employee data.", parent=self.root)
+        messagebox.showinfo("WorkPulse privacy policy", "Recorded: aggregate mouse/key activity counts, active/idle time, application names and durations.\n\nNever recorded: key contents, passwords, screenshots, window titles, document names or browsing content.\n\nTracking requires explicit authorization and working-hours policy checks. Manual stop disables automatic restart.\n\nSign-in uses the WorkPulse backend. Access tokens are kept in Windows Credential Manager; passwords are never saved. Device activation and server-recorded consent are required. Authorized aggregate intervals are encrypted locally and uploaded with device authentication. Uninstall retains local employee data.", parent=self.root)
 
     def _show_details(self):
         view = self._last_view
-        messagebox.showinfo("Activity details", f"Mouse movement events: {view['mouse_movements']}\nMouse clicks: {view['mouse_clicks']}\nAnonymous key presses: {view['key_presses']}\nForeground application: {view['active_app']}\n\nSynchronization: {view['sync']}\nLast successful synchronization: {view['last_sync']}\n\nEmployee sign-in and device synchronization are separate. Device-authenticated uploads are not connected in this build.\n\n{self.controller.policy.describe()}", parent=self.root)
+        messagebox.showinfo("Activity details", f"Mouse movement events: {view['mouse_movements']}\nMouse clicks: {view['mouse_clicks']}\nAnonymous key presses: {view['key_presses']}\nForeground application: {view['active_app']}\n\nSynchronization: {view['sync']}\nLast successful synchronization: {view['last_sync']}\n\nEmployee sign-in and device synchronization are separate. Device activation and current policy consent are required before collecting or uploading aggregate intervals.\n\n{self.controller.policy.describe()}", parent=self.root)
 
     def _render_account(self, auth):
         """Login success is independent of device connectivity/acknowledgement."""
@@ -378,7 +410,21 @@ class CompactDesktop(DesktopApplication):
         self._duration_vars["active"].set(short_duration(view["active_seconds"]))
         self._duration_vars["idle"].set(short_duration(view["idle_seconds"]))
         self._render_account(auth)
+        sync = view.get("synchronization", {})
+        self._server_policy.set(sync.get("policy_content") or "Connect this device to load the current organization privacy policy.")
+        self._device_message.set(sync.get("message", ""))
+        if sync.get("ready") and sync.get("consent_accepted") and auth.get("signed_in"):
+            self._consent_accepted = True
+            self._consent_owner = auth.get("user_id")
+            if self._page in ("consent", "device"):
+                self.show_summary()
         self._policy_note.set("Tracking is paused outside your working hours. " + ("Your authorized session resumes automatically." if view.get("automatic_resume") else "Start explicitly during working hours.") if not view["policy_open"] else ("Tracking is active under your authorization. You can stop at any time." if active else "Tracking is paused. Starting requires your authorization."))
+        if auth.get("signed_in") and not sync.get("ready"):
+            self._policy_note.set(sync.get("message", "Connect this device before starting tracking."))
+        elif auth.get("signed_in") and sync.get("ready") and not sync.get("consent_accepted"):
+            self._consent_accepted = False
+            self._policy_note.set("Accept the current organization privacy policy before starting tracking.")
+            self.start_button.configure(state="normal")
         if self._error_message:
             self._policy_note.set(self._error_message)
         if self._page == "summary":

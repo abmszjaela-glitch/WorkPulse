@@ -6,10 +6,10 @@
       "method": "POST",
       "path": "/api/v1/activity",
       "request": {
-        "record_id": "5eba02f9-25d3-4825-a9bc-5a4dd303e9ce",
-        "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-        "interval_end": "2026-11-21T08:02:54.123456+00:00",
-        "interval_start": "2026-11-21T08:01:54.123456+00:00",
+        "record_id": "91f94a62-2295-4fe9-96bd-b0078c941e00",
+        "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+        "interval_end": "2026-11-22T09:03:28.123456+00:00",
+        "interval_start": "2026-11-22T09:02:28.123456+00:00",
         "summary": {
           "active_seconds": 50,
           "activity_score": 21.5,
@@ -32,13 +32,13 @@
       "responseStatus": 201,
       "response": {
         "acknowledged_record_ids": [
-          "5eba02f9-25d3-4825-a9bc-5a4dd303e9ce"
+          "91f94a62-2295-4fe9-96bd-b0078c941e00"
         ],
         "results": [
           {
             "index": 0,
             "status": "accepted",
-            "record_id": "5eba02f9-25d3-4825-a9bc-5a4dd303e9ce",
+            "record_id": "91f94a62-2295-4fe9-96bd-b0078c941e00",
             "http_status": 201
           }
         ]
@@ -50,10 +50,10 @@
       "path": "/api/v1/app-usage",
       "requestHeaders": {},
       "request": {
-        "record_id": "a5cb0813-9113-4e25-9c39-039f61271e43",
-        "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-        "interval_end": "2026-11-21T08:08:54.123456+00:00",
-        "interval_start": "2026-11-21T08:07:54.123456+00:00",
+        "record_id": "d595e368-71ac-443d-a898-73a6d14cb60e",
+        "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+        "interval_end": "2026-11-22T09:09:28.123456+00:00",
+        "interval_start": "2026-11-22T09:08:28.123456+00:00",
         "summary": {
           "active_seconds": 50,
           "activity_score": 21.5,
@@ -77,13 +77,13 @@
       "responseStatus": 201,
       "response": {
         "acknowledged_record_ids": [
-          "a5cb0813-9113-4e25-9c39-039f61271e43"
+          "d595e368-71ac-443d-a898-73a6d14cb60e"
         ],
         "results": [
           {
             "index": 0,
             "status": "accepted",
-            "record_id": "a5cb0813-9113-4e25-9c39-039f61271e43",
+            "record_id": "d595e368-71ac-443d-a898-73a6d14cb60e",
             "http_status": 201
           }
         ]
@@ -96,10 +96,10 @@
       "requestHeaders": {},
       "request": [
         {
-          "record_id": "6ddfccc8-9f8d-44cf-85c3-8d2a9f11c36b",
-          "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-          "interval_end": "2026-11-21T08:10:54.123456+00:00",
-          "interval_start": "2026-11-21T08:09:54.123456+00:00",
+          "record_id": "1149ea8f-14c7-444e-89a3-2fb929bc4d9e",
+          "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+          "interval_end": "2026-11-22T09:11:28.123456+00:00",
+          "interval_start": "2026-11-22T09:10:28.123456+00:00",
           "summary": {
             "active_seconds": 50,
             "activity_score": 21.5,
@@ -120,10 +120,10 @@
           "sync_status": "pending"
         },
         {
-          "record_id": "11d71225-1c34-4ece-a7eb-247fbb01306a",
-          "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-          "interval_end": "2026-11-21T08:12:54.123456+00:00",
-          "interval_start": "2026-11-21T08:11:54.123456+00:00",
+          "record_id": "24250996-b8e2-48c5-8fd3-d5cd693fee54",
+          "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+          "interval_end": "2026-11-22T09:13:28.123456+00:00",
+          "interval_start": "2026-11-22T09:12:28.123456+00:00",
           "summary": {
             "active_seconds": 50,
             "activity_score": 21.5,
@@ -147,20 +147,20 @@
       "responseStatus": 200,
       "response": {
         "acknowledged_record_ids": [
-          "6ddfccc8-9f8d-44cf-85c3-8d2a9f11c36b",
-          "11d71225-1c34-4ece-a7eb-247fbb01306a"
+          "1149ea8f-14c7-444e-89a3-2fb929bc4d9e",
+          "24250996-b8e2-48c5-8fd3-d5cd693fee54"
         ],
         "results": [
           {
             "index": 0,
             "status": "accepted",
-            "record_id": "6ddfccc8-9f8d-44cf-85c3-8d2a9f11c36b",
+            "record_id": "1149ea8f-14c7-444e-89a3-2fb929bc4d9e",
             "http_status": 201
           },
           {
             "index": 1,
             "status": "accepted",
-            "record_id": "11d71225-1c34-4ece-a7eb-247fbb01306a",
+            "record_id": "24250996-b8e2-48c5-8fd3-d5cd693fee54",
             "http_status": 201
           }
         ]
@@ -173,10 +173,10 @@
       "requestHeaders": {},
       "request": [
         {
-          "record_id": "5e7f8e62-4603-4329-83ef-124ab92e573a",
-          "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-          "interval_end": "2026-11-21T08:14:54.123456+00:00",
-          "interval_start": "2026-11-21T08:13:54.123456+00:00",
+          "record_id": "860d41e9-fa43-4537-b600-40d973f8e699",
+          "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+          "interval_end": "2026-11-22T09:15:28.123456+00:00",
+          "interval_start": "2026-11-22T09:14:28.123456+00:00",
           "summary": {
             "active_seconds": 50,
             "activity_score": 21.5,
@@ -197,13 +197,13 @@
           "sync_status": "pending"
         },
         {
-          "record_id": "7a5e5642-2f43-4e56-beb8-cd77821abbe8"
+          "record_id": "424d4122-1a2b-4a27-863b-2e4e0f002c4b"
         },
         {
-          "record_id": "5e7f8e62-4603-4329-83ef-124ab92e573a",
-          "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-          "interval_end": "2026-11-21T08:14:54.123456+00:00",
-          "interval_start": "2026-11-21T08:13:54.123456+00:00",
+          "record_id": "860d41e9-fa43-4537-b600-40d973f8e699",
+          "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+          "interval_end": "2026-11-22T09:15:28.123456+00:00",
+          "interval_start": "2026-11-22T09:14:28.123456+00:00",
           "summary": {
             "active_seconds": 50,
             "activity_score": 21.5,
@@ -224,10 +224,10 @@
           "sync_status": "pending"
         },
         {
-          "record_id": "5e7f8e62-4603-4329-83ef-124ab92e573a",
-          "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-          "interval_end": "2026-11-21T08:14:54.123456+00:00",
-          "interval_start": "2026-11-21T08:13:54.123456+00:00",
+          "record_id": "860d41e9-fa43-4537-b600-40d973f8e699",
+          "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+          "interval_end": "2026-11-22T09:15:28.123456+00:00",
+          "interval_start": "2026-11-22T09:14:28.123456+00:00",
           "summary": {
             "active_seconds": 50,
             "activity_score": 21.5,
@@ -248,10 +248,10 @@
           "sync_status": "pending"
         },
         {
-          "record_id": "fb872a41-89f8-4dc6-b9ff-22c91d098b53",
-          "employee_id": "d0f4c561-4cf0-40d7-b131-1e05c00e77ef",
-          "interval_end": "2026-11-22T09:03:06.123456+00:00",
-          "interval_start": "2026-11-22T09:02:06.123456+00:00",
+          "record_id": "bb8a38a4-2b80-4dfc-84c8-08753a2811f0",
+          "employee_id": "bb439ac6-b9d6-41a1-840d-6c29a40794e3",
+          "interval_end": "2026-11-23T10:03:31.123456+00:00",
+          "interval_start": "2026-11-23T10:02:31.123456+00:00",
           "summary": {
             "active_seconds": 50,
             "activity_score": 21.5,
@@ -275,18 +275,18 @@
       "responseStatus": 207,
       "response": {
         "acknowledged_record_ids": [
-          "5e7f8e62-4603-4329-83ef-124ab92e573a"
+          "860d41e9-fa43-4537-b600-40d973f8e699"
         ],
         "results": [
           {
             "index": 0,
             "status": "accepted",
-            "record_id": "5e7f8e62-4603-4329-83ef-124ab92e573a",
+            "record_id": "860d41e9-fa43-4537-b600-40d973f8e699",
             "http_status": 201
           },
           {
             "index": 1,
-            "record_id": "7a5e5642-2f43-4e56-beb8-cd77821abbe8",
+            "record_id": "424d4122-1a2b-4a27-863b-2e4e0f002c4b",
             "status": "rejected",
             "http_status": 400,
             "error": {
@@ -296,7 +296,7 @@
           {
             "index": 2,
             "status": "duplicate",
-            "record_id": "5e7f8e62-4603-4329-83ef-124ab92e573a",
+            "record_id": "860d41e9-fa43-4537-b600-40d973f8e699",
             "http_status": 200
           },
           {
@@ -305,7 +305,7 @@
             },
             "index": 3,
             "status": "rejected",
-            "record_id": "5e7f8e62-4603-4329-83ef-124ab92e573a",
+            "record_id": "860d41e9-fa43-4537-b600-40d973f8e699",
             "http_status": 409
           },
           {
@@ -314,7 +314,7 @@
             },
             "index": 4,
             "status": "rejected",
-            "record_id": "fb872a41-89f8-4dc6-b9ff-22c91d098b53",
+            "record_id": "bb8a38a4-2b80-4dfc-84c8-08753a2811f0",
             "http_status": 400
           }
         ]
@@ -325,7 +325,7 @@
       "method": "POST",
       "path": "/api/v1/status",
       "requestHeaders": {
-        "Idempotency-Key": "d95679d7-a5a8-44b5-92f5-1706421e4c80"
+        "Idempotency-Key": "4591a4eb-f2d3-4cde-b760-0a30f2a8269f"
       },
       "request": {
         "status": "ACTIVE"
@@ -333,10 +333,10 @@
       "responseStatus": 200,
       "response": {
         "status": "ACTIVE",
-        "statusAt": "2026-11-22T08:02:07.556+00:00",
+        "statusAt": "2026-11-23T09:02:31.381+00:00",
         "duplicate": false,
-        "record_id": "d95679d7-a5a8-44b5-92f5-1706421e4c80",
-        "occurred_at": "2026-11-22T08:02:07.556+00:00",
+        "record_id": "4591a4eb-f2d3-4cde-b760-0a30f2a8269f",
+        "occurred_at": "2026-11-23T09:02:31.381+00:00",
         "reportedStatus": "ACTIVE",
         "connectionState": "ONLINE",
         "effectiveStatus": "ACTIVE",
@@ -351,9 +351,9 @@
       "request": {},
       "responseStatus": 200,
       "response": {
-        "deviceId": "7e6066ae-1d95-404a-8dd5-7e4ffcd791e2",
-        "lastSeen": "2026-11-22T08:02:07.753+00:00",
-        "statusAt": "2026-11-22T08:02:07.701+00:00",
+        "deviceId": "0e01753f-5081-48ea-8428-f5b955fd3724",
+        "lastSeen": "2026-11-23T09:02:31.464+00:00",
+        "statusAt": "2026-11-23T09:02:31.437+00:00",
         "reportedStatus": "PAUSED",
         "connectionState": "ONLINE",
         "effectiveStatus": "PAUSED",

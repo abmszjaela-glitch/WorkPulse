@@ -100,7 +100,7 @@ class DesktopApplication:
             tk.Label(card, textvariable=variable, bg="white", fg="#172554", font=("Segoe UI", 13 if key == "active_app" else 22, "bold"), wraplength=215, justify="left").pack(anchor="w", pady=(6, 0))
         sync = tk.Frame(body, bg="white", padx=18, pady=12)
         sync.pack(fill="x", pady=(5, 0))
-        self.sync_var = tk.StringVar(value="Synchronization unavailable — backend integration pending")
+        self.sync_var = tk.StringVar(value="Sign in and connect this device")
         self.last_sync_var = tk.StringVar(value="Last successful synchronization: Never")
         for var in (self.sync_var, self.last_sync_var):
             tk.Label(sync, textvariable=var, bg="white", fg="#475569", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
@@ -132,8 +132,12 @@ class DesktopApplication:
         if not auth.get("signed_in"):
             self.feedback.set("Sign in with a valid employee account before starting tracking.")
             return
+        sync = self.controller.desktop_snapshot().get("synchronization", {})
+        if not sync.get("ready") or not sync.get("consent_accepted"):
+            self.feedback.set(sync.get("message", "Connect your device and accept the current privacy policy first."))
+            return
         identity = "You are signed in to your employee account."
-        if messagebox.askyesno("Authorize local tracking", identity + "\n\nAuthorize this local session to count mouse/key events and application usage during configured working hours?\n\nNo typed text, screenshots or window titles are collected. You can pause or stop at any time. Device synchronization is not enabled by sign-in.", parent=self.root):
+        if messagebox.askyesno("Authorize local tracking", identity + "\n\nAuthorize this local session to count mouse/key events and application usage during configured working hours?\n\nNo typed text, screenshots or window titles are collected. You can pause or stop at any time. Aggregated intervals will be encrypted locally and uploaded using your activated device.", parent=self.root):
             self.feedback.set("Local session explicitly authorized; checking working-hours policy.")
             self.controller.request("start")
 
@@ -186,7 +190,9 @@ class DesktopApplication:
         self.sync_var.set(view["sync"])
         self.last_sync_var.set("Last successful synchronization: " + view["last_sync"])
         signed_in = view.get("auth", {}).get("signed_in", False)
-        self.start_button.configure(state="disabled" if self._closing or not signed_in or not view["policy_open"] or view["tracking"] == "Tracking ON" or self._error_message else "normal")
+        sync = view.get("synchronization", {})
+        ready = sync.get("ready") and sync.get("consent_accepted")
+        self.start_button.configure(state="disabled" if self._closing or not signed_in or not ready or not view["policy_open"] or view["tracking"] == "Tracking ON" or self._error_message else "normal")
         if not self._closing and not self._error_message and not signed_in:
             self.feedback.set("Sign in with a valid employee account before starting tracking.")
         elif not self._closing and not self._error_message and not view["policy_open"]:

@@ -170,6 +170,19 @@ test('device registration rotates credentials, keeps ownership, and invalidates 
   device.token=registration.accessToken;device.credential=registration.deviceCredential;
   await call('POST','/devices/register',device,{name:'Test',platform:'Windows',employeeId:O.id},400);
 });
+
+test('Admin-only provisioning and credential exchange bind device tokens to the selected employee',async()=>{
+  await call('POST','/devices/provision',E,{employeeId:E.id},403);
+  await call('POST','/devices/provision',M,{employeeId:E.id},403);
+  const credential=await(await call('POST','/devices/provision',A,{employeeId:E.id},201)).json();
+  const session=await(await call('POST','/devices/token',null,{deviceId:credential.deviceId,deviceCredential:credential.credential},200)).json();
+  const actor=await auth.authenticate(session.accessToken);
+  assert.equal(actor.kind,'device');assert.equal(actor.userId,E.id);assert.equal(actor.deviceId,credential.deviceId);
+  await call('POST','/devices/token',null,{deviceId:credential.deviceId,deviceCredential:randomBytes(32).toString('base64url')},401);
+  await call('POST','/devices/token',null,{deviceId:credential.deviceId,deviceCredential:credential.credential,employeeId:O.id},400);
+  await call('PATCH','/devices/'+credential.deviceId+'/status',A,{active:false},200);
+  await call('POST','/devices/token',null,{deviceId:credential.deviceId,deviceCredential:credential.credential},401);
+});
 test('heartbeat and agent policy report actual device state and configured working hours',async()=>{
   const heartbeat=await(await call('POST','/devices/heartbeat',device,undefined,200)).json();assert.ok(heartbeat.lastSeen);
   const config=await(await call('GET','/devices/agent-config',device,undefined,200)).json();

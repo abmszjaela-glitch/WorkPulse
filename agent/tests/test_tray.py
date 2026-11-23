@@ -52,7 +52,12 @@ class TrayTests(unittest.TestCase):
         self.auth = AgentAuthentication(self.tokens, client=self.client, clock=lambda: self.now)
         self.auth.perform(self.auth.begin("login", "employee@example.test", "synthetic-password"))
         self.tokens.reset_mock()
-        self.tray = WorkPulseTray(agent_factory=lambda **_: self.agent, token_store=self.tokens, authentication=self.auth, policy=self.policy, startup=self.startup)
+        self.sender = MagicMock()
+        self.sender.can_record.side_effect = lambda owner: owner is not None
+        self.sender.snapshot.return_value = {"ready": True, "consent_accepted": True, "policy_key": "synthetic"}
+        self.sender.tracking_settings.return_value = {}
+        self.sender.working_policy.return_value = None
+        self.tray = WorkPulseTray(agent_factory=lambda **_: self.agent, token_store=self.tokens, authentication=self.auth, sender=self.sender, policy=self.policy, startup=self.startup)
         self.addCleanup(self.tray._pause)
 
     def test_startup_is_opt_in_and_does_not_authorize_tracking(self):
@@ -226,6 +231,23 @@ class TrayTests(unittest.TestCase):
         self.assertEqual(state.snapshot()[2], last)
         with self.assertRaises(ValueError):
             state.update_sync(acknowledged_at=datetime.now())
+
+    def test_activation_flushes_the_running_interval_before_rotating_device_and_logout_cancels_it(self):
+        from uuid import uuid4
+        code = "wp1." + str(uuid4()) + "." + "x" * 43
+        self.tray._handle("start")
+        self.assertTrue(self.agent.ready.wait(1))
+        self.sender.activate.side_effect = lambda _: self.assertFalse(self.agent.listeners_running)
+        self.tray.activate_device(code)
+        self.tray._handle(self.tray._commands.get_nowait())
+        self.tray._handle(self.tray._commands.get_nowait())
+        self.sender.activate.assert_called_once_with(code)
+        self.sender.activate.reset_mock()
+        self.tray.activate_device(code)
+        self.auth.cancel()
+        self.tray._handle(self.tray._commands.get_nowait())
+        self.tray._handle(self.tray._commands.get_nowait())
+        self.sender.activate.assert_not_called()
 
 
 if __name__ == "__main__":

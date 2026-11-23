@@ -19,6 +19,9 @@ import {
 } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar.jsx'
 import useProfile from '../hooks/useProfile.js'
+import useAuth from '../hooks/useAuth.js'
+import useApiData from '../hooks/useApiData.js'
+import { apiRequest } from '../services/api.js'
 import EmptyDataPage from '../components/layout/EmptyDataPage.jsx'
 import {
   copyProfile,
@@ -119,8 +122,19 @@ export default function ProfilePage() {
 }
 
 function ProfileForm() {
-  const { profile, account, saveProfile, savePreferences, saving } =
-    useProfile()
+  const { session, logout } = useAuth()
+  const history = useApiData(
+    { history: '/profile/login-history?pageSize=20', roles: '/settings/roles' },
+    { refreshMs: 30000 },
+  )
+  const {
+    profile,
+    account,
+    saveProfile,
+    savePreferences,
+    saving,
+    reloadProfile,
+  } = useProfile()
   const [draft, setDraft] = useState(() => copyProfile(profile))
   const [notifications, setNotifications] = useState({
     ...profile.notifications,
@@ -128,6 +142,7 @@ function ProfileForm() {
   const [notice, setNotice] = useState('')
   const [profileError, setProfileError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [passwordBusy, setPasswordBusy] = useState(false)
   const [passwords, setPasswords] = useState({
     current: '',
     next: '',
@@ -177,24 +192,32 @@ function ProfileForm() {
     event.target.value = ''
     if (!file) return
     if (
-      !['image/png', 'image/jpeg', 'image/webp'].includes(file.type) ||
-      file.size > 500 * 1024
+      !['image/png', 'image/jpeg'].includes(file.type) ||
+      file.size > 256 * 1024
     ) {
-      setNotice('Choose a PNG, JPEG or WebP image up to 500 KB.')
+      setNotice('Choose a PNG or JPEG image up to 256 KB.')
       return
     }
     const reader = new FileReader()
-    reader.onload = () => {
-      update('photo', reader.result)
-      setNotice(
-        'Photo preview only. Saving personal information does not upload this image.',
-      )
+    reader.onload = async () => {
+      try {
+        const row = await apiRequest(session.accessToken, '/profile/avatar', {
+          method: 'POST',
+          body: { imageBase64: String(reader.result).split(',')[1] },
+        })
+        update('photo', row.avatar)
+        reloadProfile()
+        setNotice('Profile photo saved securely to your account.')
+      } catch (error) {
+        setNotice(error.message)
+      }
     }
     reader.onerror = () => setNotice('The selected photo could not be read.')
     reader.readAsDataURL(file)
   }
-  const changePassword = (event) => {
+  const changePassword = async (event) => {
     event.preventDefault()
+    if (passwordBusy) return
     const error = validatePasswordChange(
       passwords.current,
       passwords.next,
@@ -204,10 +227,29 @@ function ProfileForm() {
       setPasswordError(error)
       return
     }
-    setPasswordError(
-      'This password form is not connected to the password-change API. No password has been changed or stored.',
-    )
-    setPasswords({ current: '', next: '', confirm: '' })
+    if (
+      passwords.next.length < 12 ||
+      new TextEncoder().encode(passwords.next).length > 72
+    ) {
+      setPasswordError('Use at least 12 characters and at most 72 UTF-8 bytes.')
+      return
+    }
+    setPasswordBusy(true)
+    try {
+      await apiRequest(session.accessToken, '/auth/change-password', {
+        method: 'PUT',
+        body: {
+          currentPassword: passwords.current,
+          newPassword: passwords.next,
+        },
+      })
+      setPasswords({ current: '', next: '', confirm: '' })
+      logout()
+    } catch (error) {
+      setPasswordError(error.message)
+    } finally {
+      setPasswordBusy(false)
+    }
   }
   const cancelProfile = () => {
     setDraft(copyProfile(profile))
@@ -264,7 +306,7 @@ function ProfileForm() {
               <input
                 ref={photoInput}
                 type="file"
-                accept="image/png,image/jpeg,image/webp"
+                accept="image/png,image/jpeg"
                 className="sr-only"
                 aria-label="Upload profile photo"
                 onChange={selectPhoto}
@@ -503,9 +545,21 @@ function ProfileForm() {
                 </p>
                 <dl className="mt-5 space-y-2">
                   {[
-                    ['Last Login Time', 'Backend not connected'],
+                    [
+                      'Last Login Time',
+                      history.data.history?.items?.[0]?.created_at
+                        ? new Date(
+                            history.data.history.items[0].created_at,
+                          ).toLocaleString()
+                        : 'Unavailable',
+                    ],
                     ['Last Login Device & IP', 'Not available'],
-                    ['Account Created', 'Not available'],
+                    [
+                      'Account Created',
+                      account.createdAt
+                        ? new Date(account.createdAt).toLocaleString()
+                        : 'Unavailable',
+                    ],
                     ['Assigned Role', account.role || 'Not available'],
                   ].map(([title, value]) => (
                     <div
@@ -524,10 +578,14 @@ function ProfileForm() {
                     <h3 className="font-semibold tracking-wide text-muted">
                       ROLE CAPABILITIES
                     </h3>
-                    <span className="text-primary">UI preview</span>
+                    <span className="text-primary">Backend roles</span>
                   </div>
                   <p className="mt-3 text-xs text-muted">
-                    No role permissions loaded.
+                    {(
+                      history.data.roles?.data?.find(
+                        (row) => row.name === account.role,
+                      )?.permissions || []
+                    ).join(', ') || 'Permissions are enforced by the backend.'}
                   </p>
                   <p className="mt-3 text-[10px] leading-relaxed text-muted">
                     Backend authorization must enforce actual permissions. This
@@ -543,8 +601,8 @@ function ProfileForm() {
                 <div className="p-6">
                   <h2 className="text-sm font-semibold">Change Password</h2>
                   <p className="mt-1 text-[11px] text-muted">
-                    Use a secure and unique password. Backend authentication is
-                    not connected.
+                    Use a unique password of at least 12 characters. Changing it
+                    revokes existing sessions and requires sign-in again.
                   </p>
                   <div className="mt-6 grid items-start gap-6 lg:grid-cols-3">
                     <div>
@@ -628,7 +686,7 @@ function ProfileForm() {
                     </h3>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       {[
-                        'At least 8 characters',
+                        'At least 12 characters',
                         'One uppercase letter',
                         'One number',
                         'One special character',
@@ -750,7 +808,7 @@ function ProfileForm() {
                     Recent Login Activity
                   </h2>
                   <span className="rounded-full bg-soft px-2 py-1 text-[9px] text-muted">
-                    Not connected
+                    {history.loading ? 'Loading…' : 'Database sessions'}
                   </span>
                 </div>
                 <p className="mt-1 text-[11px] leading-relaxed text-muted">
@@ -760,25 +818,53 @@ function ProfileForm() {
                   <table className="w-full min-w-96 text-left text-[10px]">
                     <thead className="bg-slate-50 uppercase tracking-wide text-muted">
                       <tr>
-                        {[
-                          'Date & Time',
-                          'Device & Browser',
-                          'IP & Location',
-                        ].map((title) => (
-                          <th className="px-3 py-3 font-medium" key={title}>
-                            {title}
-                          </th>
-                        ))}
+                        {['Date & Time', 'Device', 'Session status'].map(
+                          (title) => (
+                            <th className="px-3 py-3 font-medium" key={title}>
+                              {title}
+                            </th>
+                          ),
+                        )}
                       </tr>
                     </thead>
+                    <tbody>
+                      {(history.data.history?.items || []).map((row) => (
+                        <tr key={row.id} className="border-b border-line">
+                          <td className="px-3 py-3">
+                            {new Date(row.created_at).toLocaleString()}
+                          </td>
+                          <td className="px-3 py-3">
+                            {row.device_id || 'Web/employee session'}
+                          </td>
+                          <td className="px-3 py-3">
+                            {row.revoked_at
+                              ? 'Revoked'
+                              : Date.parse(row.expires_at) <=
+                                  history.loadedAt?.getTime()
+                                ? 'Expired'
+                                : 'Active'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
-                  <div className="flex flex-col items-center gap-3 py-12 text-center">
-                    <Monitor size={26} className="text-muted" />
-                    <p className="max-w-xs text-xs leading-relaxed text-muted">
-                      No authentication sessions are available. Login history
-                      will appear when backend authentication is connected.
+                  {Object.entries(history.errors).map(([name, error]) => (
+                    <p
+                      key={name}
+                      role="alert"
+                      className="my-3 text-xs text-error"
+                    >
+                      {error}
                     </p>
-                  </div>
+                  ))}
+                  {history.data.history?.items?.length === 0 && (
+                    <div className="flex flex-col items-center gap-3 py-12 text-center">
+                      <Monitor size={26} className="text-muted" />
+                      <p className="max-w-xs text-xs leading-relaxed text-muted">
+                        No authentication sessions are available.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </section>
             )}
@@ -800,11 +886,18 @@ function ProfileForm() {
               </div>
               <button
                 className="flex items-center gap-2 rounded-lg bg-red-100 px-4 py-3 text-xs font-medium text-error hover:bg-red-200"
-                onClick={() =>
-                  setNotice(
-                    'Signing out all devices is unavailable until backend authentication and session revocation are connected. No sessions were changed.',
-                  )
-                }
+                onClick={async () => {
+                  try {
+                    await apiRequest(
+                      session.accessToken,
+                      '/profile/logout-all',
+                      { method: 'POST' },
+                    )
+                    logout()
+                  } catch (error) {
+                    setNotice(error.message)
+                  }
+                }}
               >
                 <LogOut size={16} />
                 Sign out from all devices

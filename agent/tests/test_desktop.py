@@ -21,7 +21,11 @@ class FakeController:
         self.stop = Event()
         self.view = dict(tracking="Tracking PAUSED", sync="Unavailable", last_sync="Never", startup="Not registered", closed=False, tray_visible=True, policy_open=True,
                          mouse_movements=12, mouse_clicks=3, key_presses=7, active_app="synthetic.exe", active_seconds=65, idle_seconds=5,
+                         synchronization={"ready": True, "consent_accepted": True},
                          auth={"state": "signed_in", "signed_in": True, "user_id": "synthetic-employee"})
+
+    def accept_consent(self):
+        self.view["synchronization"]["consent_accepted"] = True
 
     def desktop_snapshot(self):
         return dict(self.view)

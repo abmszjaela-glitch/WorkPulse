@@ -257,7 +257,7 @@ to start local tracking, pause, view status, open the dashboard, logout locally,
 or exit. The green badge and **Tracking ON** tooltip indicate confirmed running
 listeners; the amber badge accompanies paused/transition/error text. Windows
 may place icons in the overflow area; pin WorkPulse in taskbar tray settings.
-The existing foreground console remains visible. Windows auto-start is optional
+The desktop window and tray remain visible. Windows auto-start is optional
 and is never enabled automatically; see the startup section below.
 
 Set `DASHBOARD_URL` to the actual web dashboard URL. No frontend route is guessed.
@@ -268,11 +268,11 @@ adds their run totals to completed totals, without re-adding a polled value or
 counting any paused wall time. Totals remain in memory for the same employee until
 sign-out or application exit. A different employee starts with zero totals.
 
-Monitoring remains local; employee authentication uses the backend. Logout
-stops tracking, removes the server-scoped cached token and attempts revocation. No data
-is uploaded. Sync initially says unavailable and last successful sync is Never.
-A future sender can call `tray.state.update_sync(offline=True)` after network
-failure, and pass an aware `acknowledged_at` datetime only after server success.
+Employee authentication and authorized device synchronization use the backend.
+Logout stops tracking, removes the server-scoped employee token and attempts
+revocation. The sender reports actual connectivity/acknowledgements; last sync
+remains Never until at least one server-acknowledged interval. After activation
+and consent, aggregate intervals enter the encrypted queue and device uploader.
 The tray does not invent connection status or synchronization timestamps.
 
 # Transparent working-hours controls
@@ -558,7 +558,7 @@ The smoke test is explicit (`--smoke-test`) and never starts activity tracking.
 The desktop now opens the compact Paused/session-summary screen, with matching
 Sign In and Before we start consent pages. Rounded cards use CustomTkinter 6.0.0;
 the existing tray worker, tracking agent, emergency stop and working-hours policy
-remain in control. Sign In is disabled until a real backend adapter exists. No
+remain in control. Sign In uses the actual WorkPulse backend. No
 employee identity, logged shift, offline cache size or successful upload is
 fabricated. Details shows actual anonymous counters, application name and last
 acknowledged sync; the main card shows actual current-session durations.
@@ -586,3 +586,16 @@ installation/privacy notice, and offers unchecked current-user startup. It never
 starts tracking on installation and preserves all employee data on uninstall.
 Build commands, compiler licensing status, startup account-scope caveats and
 actual Windows test coverage are documented in `installer/README.md`.
+
+# Device synchronization and dashboard data
+
+The desktop controller now connects interval summaries to the DPAPI-encrypted
+SQLite queue and a separate device-authenticated upload worker. Administrator
+activation, server-recorded current privacy consent and explicit Start are all
+required. Employee JWTs never authorize telemetry uploads. Backend policy supplies
+working hours, idle threshold, input toggles and collection/sync intervals.
+
+Follow `../backend/setup/AGENT_INTEGRATION.md` for the complete activation flow,
+real API contracts, database prerequisites and test evidence. The live project
+currently needs the reviewed 003–007 migrations; no live SQL was applied. The
+complete guarded SQL bundle is `../backend/setup/AGENT_INTEGRATION_REVIEW.sql`.

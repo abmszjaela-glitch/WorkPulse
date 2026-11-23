@@ -3,7 +3,7 @@
   "examples": [
     {
       "method": "GET",
-      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/8a168751-62a8-45fa-9e18-2f58a5cb582b?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -12,15 +12,15 @@
           {
             "status": "ACTIVE",
             "fraction": 1,
-            "device_id": "38a3907c-1fc5-4f00-9578-4796fd608ee6",
-            "record_id": "d7c7d2aa-e185-4eba-b771-f13f4cb26a86",
-            "employee_id": "797141e8-d53c-40b8-8b48-1469079acfa9",
+            "device_id": "db10b570-3c4c-4798-aa93-bb7a2735699c",
+            "record_id": "9bb442b8-8949-4920-9d14-cb47423f7ddc",
+            "employee_id": "8a168751-62a8-45fa-9e18-2f58a5cb582b",
             "key_presses": 50,
             "idle_seconds": 900,
-            "interval_end": "2026-11-21T11:00:00+00:00",
+            "interval_end": "2026-11-22T11:00:00+00:00",
             "mouse_clicks": 10,
             "active_seconds": 2700,
-            "interval_start": "2026-11-21T10:00:00+00:00",
+            "interval_start": "2026-11-22T10:00:00+00:00",
             "mouse_movements": 120,
             "interval_seconds": 3600
           }
@@ -32,8 +32,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -42,7 +42,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/timeline?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/8a168751-62a8-45fa-9e18-2f58a5cb582b/timeline?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -50,152 +50,152 @@
         "data": [
           {
             "label": "00:00",
-            "timestamp": "2026-11-21T00:00:00+00:00",
+            "timestamp": "2026-11-22T00:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "01:00",
-            "timestamp": "2026-11-21T01:00:00+00:00",
+            "timestamp": "2026-11-22T01:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "02:00",
-            "timestamp": "2026-11-21T02:00:00+00:00",
+            "timestamp": "2026-11-22T02:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "03:00",
-            "timestamp": "2026-11-21T03:00:00+00:00",
+            "timestamp": "2026-11-22T03:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "04:00",
-            "timestamp": "2026-11-21T04:00:00+00:00",
+            "timestamp": "2026-11-22T04:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "05:00",
-            "timestamp": "2026-11-21T05:00:00+00:00",
+            "timestamp": "2026-11-22T05:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "06:00",
-            "timestamp": "2026-11-21T06:00:00+00:00",
+            "timestamp": "2026-11-22T06:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "07:00",
-            "timestamp": "2026-11-21T07:00:00+00:00",
+            "timestamp": "2026-11-22T07:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "08:00",
-            "timestamp": "2026-11-21T08:00:00+00:00",
+            "timestamp": "2026-11-22T08:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "09:00",
-            "timestamp": "2026-11-21T09:00:00+00:00",
+            "timestamp": "2026-11-22T09:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "10:00",
-            "timestamp": "2026-11-21T10:00:00+00:00",
+            "timestamp": "2026-11-22T10:00:00+00:00",
             "idle_seconds": 900,
             "active_seconds": 2700
           },
           {
             "label": "11:00",
-            "timestamp": "2026-11-21T11:00:00+00:00",
+            "timestamp": "2026-11-22T11:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "12:00",
-            "timestamp": "2026-11-21T12:00:00+00:00",
+            "timestamp": "2026-11-22T12:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "13:00",
-            "timestamp": "2026-11-21T13:00:00+00:00",
+            "timestamp": "2026-11-22T13:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "14:00",
-            "timestamp": "2026-11-21T14:00:00+00:00",
+            "timestamp": "2026-11-22T14:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "15:00",
-            "timestamp": "2026-11-21T15:00:00+00:00",
+            "timestamp": "2026-11-22T15:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "16:00",
-            "timestamp": "2026-11-21T16:00:00+00:00",
+            "timestamp": "2026-11-22T16:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "17:00",
-            "timestamp": "2026-11-21T17:00:00+00:00",
+            "timestamp": "2026-11-22T17:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "18:00",
-            "timestamp": "2026-11-21T18:00:00+00:00",
+            "timestamp": "2026-11-22T18:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "19:00",
-            "timestamp": "2026-11-21T19:00:00+00:00",
+            "timestamp": "2026-11-22T19:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "20:00",
-            "timestamp": "2026-11-21T20:00:00+00:00",
+            "timestamp": "2026-11-22T20:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "21:00",
-            "timestamp": "2026-11-21T21:00:00+00:00",
+            "timestamp": "2026-11-22T21:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "22:00",
-            "timestamp": "2026-11-21T22:00:00+00:00",
+            "timestamp": "2026-11-22T22:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           },
           {
             "label": "23:00",
-            "timestamp": "2026-11-21T23:00:00+00:00",
+            "timestamp": "2026-11-22T23:00:00+00:00",
             "idle_seconds": 0,
             "active_seconds": 0
           }
         ],
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -204,7 +204,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/log?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/8a168751-62a8-45fa-9e18-2f58a5cb582b/log?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -213,15 +213,15 @@
           {
             "status": "ACTIVE",
             "fraction": 1,
-            "device_id": "38a3907c-1fc5-4f00-9578-4796fd608ee6",
-            "record_id": "d7c7d2aa-e185-4eba-b771-f13f4cb26a86",
-            "employee_id": "797141e8-d53c-40b8-8b48-1469079acfa9",
+            "device_id": "db10b570-3c4c-4798-aa93-bb7a2735699c",
+            "record_id": "9bb442b8-8949-4920-9d14-cb47423f7ddc",
+            "employee_id": "8a168751-62a8-45fa-9e18-2f58a5cb582b",
             "key_presses": 50,
             "idle_seconds": 900,
-            "interval_end": "2026-11-21T11:00:00+00:00",
+            "interval_end": "2026-11-22T11:00:00+00:00",
             "mouse_clicks": 10,
             "active_seconds": 2700,
-            "interval_start": "2026-11-21T10:00:00+00:00",
+            "interval_start": "2026-11-22T10:00:00+00:00",
             "mouse_movements": 120,
             "interval_seconds": 3600
           }
@@ -233,8 +233,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -243,7 +243,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/summary?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/8a168751-62a8-45fa-9e18-2f58a5cb582b/summary?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -276,8 +276,8 @@
           "total_monitored_seconds": 3600
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -286,21 +286,21 @@
     },
     {
       "method": "GET",
-      "path": "/activity/employee/797141e8-d53c-40b8-8b48-1469079acfa9/trend?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/employee/8a168751-62a8-45fa-9e18-2f58a5cb582b/trend?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
         "message": "Analytics retrieved",
         "data": [
           {
-            "date": "2026-11-21",
+            "date": "2026-11-22",
             "idle_seconds": 900,
             "active_seconds": 2700
           }
         ],
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -309,7 +309,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/me?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/me?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -318,15 +318,15 @@
           {
             "status": "ACTIVE",
             "fraction": 1,
-            "device_id": "38a3907c-1fc5-4f00-9578-4796fd608ee6",
-            "record_id": "d7c7d2aa-e185-4eba-b771-f13f4cb26a86",
-            "employee_id": "797141e8-d53c-40b8-8b48-1469079acfa9",
+            "device_id": "db10b570-3c4c-4798-aa93-bb7a2735699c",
+            "record_id": "9bb442b8-8949-4920-9d14-cb47423f7ddc",
+            "employee_id": "8a168751-62a8-45fa-9e18-2f58a5cb582b",
             "key_presses": 50,
             "idle_seconds": 900,
-            "interval_end": "2026-11-21T11:00:00+00:00",
+            "interval_end": "2026-11-22T11:00:00+00:00",
             "mouse_clicks": 10,
             "active_seconds": 2700,
-            "interval_start": "2026-11-21T10:00:00+00:00",
+            "interval_start": "2026-11-22T10:00:00+00:00",
             "mouse_movements": 120,
             "interval_seconds": 3600
           }
@@ -338,8 +338,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -348,7 +348,7 @@
     },
     {
       "method": "GET",
-      "path": "/activity/me/summary?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/activity/me/summary?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -381,8 +381,8 @@
           "total_monitored_seconds": 3600
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -391,7 +391,7 @@
     },
     {
       "method": "GET",
-      "path": "/app-usage?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/app-usage?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -423,8 +423,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -433,7 +433,7 @@
     },
     {
       "method": "GET",
-      "path": "/app-usage/top?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/app-usage/top?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -465,8 +465,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -475,7 +475,7 @@
     },
     {
       "method": "GET",
-      "path": "/app-usage/categories-breakdown?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/app-usage/categories-breakdown?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -508,8 +508,8 @@
           "total_application_seconds": 3600
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -518,14 +518,14 @@
     },
     {
       "method": "GET",
-      "path": "/app-usage/trend?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/app-usage/trend?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
         "message": "Analytics retrieved",
         "data": [
           {
-            "date": "2026-11-21",
+            "date": "2026-11-22",
             "neutral_seconds": 900,
             "productive_seconds": 1800,
             "unclassified_seconds": 900,
@@ -533,8 +533,8 @@
           }
         ],
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -543,7 +543,7 @@
     },
     {
       "method": "GET",
-      "path": "/app-usage/employee/797141e8-d53c-40b8-8b48-1469079acfa9?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/app-usage/employee/8a168751-62a8-45fa-9e18-2f58a5cb582b?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -575,8 +575,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -585,13 +585,13 @@
     },
     {
       "method": "GET",
-      "path": "/app-usage/export?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/app-usage/export?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": "\"Application\",\"Seconds\",\"Users\",\"Category\"\r\n\"code.exe\",\"1800\",\"1\",\"Productive\"\r\n\"chrome.exe\",\"900\",\"1\",\"Neutral\"\r\n\"unknown.exe\",\"900\",\"1\",\"\"\r\n"
     },
     {
       "method": "GET",
-      "path": "/dashboard/stats?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/dashboard/stats?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -605,8 +605,8 @@
           "total_employees": 4
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -615,21 +615,21 @@
     },
     {
       "method": "GET",
-      "path": "/dashboard/active-vs-idle?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/dashboard/active-vs-idle?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
         "message": "Analytics retrieved",
         "data": [
           {
-            "date": "2026-11-21",
+            "date": "2026-11-22",
             "idle_seconds": 900,
             "active_seconds": 2700
           }
         ],
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -638,7 +638,7 @@
     },
     {
       "method": "GET",
-      "path": "/dashboard/app-usage-summary?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/dashboard/app-usage-summary?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -671,8 +671,8 @@
           "total_application_seconds": 3600
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -681,15 +681,15 @@
     },
     {
       "method": "GET",
-      "path": "/dashboard/live-status?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/dashboard/live-status?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
         "message": "Analytics retrieved",
         "data": [
           {
-            "id": "1998e1db-167b-4290-9a84-e5d6f958b8a0",
-            "email": "1998e1db-167b-4290-9a84-e5d6f958b8a0@example.test",
+            "id": "6483a81f-4180-488f-9e5c-4e6bb27cea41",
+            "email": "6483a81f-4180-488f-9e5c-4e6bb27cea41@example.test",
             "status": "OFFLINE",
             "last_name": "",
             "last_seen": null,
@@ -698,28 +698,28 @@
             "department_name": null
           },
           {
-            "id": "797141e8-d53c-40b8-8b48-1469079acfa9",
-            "email": "797141e8-d53c-40b8-8b48-1469079acfa9@example.test",
+            "id": "893e6bcf-789f-4a3c-9a94-d22394f1fa13",
+            "email": "893e6bcf-789f-4a3c-9a94-d22394f1fa13@example.test",
+            "status": "OFFLINE",
+            "last_name": "",
+            "last_seen": null,
+            "first_name": "",
+            "department_id": null,
+            "department_name": null
+          },
+          {
+            "id": "8a168751-62a8-45fa-9e18-2f58a5cb582b",
+            "email": "8a168751-62a8-45fa-9e18-2f58a5cb582b@example.test",
             "status": "ACTIVE",
             "last_name": "",
-            "last_seen": "2026-11-22T08:02:05.564+00:00",
+            "last_seen": "2026-11-23T09:02:12.091+00:00",
             "first_name": "",
-            "department_id": "593eaba9-5b68-4341-8ce1-66db35ec6f29",
+            "department_id": "f8dde545-2261-4ffd-95a5-da138362d9f9",
             "department_name": "Synthetic engineering"
           },
           {
-            "id": "b92d60c3-bb38-4022-8bb6-ee8c30784c00",
-            "email": "b92d60c3-bb38-4022-8bb6-ee8c30784c00@example.test",
-            "status": "OFFLINE",
-            "last_name": "",
-            "last_seen": null,
-            "first_name": "",
-            "department_id": null,
-            "department_name": null
-          },
-          {
-            "id": "bcfcd822-d946-4c01-b5e9-1bce60a622ce",
-            "email": "bcfcd822-d946-4c01-b5e9-1bce60a622ce@example.test",
+            "id": "c87d2997-45be-4528-9d24-5298a78a4f71",
+            "email": "c87d2997-45be-4528-9d24-5298a78a4f71@example.test",
             "status": "OFFLINE",
             "last_name": "",
             "last_seen": null,
@@ -735,8 +735,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -745,7 +745,7 @@
     },
     {
       "method": "GET",
-      "path": "/dashboard/top-apps?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/dashboard/top-apps?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
@@ -777,8 +777,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"
@@ -787,14 +787,14 @@
     },
     {
       "method": "GET",
-      "path": "/dashboard/department-productivity?from=2026-11-21&to=2026-11-21&timezone=UTC",
+      "path": "/dashboard/department-productivity?from=2026-11-22&to=2026-11-22&timezone=UTC",
       "status": 200,
       "response": {
         "success": true,
         "message": "Analytics retrieved",
         "data": [
           {
-            "id": "593eaba9-5b68-4341-8ce1-66db35ec6f29",
+            "id": "f8dde545-2261-4ffd-95a5-da138362d9f9",
             "name": "Synthetic engineering",
             "idle_seconds": 900,
             "active_seconds": 2700,
@@ -809,8 +809,8 @@
           "totalPages": 1
         },
         "meta": {
-          "from": "2026-11-21",
-          "to": "2026-11-21",
+          "from": "2026-11-22",
+          "to": "2026-11-22",
           "timezone": "UTC",
           "productivity_score": null,
           "classification_basis": "current_rules_and_current_department"

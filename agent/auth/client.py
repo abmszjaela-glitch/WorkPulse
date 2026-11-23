@@ -77,7 +77,7 @@ class WorkPulseAuthClient:
                 raise AuthenticationError("invalid_fields")
             if response.status_code >= 500:
                 raise AuthenticationError("unavailable")
-            if response.status_code not in (200, 204):
+            if response.status_code not in (200, 201, 204, 207):
                 raise AuthenticationError("invalid_response")
             if response.status_code == 204:
                 return None

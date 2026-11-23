@@ -4,9 +4,11 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "node --test tests/*.test.js",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
     "bootstrap:admin": "node scripts/bootstrap-admin.js",
     "check:profile": "node scripts/check-profile.js",
+    "check:agent": "node scripts/check-agent-integration.js",
+    "prepare:agent-database": "node scripts/prepare-agent-migration.js",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },

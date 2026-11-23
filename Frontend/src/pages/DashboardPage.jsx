@@ -30,14 +30,15 @@ import {
   YAxis,
 } from 'recharts'
 import Sidebar from '../components/layout/Sidebar.jsx'
+import useApiData from '../hooks/useApiData.js'
+import { queryString } from '../services/api.js'
 import {
-  applications,
-  departments,
-  employees,
-  weeklyActivity,
-} from '../data/dashboard.js'
+  duration,
+  employeeName,
+  rangeDays,
+  categoryColors,
+} from '../utils/analytics.js'
 
-const categories = []
 const appIcons = [Code2, Globe, MessageSquare, Sheet, Palette]
 
 export default function DashboardPage() {
@@ -46,6 +47,74 @@ export default function DashboardPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [notice, setNotice] = useState('')
   const [status, setStatus] = useState('All')
+  const range = rangeDays(7)
+  if (period === 'Last week') {
+    range.to = new Date(Date.parse(range.from) - 86400000)
+      .toISOString()
+      .slice(0, 10)
+    range.from = new Date(Date.parse(range.to) - 6 * 86400000)
+      .toISOString()
+      .slice(0, 10)
+  }
+  const resource = useApiData({
+    stats: '/dashboard/stats',
+    trend: '/dashboard/active-vs-idle?' + queryString(range),
+    usage: '/dashboard/app-usage-summary',
+    live:
+      '/dashboard/live-status?' +
+      queryString({
+        pageSize: 100,
+        search,
+        status: status === 'All' ? '' : status.toUpperCase(),
+      }),
+    apps: '/dashboard/top-apps',
+    departments: '/dashboard/department-productivity?pageSize=100',
+    daily: '/reports/daily?pageSize=100',
+  })
+  const stats = resource.data.stats?.data
+  const daily = new Map(
+    (resource.data.daily?.data || []).map((row) => [row.employee_id, row]),
+  )
+  const employees = (resource.data.live?.data || []).map((row) => ({
+    ...row,
+    name: employeeName(row),
+    department: row.department_name || 'Unassigned',
+    status: row.status[0] + row.status.slice(1).toLowerCase(),
+    active: duration(daily.get(row.id)?.active_seconds),
+    idle: duration(daily.get(row.id)?.idle_seconds),
+    activity: row.last_seen
+      ? new Date(row.last_seen).toLocaleString()
+      : 'No device heartbeat',
+    app: daily.get(row.id)?.top_application || '',
+  }))
+  const weeklyActivity = (resource.data.trend?.data || []).map((row) => ({
+    day: row.date,
+    active: row.active_seconds / 3600,
+    idle: row.idle_seconds / 3600,
+  }))
+  const usage = resource.data.usage?.data
+  const categories = (usage?.items || []).map((row) => ({
+    name: row.category,
+    value: row.percentage ?? 0,
+    color: categoryColors[row.category],
+    time: duration(row.seconds),
+  }))
+  const rawApps = resource.data.apps?.data || []
+  const maximum = Math.max(1, ...rawApps.map((row) => row.seconds))
+  const applications = rawApps.map((row) => ({
+    name: row.application_name,
+    category: row.category || 'Unclassified',
+    time: duration(row.seconds),
+    percent: (row.seconds * 100) / maximum,
+  }))
+  const departments = (resource.data.departments?.data || []).map((row) => ({
+    name: row.name,
+    activeSeconds: row.active_seconds,
+  }))
+  const departmentMaximum = Math.max(
+    1,
+    ...departments.map((row) => row.activeSeconds),
+  )
   const filtered = employees.filter(
     (employee) =>
       `${employee.name} ${employee.email} ${employee.department}`
@@ -80,40 +149,55 @@ export default function DashboardPage() {
           <div className="preview-notice">
             <span>
               <span className="preview-dot" />
-              No backend data loaded
+              {resource.loading
+                ? 'Loading database records…'
+                : resource.loadedAt
+                  ? `Updated ${resource.loadedAt.toLocaleTimeString()}`
+                  : 'Data unavailable'}
             </span>
-            <Link to="/login">
-              Back to login <ArrowRight size={13} />
-            </Link>
+            <button type="button" onClick={resource.reload}>
+              Refresh data <ArrowRight size={13} className="inline" />
+            </button>
           </div>
           <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
+          {Object.entries(resource.errors).map(([name, error]) => (
+            <p
+              key={name}
+              role="alert"
+              className="my-3 rounded-xl bg-red-50 p-3 text-sm text-error"
+            >
+              {name}: {error}
+            </p>
+          ))}
           <section className="summary-grid" aria-label="Employee overview">
             {[
               {
                 title: 'Total Employees',
-                value: '—',
+                value: stats?.total_employees ?? '—',
                 Icon: UsersRound,
                 detail: 'All registered team members',
-                extra: 'Not available',
+                extra: stats
+                  ? `${stats.paused} paused · ${stats.unknown} unknown`
+                  : 'Not available',
                 tone: '',
               },
               {
                 title: 'Active Now',
-                value: '—',
+                value: stats?.active ?? '—',
                 Icon: Zap,
                 detail: 'Not available',
                 tone: 'green',
               },
               {
                 title: 'Idle Now',
-                value: '—',
+                value: stats?.idle ?? '—',
                 Icon: Hourglass,
                 detail: 'Not available',
                 tone: 'orange',
               },
               {
                 title: 'Offline',
-                value: '—',
+                value: stats?.offline ?? '—',
                 Icon: CloudOff,
                 detail: 'Not available',
                 tone: 'gray',
@@ -184,8 +268,7 @@ export default function DashboardPage() {
                       dy={8}
                     />
                     <YAxis
-                      domain={[0, 8]}
-                      ticks={[0, 2, 4, 6, 8]}
+                      domain={[0, 'auto']}
                       tickFormatter={(value) => `${value}h`}
                       axisLine={false}
                       tickLine={false}
@@ -250,8 +333,8 @@ export default function DashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="donut-label">
-                  <strong>—</strong>
-                  <span>Daily avg / user</span>
+                  <strong>{duration(usage?.total_application_seconds)}</strong>
+                  <span>Recorded application time</span>
                 </div>
               </div>
               <div className="usage-legend">
@@ -270,7 +353,9 @@ export default function DashboardPage() {
             <section className="dashboard-panel employee-panel" id="employees">
               <PanelHeading title="Employee Live Status">
                 <div className="employee-controls">
-                  <span className="active-badge">Active count unavailable</span>
+                  <span className="active-badge">
+                    {stats?.active ?? '—'} Active
+                  </span>
                   <label>
                     <span className="sr-only">Filter by status</span>
                     <select
@@ -281,6 +366,8 @@ export default function DashboardPage() {
                       <option>Active</option>
                       <option>Idle</option>
                       <option>Offline</option>
+                      <option>Paused</option>
+                      <option>Unknown</option>
                     </select>
                   </label>
                 </div>
@@ -309,7 +396,13 @@ export default function DashboardPage() {
                                 .join('')}
                             </span>
                             <div>
-                              <strong>{employee.name}</strong>
+                              <Link
+                                to={
+                                  '/activity-details?employeeId=' + employee.id
+                                }
+                              >
+                                <strong>{employee.name}</strong>
+                              </Link>
                               <small>{employee.email}</small>
                             </div>
                           </div>
@@ -359,7 +452,7 @@ export default function DashboardPage() {
               </PanelHeading>
               <div className="app-ranking">
                 {applications.map((app, index) => {
-                  const Icon = appIcons[index]
+                  const Icon = appIcons[index] || Code2
                   return (
                     <div key={app.name} className="ranked-app">
                       <div className="app-info">
@@ -385,8 +478,8 @@ export default function DashboardPage() {
             id="departments"
           >
             <PanelHeading
-              title="Department Productivity"
-              subtitle="Average productive time index across teams relative to standard working quota"
+              title="Department Activity"
+              subtitle="Recorded active time by department; productivity scoring awaits an approved formula"
             >
               <span className="benchmark-label">Benchmark not configured</span>
             </PanelHeading>
@@ -395,17 +488,24 @@ export default function DashboardPage() {
                 <div className="department-row" key={department.name}>
                   <strong>{department.name}</strong>
                   <div className="department-track">
-                    <span style={{ width: `${department.value}%` }}>
-                      {department.value}%
+                    <span
+                      style={{
+                        width: `${(department.activeSeconds * 100) / departmentMaximum}%`,
+                      }}
+                    >
+                      {duration(department.activeSeconds)}
                     </span>
                   </div>
-                  <b>{department.hours}h avg</b>
+                  <b>{duration(department.activeSeconds)} active</b>
                 </div>
               ))}
             </div>
           </section>
           <footer className="dashboard-footer">
-            <Check size={13} /> Waiting for backend data
+            <Check size={13} />{' '}
+            {resource.loading
+              ? 'Loading records'
+              : 'Database-backed activity · refreshes every 15 seconds'}
           </footer>
         </main>
       </div>

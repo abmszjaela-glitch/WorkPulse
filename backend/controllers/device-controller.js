@@ -1,4 +1,6 @@
-export const createDeviceController = (service) => ({
+export const createDeviceController = (service, auth) => ({
+  provision: async (req, res) => res.status(201).json(await auth.provisionDevice(req.auth, req.input.body.employeeId)),
+  token: async (req, res) => res.json(await auth.loginDevice(req.input.body.deviceId, req.input.body.deviceCredential)),
   list: async (req, res) => res.json(await service.list(req.auth, req.input.query)),
   get: async (req, res) => res.json(await service.get(req.auth, req.input.params.id)),
   register: async (req, res) => res.status(201).json(await service.register(req.auth, req.input.body)),

@@ -1,0 +1,137 @@
+{
+  "date": "2026-11-23",
+  "implementation": "Agent / API / database queries / frontend connected",
+  "backend": {
+    "passed": 157,
+    "failed": 0,
+    "command": "node --test --test-concurrency=1 tests/*.test.js",
+    "database": "isolated PostgreSQL (PGlite)"
+  },
+  "agent": {
+    "passed": 225,
+    "failed": 0,
+    "actualEmployeeTracking": "NOT TESTED"
+  },
+  "frontend": {
+    "unit": {
+      "passed": 17,
+      "failed": 0
+    },
+    "browser": {
+      "regressionPassed": 22,
+      "additionalErrorChecksPassed": 2,
+      "failed": 0,
+      "dataSource": "explicit HTTP fixtures; desktop and mobile"
+    },
+    "lint": "PASS",
+    "build": "PASS"
+  },
+  "gui": {
+    "status": "PASS",
+    "checks": {
+      "windows_gui_subsystem_no_console": "PASS",
+      "normal_desktop_visible_paused": "PASS",
+      "callback_error_desktop_visible_paused": "PASS",
+      "callback_error_logged_without_private_details": "PASS",
+      "early_configuration_error_logged": "PASS"
+    },
+    "windowsBuild": 26200
+  },
+  "installer": {
+    "compiled_at_utc": "2026-11-23T09:33:56.544655+00:00",
+    "compiler": "C:\\Users\\DELL\\AppData\\Local\\Programs\\Inno Setup 7\\ISCC.exe",
+    "output": "C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\release\\WorkPulseAgentSetup.exe",
+    "bytes": 22376973,
+    "sha256": "31a6074921f7c89468b62514d429ace021034ee4f5c98cf96153eead4850df05",
+    "source_executable": "C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\dist\\integration-ui\\WorkPulseAgent\\WorkPulseAgent.exe",
+    "version": "1.0.0",
+    "publisher_display_name": "WorkPulse (provisional)",
+    "compilation": "PASS",
+    "signing": "Not configured",
+    "errors": [],
+    "target_os": [
+      "Windows 10 x64",
+      "Windows 11 x64"
+    ],
+    "windows_10_execution": "NOT TESTED"
+  },
+  "liveDatabase": {
+    "changed": false,
+    "schemaReady": false,
+    "unavailableResources": [
+      {
+        "name": "wp_activity_intervals",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_application_usage",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_device_presence",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_status_events",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_app_category_rules",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_daily_summaries",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_report_exports",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_system_settings",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_notifications",
+        "code": "PGRST205"
+      },
+      {
+        "name": "wp_audit_logs",
+        "code": "PGRST205"
+      }
+    ],
+    "deployment": "NOT APPLIED - explicit approval required",
+    "employeeUpload": "NOT TESTED"
+  },
+  "sqlReview": "backend/setup/AGENT_INTEGRATION_REVIEW.sql",
+  "setupGuide": "backend/setup/AGENT_INTEGRATION.md",
+  "dependenciesAdded": [],
+  "notes": [
+    "A transient Windows lock on generated legacy report files affected one rerun; the full sequential rerun passed all 157 tests.",
+    "Existing 99 API-document endpoints preserved; Admin provision and device token-exchange are two explicit integration extensions.",
+    "Productivity score stays null; classified duration percentages are not performance scores.",
+    "Working hours and actual organization privacy policy must be configured before starting an activated Agent.",
+    "Windows 10 execution and live employee uploads are not claimed."
+  ],
+  "installerVerification": {
+    "status": "PASS",
+    "testedAt": "2026-11-23T09:37:24.642404+00:00",
+    "mode": "Isolated per-user installation; elevated Program Files path not tested",
+    "checks": {
+      "install": "PASS",
+      "start_menu": "PASS",
+      "desktop_shortcut_opt_in": "PASS",
+      "runtime_payload": "PASS",
+      "privacy_and_user_guide": "PASS",
+      "no_development_guides": "PASS",
+      "installed_paused_native_smoke": "PASS",
+      "desktop_link_target": "PASS",
+      "installed_desktop_shortcut_opens_paused_gui": "PASS",
+      "uninstall": "PASS",
+      "app_and_start_menu_removed": "PASS",
+      "desktop_removed": "PASS",
+      "synthetic_data_retained": "PASS"
+    },
+    "windows10": "NOT TESTED"
+  }
+}

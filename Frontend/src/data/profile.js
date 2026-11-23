@@ -94,7 +94,7 @@ export function loadProfile(storage) {
 }
 export function passwordRequirements(password) {
   return [
-    password.length >= 8,
+    password.length >= 12,
     /[A-Z]/.test(password),
     /\d/.test(password),
     /[^A-Za-z0-9]/.test(password),

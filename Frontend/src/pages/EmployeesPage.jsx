@@ -17,9 +17,12 @@ import {
   TriangleAlert,
   UsersRound,
   UserRoundX,
+  KeyRound,
+  Activity,
 } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar.jsx'
 import EmployeeDialog from '../components/employees/EmployeeDialog.jsx'
+import DeviceActivationDialog from '../components/employees/DeviceActivationDialog.jsx'
 import { employeeRoles } from '../data/employees.js'
 import useAuth from '../hooks/useAuth.js'
 import useEmployeeDirectory from '../hooks/useEmployeeDirectory.js'
@@ -44,6 +47,7 @@ export default function EmployeesPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(8)
   const [modal, setModal] = useState(null)
+  const [deviceEmployee, setDeviceEmployee] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [notice, setNotice] = useState('')
   const selectAll = useRef(null)
@@ -495,6 +499,20 @@ export default function EmployeesPage() {
                       </td>
                       <td>
                         <div className="row-actions">
+                          <Link
+                            aria-label={`Activity for ${employee.name}`}
+                            to={'/activity-details?employeeId=' + employee.id}
+                          >
+                            <Activity size={16} />
+                          </Link>
+                          {employee.status === 'Active' && (
+                            <button
+                              aria-label={`Connect Agent for ${employee.name}`}
+                              onClick={() => setDeviceEmployee(employee)}
+                            >
+                              <KeyRound size={16} />
+                            </button>
+                          )}
                           <button
                             aria-label={`View ${employee.name}`}
                             onClick={() => setModal({ type: 'view', employee })}
@@ -618,6 +636,12 @@ export default function EmployeesPage() {
           onClose={() => setModal(null)}
           onSave={saveEmployee}
           onBulk={bulkUpdate}
+        />
+      )}
+      {deviceEmployee && (
+        <DeviceActivationDialog
+          employee={deviceEmployee}
+          onClose={() => setDeviceEmployee(null)}
         />
       )}
     </div>

@@ -38,6 +38,8 @@ class CompactTests(unittest.TestCase):
         self.app.start_tracking()
         self.assertEqual(self.app._page, "consent")
         self.app._accept_consent()
+        with patch("agent.ui.desktop.logging_available", return_value=True):
+            self.app._poll()
         self.assertEqual(self.app._page, "summary")
         self.assertEqual(self.controller.commands, [])
         with patch("agent.ui.desktop.messagebox.askyesno", return_value=True):

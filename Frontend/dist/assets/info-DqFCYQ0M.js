@@ -1,1 +1,0 @@
-import{n as e}from"./Logo-7Zm70fUw.js";var t={name:`chevron-right`,size:24,node:[[`path`,{d:`m9 18 6-6-6-6`,key:`mthhwq`}]]};t.node;var n=e(t),r={name:`info`,size:24,node:[[`circle`,{cx:`12`,cy:`12`,r:`10`,key:`1mglay`}],[`path`,{d:`M12 16v-4`,key:`1dtifu`}],[`path`,{d:`M12 8h.01`,key:`e9boi3`}]]};r.node;var i=e(r);export{n,i as t};

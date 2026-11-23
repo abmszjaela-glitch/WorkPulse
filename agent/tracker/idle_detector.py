@@ -18,8 +18,15 @@ class IdleDetector:
     is created, and no individual input information is accessed or retained.
     """
 
-    def __init__(self, activity_state: ActivityState) -> None:
+    def __init__(self, activity_state: ActivityState, *, threshold=None) -> None:
         self.activity_state = activity_state
+        if threshold is not None and (type(threshold) not in (int, float) or not 0 < threshold <= 86400):
+            raise ValueError("Invalid idle threshold.")
+        self._threshold = threshold
+
+    @property
+    def threshold(self):
+        return config.IDLE_THRESHOLD if self._threshold is None else self._threshold
 
     def get_inactivity_duration(self) -> float:
         """Return elapsed seconds using the shared state's locked monotonic clock."""
@@ -27,10 +34,10 @@ class IdleDetector:
 
     def get_status(self) -> str:
         """Return IDLE at or above IDLE_THRESHOLD, otherwise ACTIVE."""
-        if self.get_inactivity_duration() >= config.IDLE_THRESHOLD:
+        if self.get_inactivity_duration() >= self.threshold:
             return "IDLE"
         return "ACTIVE"
 
     def get_active_elapsed(self) -> float:
         """Monotonic active-time clock excluding gaps beyond IDLE_THRESHOLD."""
-        return self.activity_state.active_elapsed(config.IDLE_THRESHOLD)
+        return self.activity_state.active_elapsed(self.threshold)

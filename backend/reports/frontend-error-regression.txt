@@ -1,0 +1,11 @@
+
+Running 2 tests using 1 worker
+
+(node:5532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [desktop] › tests\e2e\agent-data.spec.js:495:1 › missing services stay visible without duplicate React keys and scoped exports require a selection (6.8s)
+(node:11548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 2 [mobile] › tests\e2e\agent-data.spec.js:495:1 › missing services stay visible without duplicate React keys and scoped exports require a selection (5.4s)
+
+  2 passed (15.6s)

@@ -8,10 +8,11 @@ import { createDepartmentService } from '../services/departments.js';
 import { createDeviceService } from '../services/devices.js';
 import { createProfileService } from '../services/profile.js';
 import { createConsentService } from '../services/consent.js';
+import {createAgentSettings} from '../services/agent-settings.js';
 
 export function createConfiguredCore(auth) {
   const repository=createCoreRepository(supabase), config=loadAuthConfig();
   return { auth,repository,employees:createEmployeeService({repository,config,mailer:createEmailService()}),
-    departments:createDepartmentService({repository}),devices:createDeviceService({repository,config,policy:loadAgentPolicy()}),
+    departments:createDepartmentService({repository}),devices:createDeviceService({repository,config,policy:loadAgentPolicy(),policyProvider:createAgentSettings(loadAgentPolicy())}),
     profile:createProfileService({repository}),consent:createConsentService({repository}) };
 }

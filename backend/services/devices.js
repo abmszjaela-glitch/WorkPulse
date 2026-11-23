@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { createTokenService, opaqueToken, tokenHash } from './tokens.js';
 
-export function createDeviceService({ repository, config, policy }) {
+export function createDeviceService({ repository, config, policy, policyProvider }) {
   const tokens = createTokenService(config);
   return {
     list: (actor,options) => repository.devices(actor,'list',null,options),
@@ -15,6 +15,9 @@ export function createDeviceService({ repository, config, policy }) {
         refreshToken, tokenType:'Bearer', expiresIn:config.accessSeconds };
     },
     heartbeat: (actor) => repository.devices(actor,'heartbeat'),
-    async agentConfig(actor) { return { ...policy, ...await repository.devices(actor,'agent-config') }; },
+    async agentConfig(actor) {
+      const result=await repository.devices(actor,'agent-config');
+      return { ...(policyProvider?await policyProvider(result):policy), ...result };
+    },
   };
 }

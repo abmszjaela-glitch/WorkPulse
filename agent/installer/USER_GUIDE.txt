@@ -37,9 +37,9 @@ allowed only on loopback for local development. Redirects are not followed.
 The server verifies the JWT through /auth/me before the app reports Signed in.
 The green account card shows "Signed in successfully" and your verified email.
 The main summary shows account status, local activity totals and tracking controls.
-Sync and last-upload diagnostics are available through Details. This build's
-device uploader is not connected; default sync values are not login errors or
-evidence of a failed network connection.
+Sync and last-upload diagnostics are available through Details. After device
+activation, authorized aggregated intervals are encrypted locally and sent to
+the backend. Only server-acknowledged record IDs are removed from the queue.
 Access tokens are saved only in Windows Credential Manager. Passwords are not
 saved or logged. Cached access tokens are reverified on launch. Expiry pauses
 tracking and requires sign-in again. Sign out pauses listeners, removes the
@@ -51,17 +51,25 @@ password, choose/confirm a new password, update, then sign in again. Tracking
 does not start on login or password change. Accept the notice and explicitly
 authorize Start / resume under the applicable policy.
 
-CURRENT RELEASE LIMITATIONS
-Monitoring is local; device-authenticated backend synchronization is not connected
-by employee sign-in. An employee JWT is not a device upload credential. Do not
-bypass organization authorization. The About menu shows
+DEVICE ACTIVATION
+An administrator opens Employees, selects Connect Agent for your account, and
+generates an activation code. After employee sign-in, open Connect device and
+paste the code once. Review and accept the organization privacy policy. Wait for
+server confirmation, then explicitly Start / Resume during your working hours.
+Device activation and consent do not start tracking. An employee JWT is never a
+device upload credential. Failed/offline uploads stay queued with bounded
+retention; sending resumes when connectivity and authorization permit. The
+backend database migrations must be deployed before synchronization can work.
+The About menu shows
 the Agent version and provisional publisher display. No digital signing or
 verified publisher identity is claimed.
 
 WORKING HOURS AND SETTINGS
-Default hours are Monday-Friday 09:00-17:30 in Asia/Colombo. The displayed policy
-is authoritative for the current session. Central configuration is compiled
-into the application and accepts Windows environment overrides:
+The organization must configure the actual working hours and IANA timezone in
+the dashboard Settings page. Connected Agents reload policy every 60 seconds;
+policy changes pause the current run and require an explicit restart. An
+unconfigured schedule blocks collection. The displayed remote policy is
+authoritative for an activated device. Local bootstrap configuration accepts:
 WORKING_TIMEZONE (IANA name), WORKING_START / WORKING_END (24-hour HH:MM),
 WORKING_DAYS (Monday=0 through Sunday=6), DASHBOARD_URL and SERVER_URL.
 Use authorized settings and restart transparently after policy changes.

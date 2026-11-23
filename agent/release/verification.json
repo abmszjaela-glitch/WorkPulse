@@ -1,5 +1,5 @@
 {
-  "tested_at_utc": "2026-11-20T05:01:52.490286+00:00",
+  "tested_at_utc": "2026-11-23T09:37:24.642404+00:00",
   "windows_build": 26200,
   "mode": "Isolated per-user installation; elevated Program Files path not tested",
   "checks": {
@@ -59,7 +59,7 @@
     "tracking_never_started": true,
     "callback_error_seen": false,
     "tracking": "Tracking PAUSED",
-    "employee_status": "Not signed in; backend authentication unavailable"
+    "employee_status": "signed_out"
   },
   "status": "PASS"
 }

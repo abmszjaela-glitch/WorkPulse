@@ -45,6 +45,17 @@ test('personal information uses authenticated API writes, survives re-login and 
       },
     }),
   )
+  await page.route('**/api/v1/profile/login-history?*', (r) =>
+    r.fulfill({ json: { items: [], total: 0, page: 1, pageSize: 20 } }),
+  )
+  await page.route('**/api/v1/settings/roles', (r) =>
+    r.fulfill({
+      json: {
+        success: true,
+        data: [{ role: 'A', permissions: ['profile.manage.self'] }],
+      },
+    }),
+  )
   await page.route('**/api/v1/profile', async (r) => {
     expect(r.request().headers().authorization).toBe(
       'Bearer isolated-test-token',

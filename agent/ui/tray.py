@@ -1,9 +1,10 @@
 """Visible Windows tray. Run python -m agent.ui.tray; starts paused.
 
-Employee sign-in uses the backend; tracking is local until device sync is wired.
+Employee sign-in and administrator-approved device activation use the backend.
 Optional current-user logon launch opens paused; no hidden tracking.
 """
 from datetime import datetime, timezone
+from dataclasses import dataclass, field
 from queue import Empty, Queue
 from threading import Event, Lock, Thread
 import webbrowser
@@ -13,6 +14,7 @@ from PIL import Image, ImageDraw
 
 from ..core.agent import ActivityAgent
 from ..core.session_totals import SessionTotals
+from ..core.data_sender import DataSender
 from ..config import config
 from ..auth.token_store import WindowsTokenStore
 from ..auth.session import AgentAuthentication, AuthJob
@@ -22,12 +24,18 @@ from ..utils.logger import get_logger, configure_logging, shutdown_logging
 from ..version import APP_NAME, APP_VERSION, PUBLISHER_DISPLAY_NAME, APP_DESCRIPTION
 
 
+@dataclass(frozen=True)
+class DeviceActivationJob:
+    code: str = field(repr=False)
+    owner: str = field(repr=False)
+
+
 class TrayState:
     """Shared presentation state; sender must report actual synchronization events."""
     def __init__(self):
         self._lock = Lock()
         self.tracking = "Tracking PAUSED"
-        self.sync = "Sync unavailable: backend integration pending"
+        self.sync = "Sign in to connect this device"
         self.last_sync = "Never"
 
     def set_tracking(self, value):
@@ -66,11 +74,13 @@ def tray_image(active=False, idle=False):
 
 class WorkPulseTray:
     """Tray callbacks enqueue work; listener startup/shutdown runs off the UI thread."""
-    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, authentication=None, policy=None, startup=None, open_window=None, show_summary=None, privacy_policy=None):
+    def __init__(self, *, agent_factory=ActivityAgent, token_store=None, authentication=None, sender=None, policy=None, startup=None, open_window=None, show_summary=None, privacy_policy=None):
         self.state = TrayState()
         self._factory = agent_factory
         self._tokens = token_store or WindowsTokenStore(config.SERVER_URL)
         self.authentication = authentication or AgentAuthentication(self._tokens)
+        self.sender = sender or DataSender(self.authentication)
+        self._run_policy_key = None
         self._startup = WindowsStartup() if startup is None else startup
         self._startup_status = "Not checked"
         self._commands = Queue()
@@ -103,7 +113,7 @@ class WorkPulseTray:
                 item("View tracking status", self._show_status, default=open_window is None),
                 item("Open dashboard", command("dashboard")),
                 pystray.Menu.SEPARATOR,
-                item("Start / resume tracking", command("start"), enabled=lambda _: self.authentication.tracking_identity() is not None),
+                item("Start / resume tracking", command("start"), enabled=lambda _: self.sender.can_record(self.authentication.tracking_identity())),
                 item("Pause tracking", command("pause")),
                 item("EMERGENCY STOP", command("emergency")),
                 item(lambda _: self.state.snapshot()[1], None, enabled=False),
@@ -129,7 +139,19 @@ class WorkPulseTray:
         result["automatic_resume"] = self._requested and not self._manual_stop.is_set()
         result["tray_visible"] = bool(self.icon.visible)
         result["auth"] = self.authentication.snapshot()
+        result["synchronization"] = self.sender.snapshot()
         return result
+
+    def activate_device(self, code):
+        owner = self.authentication.tracking_identity()
+        if owner is None:
+            raise RuntimeError("Sign in before connecting this device.")
+        DataSender.parse_activation(code)
+        self.request("pause")
+        self._commands.put(DeviceActivationJob(code, owner))
+
+    def accept_consent(self):
+        self.sender.accept_consent()
 
     def request_auth(self, action, *values):
         """Pause first; run bounded authentication work on the existing worker."""
@@ -213,10 +235,19 @@ class WorkPulseTray:
         with self._view_lock:
             self._view.update(active_app="Paused", activity_status="PAUSED")
         self.state.set_tracking("Tracking PAUSED")
+        self.sender.set_status("PAUSED")
 
     def _handle(self, command):
+        if isinstance(command, DeviceActivationJob):
+            self._pause()  # Flush the old device interval before rotating queues.
+            if self.authentication.tracking_identity() == command.owner:
+                self.sender.activate(command.code)
+            return
         if isinstance(command, AuthJob):
+            if command.action != "restore":
+                self._pause()
             self.authentication.perform(command)
+            self.sender.notify_auth_changed()
             owner = self.authentication.tracking_identity()
             if owner is not None and owner != self._metrics_owner:
                 self._pause()
@@ -252,6 +283,9 @@ class WorkPulseTray:
                 self.state.set_tracking("Tracking PAUSED: sign in required")
                 self.icon.notify("Sign in with a valid employee account before starting tracking.", "WorkPulse")
                 return
+            if not self.sender.can_record(owner):
+                self.icon.notify(self.sender.snapshot().get("message", "Connect the device and accept the current privacy policy first."), "WorkPulse")
+                return
             # Serialize this short local-only startup against an emergency veto.
             # Never perform network/storage calls while holding this lock.
             with self._control_lock:
@@ -271,7 +305,12 @@ class WorkPulseTray:
                 if owner != self._metrics_owner:
                     self._reset_totals(owner)
                 self.state.set_tracking("Tracking starting")
-                self._agent = self._factory(policy=self.policy, authorization=lambda: self.authentication.tracking_identity() == owner)
+                self._run_policy_key = self.sender.snapshot().get("policy_key")
+                policy_key = self._run_policy_key
+                self._agent = self._factory(policy=self.policy,
+                    authorization=lambda: self.authentication.tracking_identity() == owner and self.sender.can_record(owner) and self.sender.snapshot().get("policy_key") == policy_key,
+                    on_interval=lambda start, end, summary: self.sender.enqueue(start, end, summary, owner=owner),
+                    output=lambda _message: None, settings=self.sender.tracking_settings())
                 self._runner = Thread(target=self._agent.run, name="WorkPulse tracking")
                 self._runner.start()
                 with self._view_lock:
@@ -285,8 +324,10 @@ class WorkPulseTray:
             if command == "logout":
                 self._reset_totals()
                 self.authentication.logout()
+                self.sender.notify_auth_changed()
                 self.icon.notify(self.authentication.snapshot()["message"], "WorkPulse sign out")
             elif command == "exit":
+                self.sender.stop()
                 self._closing.set()
                 self.icon.stop()
         elif command == "dashboard":
@@ -299,6 +340,10 @@ class WorkPulseTray:
         if self.authentication.tracking_identity() is None:
             if self._agent is not None or self._requested:
                 self._handle("pause")
+            return
+        if self._agent is not None and (not self.sender.can_record(self._metrics_owner)
+                or self.sender.snapshot().get("policy_key") != self._run_policy_key):
+            self._handle("pause")
             return
         if self._manual_stop.is_set() or not self._requested:
             return
@@ -326,10 +371,19 @@ class WorkPulseTray:
                 if self.authentication.expire():
                     self._handle("pause")
                     self.icon.notify("Your employee session expired. Tracking paused; sign in again.", "WorkPulse")
+                remote_policy = self.sender.working_policy()
+                if remote_policy is not None:
+                    self.policy = remote_policy
                 self._policy_open = self.policy.allows()
                 self._schedule()
                 if self._open_window is not None:
                     self._cache_metrics()
+                sync = self.sender.snapshot()
+                with self.state._lock:
+                    self.state.sync = "Offline: synchronization pending" if sync["offline"] else sync["message"]
+                    self.state.last_sync = sync["last_sync"]
+                if self._agent is not None and self._agent.is_tracking:
+                    self.sender.set_status(self._view.get("activity_status", "ACTIVE"))
                 self._refresh()
             except Exception:
                 self._policy_open = False
@@ -349,6 +403,7 @@ class WorkPulseTray:
         get_logger().info("application_started")
         def setup(icon):
             icon.visible = True
+            self.sender.start()
             self._worker = Thread(target=self._work, name="WorkPulse tray controls")
             self._worker.start()
             self.request("startup_status")  # Read only: never re-enable on launch.

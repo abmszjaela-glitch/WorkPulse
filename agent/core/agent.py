@@ -2,7 +2,7 @@
 
 Run from the repository root with ``python -m agent.core.agent``, or from the
 agent directory with ``python -m core.agent``. Importing this module does not
-start tracking. No networking, file persistence, services or autostart are used.
+start tracking. The desktop injects a device-authenticated interval queue callback.
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from threading import Event, Lock, Thread
 from time import monotonic
+from datetime import datetime, timedelta, timezone
 
 if __package__ == "core":
     from config import config
@@ -81,13 +82,19 @@ class ActivityAgent:
         output: Callable[[str], None] = _console_output,
         policy=None,
         authorization: Callable[[], bool] | None = None,
+        on_interval=None,
+        settings=None,
     ) -> None:
         self.activity_state = (
             activity_state if activity_state is not None else ActivityState()
         )
         self.mouse_tracker = MouseTracker(self.activity_state)
         self.keyboard_tracker = KeyboardTracker(self.activity_state)
-        self.idle_detector = IdleDetector(self.activity_state)
+        settings = settings or {}
+        self.idle_detector = IdleDetector(self.activity_state, threshold=settings.get("idleThreshold"))
+        self._on_interval = on_interval
+        self._interval_cursor = None
+        self._tracking_interval = settings.get("trackingInterval")
         self.active_window_tracker = ActiveWindowTracker()
         self.app_usage_tracker = AppUsageTracker(
             self.active_window_tracker, self.idle_detector
@@ -95,6 +102,7 @@ class ActivityAgent:
         self.activity_calculator = ActivityCalculator(
             self.mouse_tracker, self.keyboard_tracker,
             self.idle_detector, self.app_usage_tracker,
+            interval=self._tracking_interval,
         )
         self._trackers = (
             ("Mouse", self.mouse_tracker),
@@ -102,6 +110,9 @@ class ActivityAgent:
             ("Application usage", self.app_usage_tracker),
             ("Foreground application", self.active_window_tracker),
         )
+        enabled = {"Mouse": settings.get("trackMouseCounts", True), "Keyboard": settings.get("trackKeyboardCounts", True),
+                   "Application usage": settings.get("trackApplications", True), "Foreground application": settings.get("trackApplications", True)}
+        self._trackers = tuple((name, tracker) for name, tracker in self._trackers if enabled[name])
         self._output = output
         self._stop_event = Event()
         self._run_lock = Lock()
@@ -121,6 +132,17 @@ class ActivityAgent:
             return not self._stop_event.is_set() and self._authorized() and self.policy.allows()
         except Exception:
             return False  # Policy errors never permit collection.
+
+    @property
+    def tracking_interval(self):
+        return config.TRACKING_INTERVAL if self._tracking_interval is None else self._tracking_interval
+
+    def _publish_interval(self, summary):
+        if self._on_interval is not None and self._interval_cursor is not None:
+            end = self._interval_cursor + timedelta(seconds=summary["interval_seconds"])
+            self._on_interval(self._interval_cursor, end, summary)
+            self._interval_cursor = end
+        self._output(json.dumps(summary, allow_nan=False))
 
     def _authorized(self):
         try:
@@ -153,6 +175,7 @@ class ActivityAgent:
     def stop(self) -> None:
         """Request shutdown, immediately interrupting the reporting wait."""
         self._stop_event.set()
+        self.activity_state.freeze()
         with self._timing_lock:
             if self._session_started is not None and self._session_finished is None:
                 self._session_finished = monotonic()
@@ -251,7 +274,7 @@ class ActivityAgent:
                     "Mouse movement, mouse click and key press counts, plus the current "
                     "foreground process name, are collected. No window titles, documents, "
                     "URLs, coordinates, key contents, typed text or screenshots are stored. "
-                    "Data stays in memory; nothing is uploaded. Press Ctrl+C to stop."
+                    "Authorized aggregate intervals can be queued securely and synchronized with WorkPulse. Press Ctrl+C to stop, or use the visible Stop control."
                 )
                 self._output(
                     "Application duration totals exclude idle time. Activity scores "
@@ -270,6 +293,7 @@ class ActivityAgent:
                     self._check_listeners()
                     self.activity_state.touch()
                     self.activity_calculator.start()
+                    self._interval_cursor = datetime.now(timezone.utc)
                     with self._timing_lock:
                         self._session_started = monotonic()
                         self._session_active_start = self.idle_detector.get_active_elapsed()
@@ -289,12 +313,12 @@ class ActivityAgent:
                     # Event.wait() allows immediate shutdown instead of waiting
                     # out a blocking sleep. Foreground app sampling has its own
                     # explicitly started, low-frequency poller.
-                    while not self._stop_event.wait(config.TRACKING_INTERVAL):
+                    while not self._stop_event.wait(self.tracking_interval):
                         self._check_listeners()
                         self._output(self.get_summary().format())
                         interval_summary = self.activity_calculator.calculate_summary()
                         if interval_summary is not None:
-                            self._output(json.dumps(interval_summary, allow_nan=False))
+                            self._publish_interval(interval_summary)
         except KeyboardInterrupt:
             self.stop()
         except Exception:
@@ -316,7 +340,7 @@ class ActivityAgent:
 
         if final_interval is not None:
             try:
-                self._output(json.dumps(final_interval, allow_nan=False))
+                self._publish_interval(final_interval)
             except (Exception, KeyboardInterrupt):
                 failed = True
         if self.pause_reason == "working_hours":

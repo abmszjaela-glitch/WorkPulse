@@ -53,6 +53,13 @@ except ValueError:
 # Bounded network waits run on the control worker, never Tk or input listeners.
 AUTH_CONNECT_TIMEOUT: int = _positive_seconds("AUTH_CONNECT_TIMEOUT", 3)
 AUTH_READ_TIMEOUT: int = _positive_seconds("AUTH_READ_TIMEOUT", 10)
+SYNC_INTERVAL: int = _positive_seconds("SYNC_INTERVAL", 30)
+SYNC_BATCH_SIZE: int = _positive_integer("SYNC_BATCH_SIZE", 100)
+# Leave headroom below the backend's existing 1 MB JSON request limit.
+SYNC_MAX_BATCH_BYTES: int = _positive_integer("SYNC_MAX_BATCH_BYTES", 900 * 1024)
+SYNC_RETRY_BASE: int = _positive_seconds("SYNC_RETRY_BASE", 2)
+SYNC_RETRY_MAX: int = _positive_seconds("SYNC_RETRY_MAX", 60)
+HEARTBEAT_INTERVAL: int = _positive_seconds("HEARTBEAT_INTERVAL", 60)
 
 # Default sampling cadence: once per minute. This module does not start tracking.
 TRACKING_INTERVAL: int = _positive_seconds("TRACKING_INTERVAL", 60)

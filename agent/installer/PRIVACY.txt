@@ -17,8 +17,11 @@ CURRENT APPLICATION CAPABILITIES
 Employee sign-in uses the existing WorkPulse backend. JWT signature, expiry,
 account and session validity are verified by the server through /auth/me.
 Temporary-password accounts must change their password and sign in again.
-Sign-in and installation do not authorize tracking. Monitoring remains local;
-device-authenticated synchronization is not enabled by employee sign-in.
+Sign-in and installation do not authorize tracking. An administrator provisions
+an employee-bound device activation code. After activation the employee reviews
+the actual organization privacy policy, records consent and explicitly starts
+tracking during authorized working hours. Aggregated intervals are queued with
+current-user Windows encryption and synchronized using a device-specific JWT.
 No employee token is treated as an unrestricted agent upload credential.
 
 When explicitly enabled, activity tracking counts mouse movement/click and
@@ -33,7 +36,9 @@ The current-user offline queue component encrypts aggregate payloads using
 Windows DPAPI and applies restricted ACLs. Verified access tokens are stored in
 Windows Credential Manager. Passwords and refresh tokens are not saved. Cached
 access tokens are reverified before use; expiry pauses tracking. Sign-out stops
-listeners, removes the local credential and attempts backend logout. Network
+listeners, removes the employee access token and attempts backend logout. The
+employee/server-scoped device secret remains in Credential Manager for the next
+authorized sign-in; an administrator can disable or remove the device. Network
 failures may prevent remote revocation; the UI reports that limitation.
 Normal data/log locations are within the user's
 WorkPulse AppData directory or explicitly configured paths.

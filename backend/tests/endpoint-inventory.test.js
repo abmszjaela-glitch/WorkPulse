@@ -27,5 +27,7 @@ test('all 99 document method/path pairs exist exactly once in actual routers',as
  walk(createCategoryRouter({auth:unused,service:unused}),'',['/app-categories']);implemented.push('GET /health');
  const documented=manifest.endpoints.map(x=>x.method+' '+x.path);
  assert.equal(documented.length,99);assert.equal(new Set(implemented).size,implemented.length,'Duplicate endpoints');
- assert.deepEqual(implemented.sort(),documented.sort());
+ // Explicit Agent enrollment extensions reuse the existing authorization model.
+ const extensions=['POST /devices/provision','POST /devices/token'];
+ assert.deepEqual(implemented.sort(),[...documented,...extensions].sort());
 });
