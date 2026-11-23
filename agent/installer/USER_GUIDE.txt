@@ -13,22 +13,63 @@ A manual stop requires an explicit restart. Closing the window shuts down the
 listeners and exits. Normal minimize keeps a taskbar window; the application
 does not hide itself in an overflow-only tray. The tray can reopen the window.
 
+START AND RESUME VALIDATION
+Sign in with a valid employee account before starting. Signed-out, expired and
+temporary-password accounts cannot start tracking from the window or tray.
+Tracking also checks authentication while collecting, so logout/expiry stops
+further input counts. Privacy acceptance and working-hours checks still apply.
+Pause/resume keeps this employee's mouse, click, anonymous key and application
+duration totals, plus active/idle durations. Paused time is excluded. Emergency
+Stop keeps totals but requires an explicit authorized restart. Sign-out clears
+the in-memory totals; application exit starts a new session on the next launch.
+
 PRIVACY
 Read PRIVACY.txt before use. Counts are anonymous input-event totals, not key
 contents or text. No screenshots, window titles, URLs or document names are
 collected. Application usage tracks process names and durations only.
 
-CURRENT RELEASE LIMITATIONS
-This build is local mode. Backend employee login/JWT verification and backend
-synchronization are not connected. Do not treat it as a production-authenticated
-employee deployment or bypass organization authorization. The About menu shows
+EMPLOYEE SIGN-IN
+Start the configured WorkPulse backend, open Sign in and use the account your
+administrator created. The default development API is http://localhost:5000/api/v1.
+Set SERVER_URL to the actual HTTPS API base for another computer/deployment;
+localhost refers to this computer, not your administrator's computer. HTTP is
+allowed only on loopback for local development. Redirects are not followed.
+The server verifies the JWT through /auth/me before the app reports Signed in.
+The green account card shows "Signed in successfully" and your verified email.
+The main summary shows account status, local activity totals and tracking controls.
+Sync and last-upload diagnostics are available through Details. After device
+activation, authorized aggregated intervals are encrypted locally and sent to
+the backend. Only server-acknowledged record IDs are removed from the queue.
+Access tokens are saved only in Windows Credential Manager. Passwords are not
+saved or logged. Cached access tokens are reverified on launch. Expiry pauses
+tracking and requires sign-in again. Sign out pauses listeners, removes the
+local token and attempts server session revocation. If offline, remote logout
+cannot be confirmed and the UI says so.
+
+New accounts require a temporary-password change: enter the current temporary
+password, choose/confirm a new password, update, then sign in again. Tracking
+does not start on login or password change. Accept the notice and explicitly
+authorize Start / resume under the applicable policy.
+
+DEVICE ACTIVATION
+An administrator opens Employees, selects Connect Agent for your account, and
+generates an activation code. After employee sign-in, open Connect device and
+paste the code once. Review and accept the organization privacy policy. Wait for
+server confirmation, then explicitly Start / Resume during your working hours.
+Device activation and consent do not start tracking. An employee JWT is never a
+device upload credential. Failed/offline uploads stay queued with bounded
+retention; sending resumes when connectivity and authorization permit. The
+backend database migrations must be deployed before synchronization can work.
+The About menu shows
 the Agent version and provisional publisher display. No digital signing or
 verified publisher identity is claimed.
 
 WORKING HOURS AND SETTINGS
-Default hours are Monday-Friday 09:00-17:30 in Asia/Colombo. The displayed policy
-is authoritative for the current session. Central configuration is compiled
-into the application and accepts Windows environment overrides:
+The organization must configure the actual working hours and IANA timezone in
+the dashboard Settings page. Connected Agents reload policy every 60 seconds;
+policy changes pause the current run and require an explicit restart. An
+unconfigured schedule blocks collection. The displayed remote policy is
+authoritative for an activated device. Local bootstrap configuration accepts:
 WORKING_TIMEZONE (IANA name), WORKING_START / WORKING_END (24-hour HH:MM),
 WORKING_DAYS (Monday=0 through Sunday=6), DASHBOARD_URL and SERVER_URL.
 Use authorized settings and restart transparently after policy changes.

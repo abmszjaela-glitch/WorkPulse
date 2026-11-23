@@ -1,0 +1,15 @@
+
+Running 6 tests using 1 worker
+
+(node:20872) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [desktop] › tests\e2e\agent-data.spec.js:382:1 › all analytics pages render actual API values and employee interval counts without fabricated scores (13.4s)
+  ok 2 [desktop] › tests\e2e\agent-data.spec.js:431:1 › Admin device activation, settings, department creation and report downloads use authorized backend calls (9.5s)
+  ok 3 [desktop] › tests\e2e\profile-persistence.spec.js:3:1 › personal information uses authenticated API writes, survives re-login and preserves edits on failure (4.8s)
+(node:11548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 4 [mobile] › tests\e2e\agent-data.spec.js:382:1 › all analytics pages render actual API values and employee interval counts without fabricated scores (12.1s)
+  ok 5 [mobile] › tests\e2e\agent-data.spec.js:431:1 › Admin device activation, settings, department creation and report downloads use authorized backend calls (8.5s)
+  ok 6 [mobile] › tests\e2e\profile-persistence.spec.js:3:1 › personal information uses authenticated API writes, survives re-login and preserves edits on failure (4.3s)
+
+  6 passed (57.1s)

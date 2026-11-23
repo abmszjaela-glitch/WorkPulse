@@ -1,0 +1,50 @@
+✔ Admin enrollment, credential rotation and authoritative monitoring policy use actual contracts (6584.7375ms)
+✔ current consent and device-bound employee ownership gate aggregate uploads (126.7024ms)
+✔ stored Agent data appears in dashboard, employee activity, application and report APIs (685.3997ms)
+✔ review bundle upgrades existing core schema atomically, preserves accounts, and refuses duplicate deployment (5280.8869ms)
+✔ all 37 documented management endpoints require authentication (6258.6689ms)
+✔ role permissions reject employee management, manager writes, device/profile misuse (71.6525ms)
+✔ employee create/get/list/update support search, filters and pagination without credential leakage (201.7825ms)
+✔ duplicate email and employee codes are rejected atomically (394.435ms)
+✔ manager can read only assigned employees/departments and scoped CSV (100.7122ms)
+✔ activate/deactivate revoke sessions; soft deletion retains records (242.6486ms)
+✔ department assignment, bulk deactivation and missing-member rollback (273.4377ms)
+✔ temporary password generation revokes access and enforces first-login password change (367.8213ms)
+✔ employee summary and CSV return actual scoped counts and escape formulas (106.6843ms)
+✔ departments list/get/update/employees return real membership statistics (71.3544ms)
+✔ department deletion requires atomic reassignment and preserves soft-deleted history (140.1268ms)
+✔ duplicate department names, invalid managers and missing records fail (54.7817ms)
+{"level":"ERROR","event":"api.request.failed","time":"2026-11-23T08:49:26.630Z","errorType":"Error"}
+✔ productivity endpoint refuses fabricated statistics without approved telemetry (20.9032ms)
+✔ device registration rotates credentials, keeps ownership, and invalidates older tokens (44.0842ms)
+✔ Admin-only provisioning and credential exchange bind device tokens to the selected employee (62.6388ms)
+✔ heartbeat and agent policy report actual device state and configured working hours (22.3342ms)
+✔ device list/detail are scoped and never expose credential hashes (29.8046ms)
+✔ device disable/enable/remove safely invalidate sessions and preserve data (57.3033ms)
+✔ own profile updates cannot change identity, role or another employee (53.8035ms)
+✔ new employee creation atomically stores a bcrypt credential and linked personal data with a temporary-password requirement (397.6195ms)
+✔ personal information persists across reads in the existing profile table and is owner-only (45.931ms)
+✔ avatar endpoint sanitizes real images and rejects invalid content (30.5473ms)
+✔ profile login history and notification preferences are own-only (30.9258ms)
+✔ privacy policy versions and consent are owned, immutable and require the current version (98.0984ms)
+✔ profile logout-all invalidates every human/device session (260.4695ms)
+✔ validation rejects bad pagination, UUIDs, empty updates, SQL-like input and unknown fields (33.2427ms)
+✔ database outages return safe errors and RLS denies direct browser access (5.8756ms)
+✔ every documented endpoint rejects all unauthorized role classes (550.2126ms)
+✔ missing mutation targets and department subresources return 404 (263.353ms)
+{"level":"ERROR","event":"api.request.failed","time":"2026-11-23T08:49:28.643Z","errorType":"Error"}
+{"level":"ERROR","event":"api.request.failed","time":"2026-11-23T08:49:28.651Z","errorType":"Error"}
+{"level":"ERROR","event":"api.request.failed","time":"2026-11-23T08:49:28.656Z","errorType":"Error"}
+{"level":"ERROR","event":"api.request.failed","time":"2026-11-23T08:49:28.663Z","errorType":"Error"}
+{"level":"ERROR","event":"api.request.failed","time":"2026-11-23T08:49:28.669Z","errorType":"Error"}
+✔ database failures are sanitized through actual HTTP routes for every management module (45.3316ms)
+✔ management migration refuses duplicate columns and leaves existing records intact (20.4674ms)
+✔ every documented endpoint has an integration result (productivity explicitly unavailable) (0.6752ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11264.861

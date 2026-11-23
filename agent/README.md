@@ -1,20 +1,24 @@
 # Foreground activity agent
 
-From the repository root, start the agent explicitly in a visible terminal:
+From the repository root, open the desktop, sign in and explicitly start tracking:
 
 ```powershell
-.\agent\venv\Scripts\python.exe -m agent.core.agent
+.\agent\venv\Scripts\python.exe agent/start_agent.py
 ```
 
-Alternatively, from the `agent` directory, use `python -m core.agent` with the
-virtual environment activated. Importing the module does not start tracking.
+Importing a module does not start tracking. The low-level `ActivityAgent` requires
+an explicit authorization callback; without one it stays paused and starts no
+listeners. The desktop supplies a callback bound to the verified employee and
+checks expiry on every input/foreground privacy gate. A cached token or a visible
+Start button is never sufficient authorization.
 
 The agent announces when tracking starts, prints cumulative mouse movement,
 mouse click and anonymous key press counts with `ACTIVE`/`IDLE` status and the
 current foreground process name, and prints a final summary on normal shutdown.
 It stores no window titles, document names, URLs, coordinates, individual keys,
-typed text or screenshots. Data stays in memory; no API requests, persistent
-files, services or autostart entries are created.
+typed text or screenshots. Tracking totals stay in memory; authentication uses
+the backend, while activity uploads remain unconnected. No persistent tracking
+files, services or autostart entries are created by starting a session.
 
 Set `TRACKING_INTERVAL`, `IDLE_THRESHOLD`, and `ACTIVE_WINDOW_INTERVAL` environment
 variables (seconds) before launch to override the defaults in `config/config.py`.
@@ -193,37 +197,52 @@ errors rather than clearing/replacing the database or logging record contents.
 
 ## Authentication integration status
 
-The checked-out `backend` has package files but no implemented routes,
-controllers, JWT middleware or API response contract. The frontend login also
-explicitly reports that backend authentication is unavailable. No login URL,
-JWT algorithm/issuer/audience/key source, refresh flow or logout URL is assumed.
-The agent is therefore **not yet authenticated or gated by a backend session**.
-Do not treat the support components below as completed backend authentication.
+The compact desktop Sign In form is connected to the existing custom-JWT backend:
+POST `/api/v1/auth/login` accepts email/password, followed by GET `/auth/me` with
+the returned bearer token. The server verifies its signature, expiry, session and
+account status. Only the verified `/me` identity is displayed; the agent does not
+decode/trust unsigned claims or ship a signing secret. Device-token responses are
+not accepted as employee sessions. No backend or frontend code is changed here.
 
-- `ui/login.py` provides a masked email/password form. Without a real controller,
-  the form disables credential entry and submission. It never starts tracking.
-  A future adapter must perform the real HTTP request and verified authentication
-  before closing/replacing the form. Error categories are sanitized; raw backend
-  exceptions and response bodies are never shown or printed by the view.
-- `auth/token_store.py` stores an already-verified access token and authoritative
-  expiry in current-user Windows Credential Manager, scoped to the backend URL.
-  It stores no passwords, employee profile, refresh token or plaintext file.
-  Cached entries are not authentication proof, and no JWT claims are trusted or
-  decoded by the cache. Signature/session verification requires the real backend
-  contract. Expired/malformed entries are removed; local clear is idempotent.
-- Credential Manager capacity errors fail closed without a file fallback. Token
-  bytes are omitted from object representations and native errors are sanitized.
-  As with DPAPI, a process controlling the same Windows account remains within
-  the account's trust boundary.
+`SERVER_URL` defaults to `http://localhost:5000/api/v1`. The backend must be running
+on that computer. Override it with the actual HTTPS API base for remote deployment;
+HTTP is accepted only on loopback for development. The legacy `/api` base is not
+the implemented API. Redirects are rejected to avoid forwarding credentials.
+`AUTH_CONNECT_TIMEOUT` (3 seconds) and `AUTH_READ_TIMEOUT` (10 seconds) bound network
+waits on the existing tray control worker, outside Tk and input listeners.
 
-Preview the disabled form with `python -m agent.ui.login` from the repository
-root. To complete actual authentication, provide the implemented backend source
-or API specification covering login payload/response, JWT verification or session
-validation and logout/revocation. No new JWT library or guessed endpoint is added.
+`auth/client.py` implements the actual API contract; `auth/session.py` maintains
+thread-safe state and cancels late login results after logout/shutdown. Only a
+verified access token and expiry are saved in server-scoped Windows Credential
+Manager through `auth/token_store.py`. There is no plaintext fallback. Passwords,
+refresh tokens and employee profiles are not persisted. Cached tokens are verified
+on normal GUI launch without starting tracking. Expiration pauses tracking and
+requires sign-in again; this release does not rotate refresh tokens automatically.
+Signed-out, expired and temporary-password sessions cannot start from either the
+window or tray. The core also refuses collection without valid authorization.
 
-Authentication support tests use fabricated values. One integration test writes,
-reads and deletes a synthetic Credential Manager entry under a fresh unique test
-namespace; no existing credential targets are enumerated or read.
+Temporary-password accounts open a change-password screen using the existing
+PUT `/auth/change-password` contract. They are not cached or authorized to start
+tracking until the required change is completed. The backend revokes sessions;
+the employee then signs in again with their new password. Sign out pauses input
+listeners before clearing the credential and attempting POST `/auth/logout`.
+Offline remote logout cannot be guaranteed and is reported without claiming it
+succeeded. Local tracking still requires explicit authorization and work-hours
+checks. Employee sign-in does not enable device authentication or upload data.
+
+The summary shows a verified account in a green "Signed in successfully" card
+with its email, followed by local activity totals and tracking controls. Sync,
+last-upload and queue diagnostics are available under Details, outside the main
+summary. The device uploader remains unconnected; employee login never creates
+an upload acknowledgement or turns a default sync value into a network diagnosis.
+
+`ui/login.py` remains a reusable standalone form/preview; the installed entry
+point is `start_agent.py` and uses the connected `ui/compact.py` screens. Do not
+use `python -m agent.ui.login` as the full application launch command.
+
+Tests use fabricated values and mocks for backend authentication. The existing
+Credential Manager test writes/reads/deletes only a unique synthetic test entry.
+No real employee password, token or account was used to claim a successful login.
 
 Run the synthetic test suite without recording real input:
 
@@ -238,20 +257,22 @@ to start local tracking, pause, view status, open the dashboard, logout locally,
 or exit. The green badge and **Tracking ON** tooltip indicate confirmed running
 listeners; the amber badge accompanies paused/transition/error text. Windows
 may place icons in the overflow area; pin WorkPulse in taskbar tray settings.
-The existing foreground console remains visible. Windows auto-start is optional
+The desktop window and tray remain visible. Windows auto-start is optional
 and is never enabled automatically; see the startup section below.
 
 Set `DASHBOARD_URL` to the actual web dashboard URL. No frontend route is guessed.
 Lifecycle commands execute on a worker, separate from the tray and input callbacks.
-Pause stops the listeners; starting again creates a fresh in-memory tracking
-session, so previous console session totals are not carried forward.
+Pause stops every listener and freezes the employee's accumulated counts and
+active/idle/application-duration totals. Resume uses new listener instances and
+adds their run totals to completed totals, without re-adding a polled value or
+counting any paused wall time. Totals remain in memory for the same employee until
+sign-out or application exit. A different employee starts with zero totals.
 
-This is explicitly local mode, not authenticated employee deployment. Logout
-stops tracking and removes the server-scoped cached token; server revocation
-cannot run until the real backend authentication contract is supplied. No data
-is uploaded. Sync initially says unavailable and last successful sync is Never.
-A future sender can call `tray.state.update_sync(offline=True)` after network
-failure, and pass an aware `acknowledged_at` datetime only after server success.
+Employee authentication and authorized device synchronization use the backend.
+Logout stops tracking, removes the server-scoped employee token and attempts
+revocation. The sender reports actual connectivity/acknowledgements; last sync
+remains Never until at least one server-acknowledged interval. After activation
+and consent, aggregate intervals enter the encrypted queue and device uploader.
 The tray does not invent connection status or synchronization timestamps.
 
 # Transparent working-hours controls
@@ -264,7 +285,7 @@ $env:WORKING_TIMEZONE = 'Asia/Colombo'
 $env:WORKING_START = '09:00'
 $env:WORKING_END = '17:30'
 $env:WORKING_DAYS = '0,1,2,3,4'
-.\agent\venv\Scripts\python.exe -m agent.ui.tray
+.\agent\venv\Scripts\python.exe agent/start_agent.py
 ```
 
 Days use Monday=0 through Sunday=6. Times use 24-hour `HH:MM`; start is included,
@@ -273,8 +294,9 @@ Equal start/end is rejected, rather than silently enabling all-day tracking.
 Invalid settings or an unavailable IANA timezone prevent startup. Install the
 requirements, including `tzdata` on Windows. No backend policy endpoint is assumed.
 
-The tray always starts paused. An explicit **Start / restart local tracking**
-during allowed hours enables the current session and its scheduled resumption.
+The tray always starts paused. After verified employee sign-in, an explicit
+**Start / resume tracking** during allowed hours enables the current session and
+its scheduled resumption.
 At closing time, listeners stop and status says **Tracking PAUSED: outside working
 hours**. If the tray remains open, an automatically paused session resumes at the
 next allowed window with a visible **Tracking ON** notification. Start outside
@@ -287,11 +309,12 @@ cleanup runs on the worker so the tray menu remains responsive. A listener failu
 also disables automatic resumption. Windows may put the icon in its overflow
 area; pin WorkPulse to keep its status visible. The console remains visible too.
 
-The console entry point (`python -m agent.core.agent`) applies the same policy,
-prints the schedule/status, and stops its session when hours close; it does not
-automatically restart. Ctrl+C is its always-available emergency stop. Starting
-that command again is an explicit restart. Tray pause/resume creates a fresh
-in-memory agent session and does not combine previous session totals.
+The low-level console entry (`python -m agent.core.agent`) cannot authenticate an
+employee and therefore stays paused. Launch the desktop to sign in. Embedded
+callers must supply an authorization callback; a listener run still applies the
+working-hours and authentication gates and never automatically restarts itself.
+The tray preserves totals across these runs for the same employee; no interval
+payload is changed into a cumulative upload payload.
 
 Input events check the policy before updating counters or the activity timestamp.
 Foreground sampling checks it before querying and publishing process names.
@@ -344,11 +367,12 @@ the installation; uninstallers should remove the named current-user value.
 
 Launches at sign-in always open the visible tray **Tracking PAUSED**, display a
 notification, and leave scheduled tracking disabled until the employee explicitly
-chooses Start. `--startup` identifies the launch origin only: it does not restore
-tracking consent, authenticate, upload, or start listeners. Working-hours checks
-still apply to Start. The existing backend authorization integration remains
-unavailable; auto-start does not grant authorization or enable a production
-employee session. Emergency Stop and manual-stop behavior are unchanged.
+chooses Start. `--startup` identifies the launch origin: it does not restore
+tracking consent, upload, or start listeners. The normal desktop may verify a
+cached employee token, while keeping monitoring paused. Working-hours checks
+still apply to Start. Auto-start and employee authentication do not grant tracking
+authorization or device upload permissions. Emergency Stop and manual-stop
+behavior are unchanged.
 
 WorkPulse reports whether its expected entry is **registered**, rather than
 claiming Windows will execute it. Windows Settings / Task Manager, organization
@@ -534,7 +558,7 @@ The smoke test is explicit (`--smoke-test`) and never starts activity tracking.
 The desktop now opens the compact Paused/session-summary screen, with matching
 Sign In and Before we start consent pages. Rounded cards use CustomTkinter 6.0.0;
 the existing tray worker, tracking agent, emergency stop and working-hours policy
-remain in control. Sign In is disabled until a real backend adapter exists. No
+remain in control. Sign In uses the actual WorkPulse backend. No
 employee identity, logged shift, offline cache size or successful upload is
 fabricated. Details shows actual anonymous counters, application name and last
 acknowledged sync; the main card shows actual current-session durations.
@@ -562,3 +586,16 @@ installation/privacy notice, and offers unchecked current-user startup. It never
 starts tracking on installation and preserves all employee data on uninstall.
 Build commands, compiler licensing status, startup account-scope caveats and
 actual Windows test coverage are documented in `installer/README.md`.
+
+# Device synchronization and dashboard data
+
+The desktop controller now connects interval summaries to the DPAPI-encrypted
+SQLite queue and a separate device-authenticated upload worker. Administrator
+activation, server-recorded current privacy consent and explicit Start are all
+required. Employee JWTs never authorize telemetry uploads. Backend policy supplies
+working hours, idle threshold, input toggles and collection/sync intervals.
+
+Follow `../backend/setup/AGENT_INTEGRATION.md` for the complete activation flow,
+real API contracts, database prerequisites and test evidence. The live project
+currently needs the reviewed 003–007 migrations; no live SQL was applied. The
+complete guarded SQL bundle is `../backend/setup/AGENT_INTEGRATION_REVIEW.sql`.

@@ -59,7 +59,8 @@ class ActivityAgentTests(unittest.TestCase):
             listener_patch.start()
             self.addCleanup(listener_patch.stop)
         self.messages = []
-        self.agent = ActivityAgent(output=self.messages.append, policy=Mock(allows=Mock(return_value=True), describe=Mock(return_value="test hours")))
+        self.authorized = True
+        self.agent = ActivityAgent(output=self.messages.append, policy=Mock(allows=Mock(return_value=True), describe=Mock(return_value="test hours")), authorization=lambda: self.authorized)
         self.addCleanup(self.agent.mouse_tracker.stop)
         self.addCleanup(self.agent.keyboard_tracker.stop)
         self.addCleanup(self.agent.active_window_tracker.stop)
@@ -74,6 +75,25 @@ class ActivityAgentTests(unittest.TestCase):
             self.assertIs(component.activity_state, self.agent.activity_state)
         self.assertFalse(self.agent.mouse_tracker.is_running)
         self.assertFalse(self.agent.keyboard_tracker.is_running)
+
+    def test_missing_authentication_blocks_every_listener_before_start(self):
+        self.agent._authorization = None
+        with patch.object(self.agent.mouse_tracker, "start") as start:
+            self.assertEqual(self.agent.run(), 0)
+        start.assert_not_called()
+        self.assertFalse(self.agent.listeners_running)
+        self.assertEqual(self.agent.pause_reason, "authentication")
+
+    def test_authentication_loss_blocks_late_input_before_supervisor_cleanup(self):
+        self.agent.mouse_tracker.start()
+        self.agent.keyboard_tracker.start()
+        self.authorized = False
+        self.agent.mouse_tracker._on_move(10, 20)
+        self.agent.mouse_tracker._on_click(10, 20, object(), True)
+        self.agent.keyboard_tracker._on_press(object())
+        self.assertEqual(self.agent.get_summary().mouse_movements, 0)
+        self.assertEqual(self.agent.get_summary().mouse_clicks, 0)
+        self.assertEqual(self.agent.get_summary().key_presses, 0)
 
     def test_policy_closure_interrupts_reporting_wait_and_stops_every_listener(self):
         ready = Event()

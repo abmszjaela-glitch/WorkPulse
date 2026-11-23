@@ -1,0 +1,45 @@
+{
+  "executedOn": "2026-11-22",
+  "result": "PASS_LOCAL_VERIFICATION",
+  "httpEndpoints": 99,
+  "missingEndpoints": [],
+  "serverEvents": [
+    "employee:status",
+    "dashboard:stats",
+    "activity:update",
+    "device:online",
+    "device:offline",
+    "notification:new",
+    "settings:updated"
+  ],
+  "tests": {
+    "total": 141,
+    "passed": 141,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 21536.2223
+  },
+  "syntax": {
+    "files": 83,
+    "result": "PASS"
+  },
+  "productionDependencyAudit": "PASS: 0 known vulnerabilities",
+  "credentialsScan": "PASS: see phase9-secret-scan.json",
+  "postman": {
+    "documentRequests": 99,
+    "rbacExamples": 4,
+    "structuralTests": "PASS",
+    "executedInPostman": false
+  },
+  "database": "Isolated PostgreSQL/PGlite only; proposed migrations NOT applied live",
+  "productionReady": false,
+  "remaining": [
+    "Approve/reconcile/apply migrations",
+    "Configure local AUTH_JWT_SECRET",
+    "Verify SMTP sender and actual HTTPS reset URL",
+    "Configure TLS/origins, real installer metadata and authorized policy",
+    "Frontend/Agent integration and production-volume load test",
+    "Review outbox archival and shared rate limiting"
+  ],
+  "details": "../FINAL_VERIFICATION.md"
+}

@@ -1,3 +1,4 @@
+import EmptyState from '../ui/EmptyState.jsx'
 import {
   Area,
   AreaChart,
@@ -7,7 +8,6 @@ import {
   Cell,
   Pie,
   PieChart,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -18,6 +18,19 @@ import { formatReportTime } from '../../data/reports.js'
 const panel = 'rounded-2xl border border-line/70 bg-white shadow-card'
 const chartTick = { fill: '#53649b', fontSize: 11 }
 export default function ReportCharts({ report, applied, charts, categories }) {
+  if (!report.rows.length)
+    return (
+      <div className="my-6 grid gap-6 xl:grid-cols-2">
+        {[
+          'Active vs. Idle Time Distribution',
+          'Application Categories',
+          'Productivity Trend',
+          'Department Comparison',
+        ].map((title) => (
+          <EmptyState key={title} title={title} />
+        ))}
+      </div>
+    )
   return (
     <>
       {' '}
@@ -161,10 +174,10 @@ export default function ReportCharts({ report, applied, charts, categories }) {
         <section className={`${panel} p-6`}>
           <Heading
             title="Productivity Trend vs Benchmark"
-            subtitle="Illustrative daily ratio against organizational target"
+            subtitle="No approved productivity calculation"
           >
             <span className="rounded bg-soft px-2 py-1 text-[10px] text-muted-strong">
-              ○ Target: 75%
+              No benchmark configured
             </span>
           </Heading>
           <div className="mt-7 h-56 w-full">
@@ -204,7 +217,7 @@ export default function ReportCharts({ report, applied, charts, categories }) {
                   tick={chartTick}
                 />
                 <Tooltip formatter={(value) => [`${value}%`, 'Productivity']} />
-                <ReferenceLine y={75} stroke="#2563eb" strokeDasharray="4 4" />
+
                 <Area
                   type="monotone"
                   dataKey="productivity"
@@ -220,7 +233,7 @@ export default function ReportCharts({ report, applied, charts, categories }) {
         <section className={`${panel} p-6`}>
           <Heading
             title="Department Comparison"
-            subtitle="Efficiency rankings indexed against 75% baseline"
+            subtitle="Available department metrics"
           >
             <span className="rounded bg-green-50 px-2 py-1 text-[10px] text-success-strong">
               {report.groups.filter((group) => group.productivity >= 75).length}{' '}

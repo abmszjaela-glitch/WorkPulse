@@ -34,7 +34,7 @@ def build(spec_directory, *, onefile, windowed=False):
         "pystray._win32", "psutil._psutil_windows", "pywintypes",
         "win32api", "win32con", "win32gui", "win32process", "win32security",
         "win32file", "win32crypt", "win32cryptcon", "win32cred", "ntsecuritycon",
-        "agent.ui.login", "agent.ui.desktop", "agent.ui.compact", "agent.desktop_bootstrap", "agent.core.offline_queue", "requests", "tkinter", "tkinter.ttk", "customtkinter", "darkdetect", "PIL._tkinter_finder",
+        "agent.ui.login", "agent.ui.desktop", "agent.ui.compact", "agent.auth.client", "agent.auth.session", "agent.auth.device_store", "agent.core.data_sender", "agent.core.remote_policy", "agent.desktop_bootstrap", "agent.core.offline_queue", "requests", "tkinter", "tkinter.ttk", "customtkinter", "darkdetect", "PIL._tkinter_finder",
     ]
     analysis = Analysis(
         [str(agent / "start_agent.py")], pathex=[str(repository)],

@@ -1,4 +1,4 @@
-export const SETTINGS_KEY = 'workpulse.settings.preview.v1'
+export const SETTINGS_KEY = 'workpulse.settings.draft.v2'
 export const settingDays = [
   'Monday',
   'Tuesday',
@@ -25,46 +25,14 @@ export const defaultSettings = {
   weeklyDigest: false,
   sessionMinutes: 30,
   requireMfa: false,
-  schedule: settingDays.map((day, index) => ({
+  schedule: settingDays.map((day) => ({
     day,
-    enabled: index < 5,
+    enabled: false,
     start: '09:00',
-    end: index === 4 ? '17:00' : '17:30',
+    end: '17:30',
   })),
-  rules: [
-    {
-      id: 'vscode',
-      name: 'Visual Studio Code',
-      category: 'Productive',
-      scope: 'All Departments',
-    },
-    {
-      id: 'chrome',
-      name: 'Google Chrome',
-      category: 'Neutral',
-      scope: 'All Departments',
-    },
-    {
-      id: 'slack',
-      name: 'Slack',
-      category: 'Productive',
-      scope: 'All Departments',
-    },
-    {
-      id: 'youtube',
-      name: 'YouTube',
-      category: 'Unproductive',
-      scope: 'All Departments',
-    },
-    {
-      id: 'facebook',
-      name: 'Facebook',
-      category: 'Unproductive',
-      scope: 'All Departments',
-    },
-  ],
-  policy:
-    'Activity monitoring requires transparent disclosure and employee consent. Only aggregate activity counts and application usage durations are included in this preview. Keystroke content, screenshots and confidential messages are not collected.',
+  rules: [],
+  policy: '',
 }
 export const cloneSettings = (value = defaultSettings) =>
   JSON.parse(JSON.stringify(value))

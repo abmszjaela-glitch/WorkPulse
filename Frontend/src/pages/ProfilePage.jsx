@@ -19,8 +19,11 @@ import {
 } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar.jsx'
 import useProfile from '../hooks/useProfile.js'
+import useAuth from '../hooks/useAuth.js'
+import useApiData from '../hooks/useApiData.js'
+import { apiRequest } from '../services/api.js'
+import EmptyDataPage from '../components/layout/EmptyDataPage.jsx'
 import {
-  profileAccount as account,
   copyProfile,
   passwordRequirements,
   profileLanguages,
@@ -87,14 +90,59 @@ function PasswordField({ id, label, value, onChange, error }) {
 }
 
 export default function ProfilePage() {
-  const { profile, saveProfile, loadError } = useProfile()
+  const { loading, loaded, loadError, reloadProfile, account } = useProfile()
+  if (loading)
+    return (
+      <EmptyDataPage
+        title="My Profile"
+        message="Loading your saved personal information…"
+      />
+    )
+  if (!loaded)
+    return (
+      <EmptyDataPage
+        title="My Profile"
+        message={
+          <>
+            <span>
+              {loadError || 'Sign in to load your personal information.'}
+            </span>
+            <button
+              type="button"
+              className="mt-3 block w-full text-primary"
+              onClick={reloadProfile}
+            >
+              Retry loading profile
+            </button>
+          </>
+        }
+      />
+    )
+  return <ProfileForm key={account.id} />
+}
+
+function ProfileForm() {
+  const { session, logout } = useAuth()
+  const history = useApiData(
+    { history: '/profile/login-history?pageSize=20', roles: '/settings/roles' },
+    { refreshMs: 30000 },
+  )
+  const {
+    profile,
+    account,
+    saveProfile,
+    savePreferences,
+    saving,
+    reloadProfile,
+  } = useProfile()
   const [draft, setDraft] = useState(() => copyProfile(profile))
   const [notifications, setNotifications] = useState({
     ...profile.notifications,
   })
-  const [notice, setNotice] = useState(loadError)
+  const [notice, setNotice] = useState('')
   const [profileError, setProfileError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [passwordBusy, setPasswordBusy] = useState(false)
   const [passwords, setPasswords] = useState({
     current: '',
     next: '',
@@ -106,14 +154,9 @@ export default function ProfilePage() {
   const photoInput = useRef(null)
   const requirements = passwordRequirements(passwords.next)
   const strength = requirements.filter(Boolean).length
-  const dirty = [
-    'firstName',
-    'lastName',
-    'phone',
-    'language',
-    'timezone',
-    'photo',
-  ].some((key) => draft[key] !== profile[key])
+  const dirty = ['firstName', 'lastName', 'phone', 'language', 'timezone'].some(
+    (key) => draft[key] !== profile[key],
+  )
   const notificationsDirty =
     JSON.stringify(notifications) !== JSON.stringify(profile.notifications)
   const show = (id) =>
@@ -125,26 +168,23 @@ export default function ProfilePage() {
     setDraft((previous) => ({ ...previous, [key]: value }))
     setProfileError('')
   }
-  const save = (event) => {
+  const save = async (event) => {
     event.preventDefault()
-    const error = saveProfile({
+    if (saving) return
+    setProfileError('')
+    setNotice('')
+    const submitted = {
       ...draft,
       firstName: draft.firstName.trim(),
       lastName: draft.lastName.trim(),
       phone: draft.phone.trim(),
       notifications: profile.notifications,
-    })
+    }
+    const error = await saveProfile(submitted)
     if (error) setProfileError(error)
     else {
-      setDraft((previous) => ({
-        ...previous,
-        firstName: previous.firstName.trim(),
-        lastName: previous.lastName.trim(),
-        phone: previous.phone.trim(),
-      }))
-      setNotice(
-        'Profile saved in this browser. No live account details have been changed.',
-      )
+      setDraft({ ...submitted, photo: profile.photo })
+      setNotice('Personal information saved to your account.')
     }
   }
   const selectPhoto = (event) => {
@@ -152,22 +192,32 @@ export default function ProfilePage() {
     event.target.value = ''
     if (!file) return
     if (
-      !['image/png', 'image/jpeg', 'image/webp'].includes(file.type) ||
-      file.size > 500 * 1024
+      !['image/png', 'image/jpeg'].includes(file.type) ||
+      file.size > 256 * 1024
     ) {
-      setNotice('Choose a PNG, JPEG or WebP image up to 500 KB.')
+      setNotice('Choose a PNG or JPEG image up to 256 KB.')
       return
     }
     const reader = new FileReader()
-    reader.onload = () => {
-      update('photo', reader.result)
-      setNotice('Photo selected. Save Changes to keep it in this browser.')
+    reader.onload = async () => {
+      try {
+        const row = await apiRequest(session.accessToken, '/profile/avatar', {
+          method: 'POST',
+          body: { imageBase64: String(reader.result).split(',')[1] },
+        })
+        update('photo', row.avatar)
+        reloadProfile()
+        setNotice('Profile photo saved securely to your account.')
+      } catch (error) {
+        setNotice(error.message)
+      }
     }
     reader.onerror = () => setNotice('The selected photo could not be read.')
     reader.readAsDataURL(file)
   }
-  const changePassword = (event) => {
+  const changePassword = async (event) => {
     event.preventDefault()
+    if (passwordBusy) return
     const error = validatePasswordChange(
       passwords.current,
       passwords.next,
@@ -177,10 +227,29 @@ export default function ProfilePage() {
       setPasswordError(error)
       return
     }
-    setPasswordError(
-      'Password changes are unavailable until backend authentication is connected. No password has been changed or stored.',
-    )
-    setPasswords({ current: '', next: '', confirm: '' })
+    if (
+      passwords.next.length < 12 ||
+      new TextEncoder().encode(passwords.next).length > 72
+    ) {
+      setPasswordError('Use at least 12 characters and at most 72 UTF-8 bytes.')
+      return
+    }
+    setPasswordBusy(true)
+    try {
+      await apiRequest(session.accessToken, '/auth/change-password', {
+        method: 'PUT',
+        body: {
+          currentPassword: passwords.current,
+          newPassword: passwords.next,
+        },
+      })
+      setPasswords({ current: '', next: '', confirm: '' })
+      logout()
+    } catch (error) {
+      setPasswordError(error.message)
+    } finally {
+      setPasswordBusy(false)
+    }
   }
   const cancelProfile = () => {
     setDraft(copyProfile(profile))
@@ -237,7 +306,7 @@ export default function ProfilePage() {
               <input
                 ref={photoInput}
                 type="file"
-                accept="image/png,image/jpeg,image/webp"
+                accept="image/png,image/jpeg"
                 className="sr-only"
                 aria-label="Upload profile photo"
                 onChange={selectPhoto}
@@ -246,16 +315,18 @@ export default function ProfilePage() {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="break-words text-xl font-bold tracking-tight">
-                  {profile.firstName} {profile.lastName}
+                  {[profile.firstName, profile.lastName]
+                    .filter(Boolean)
+                    .join(' ') || 'No profile loaded'}
                 </h1>
                 <span className="rounded-full bg-soft px-2 py-0.5 text-[10px] font-semibold text-green-800">
-                  ● Preview account
+                  Account details loaded
                 </span>
               </div>
               <p className="mt-1 text-xs text-muted">{account.email}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <span className="rounded-full bg-soft px-2 py-0.5 text-[10px] font-medium text-primary">
-                  Administrator
+                  {account.role || 'Role not available'}
                 </span>
                 <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-muted-strong">
                   {account.department}
@@ -263,14 +334,16 @@ export default function ProfilePage() {
               </div>
               <p className="mt-2 flex items-center gap-1 text-[10px] text-muted">
                 <CalendarDays size={12} />
-                Browser preview · Account creation date unavailable
+                {account.createdAt
+                  ? `Account created ${new Date(account.createdAt).toLocaleDateString()}`
+                  : 'Account creation date unavailable'}
               </p>
               {draft.photo && (
                 <button
                   className="mt-2 text-[10px] text-error"
                   onClick={() => update('photo', '')}
                 >
-                  Remove photo
+                  Clear photo preview
                 </button>
               )}
             </div>
@@ -310,81 +383,48 @@ export default function ProfilePage() {
             {show('personal') && (
               <section className={`${panel} overflow-hidden`}>
                 <form onSubmit={save} noValidate>
-                  <div className="p-6">
-                    <h2 className="text-sm font-semibold">
-                      Personal Information
-                    </h2>
-                    <p className="mt-1 text-[11px] text-muted">
-                      Update your personal and contact details
-                    </p>
-                    <div className="mt-6 grid gap-x-6 gap-y-4 sm:grid-cols-2">
-                      <label className="block text-[11px] font-medium text-muted-strong">
-                        First name
-                        <input
-                          ref={firstName}
-                          className={field}
-                          maxLength={50}
-                          required
-                          autoComplete="given-name"
-                          value={draft.firstName}
-                          onChange={(event) =>
-                            update('firstName', event.target.value)
-                          }
-                        />
-                      </label>
-                      <label className="block text-[11px] font-medium text-muted-strong">
-                        Last name
-                        <input
-                          className={field}
-                          maxLength={50}
-                          required
-                          autoComplete="family-name"
-                          value={draft.lastName}
-                          onChange={(event) =>
-                            update('lastName', event.target.value)
-                          }
-                        />
-                      </label>
-                      <label className="block text-[11px] font-medium text-muted-strong">
-                        Email address
-                        <div className="relative">
+                  <fieldset disabled={saving}>
+                    <div className="p-6">
+                      <h2 className="text-sm font-semibold">
+                        Personal Information
+                      </h2>
+                      <p className="mt-1 text-[11px] text-muted">
+                        Update your personal and contact details
+                      </p>
+                      <div className="mt-6 grid gap-x-6 gap-y-4 sm:grid-cols-2">
+                        <label className="block text-[11px] font-medium text-muted-strong">
+                          First name
                           <input
-                            className={`${field} !pr-8`}
-                            value={account.email}
-                            disabled
+                            ref={firstName}
+                            className={field}
+                            maxLength={100}
+                            required
+                            autoComplete="given-name"
+                            value={draft.firstName}
+                            onChange={(event) =>
+                              update('firstName', event.target.value)
+                            }
                           />
-                          <LockKeyhole
-                            size={14}
-                            className="absolute right-3 top-4 text-muted"
+                        </label>
+                        <label className="block text-[11px] font-medium text-muted-strong">
+                          Last name
+                          <input
+                            className={field}
+                            maxLength={100}
+                            required
+                            autoComplete="family-name"
+                            value={draft.lastName}
+                            onChange={(event) =>
+                              update('lastName', event.target.value)
+                            }
                           />
-                        </div>
-                      </label>
-                      <label className="block text-[11px] font-medium text-muted-strong">
-                        Phone number
-                        <input
-                          className={field}
-                          type="tel"
-                          autoComplete="tel"
-                          maxLength={40}
-                          value={draft.phone}
-                          onChange={(event) =>
-                            update('phone', event.target.value)
-                          }
-                        />
-                      </label>
-                      {[
-                        ['Employee ID', account.employeeId],
-                        ['Department', account.department],
-                      ].map(([title, value]) => (
-                        <label
-                          key={title}
-                          className="block text-[11px] font-medium text-muted-strong"
-                        >
-                          {title}
+                        </label>
+                        <label className="block text-[11px] font-medium text-muted-strong">
+                          Email address
                           <div className="relative">
                             <input
                               className={`${field} !pr-8`}
-                              value={value}
+                              value={account.email}
                               disabled
                             />
                             <LockKeyhole
@@ -393,65 +433,107 @@ export default function ProfilePage() {
                             />
                           </div>
                         </label>
-                      ))}
-                      <label className="block text-[11px] font-medium text-muted-strong">
-                        Preferred language
-                        <select
-                          className={field}
-                          value={draft.language}
-                          onChange={(event) =>
-                            update('language', event.target.value)
-                          }
-                        >
-                          {profileLanguages.map((language) => (
-                            <option key={language}>{language}</option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="block text-[11px] font-medium text-muted-strong">
-                        Time zone
-                        <select
-                          className={field}
-                          value={draft.timezone}
-                          onChange={(event) =>
-                            update('timezone', event.target.value)
-                          }
-                        >
-                          {profileTimezones.map((timezone) => (
-                            <option key={timezone}>{timezone}</option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-                    <p className="mt-4 text-[10px] leading-relaxed text-muted">
-                      Language and time zone are saved preferences. Translations
-                      and server timestamps are not changed by this preview.
-                    </p>
-                    {profileError && (
-                      <p className="mt-3 text-xs text-error" role="alert">
-                        {profileError}
+                        <label className="block text-[11px] font-medium text-muted-strong">
+                          Phone number
+                          <input
+                            className={field}
+                            type="tel"
+                            autoComplete="tel"
+                            maxLength={32}
+                            value={draft.phone}
+                            onChange={(event) =>
+                              update('phone', event.target.value)
+                            }
+                          />
+                        </label>
+                        {[
+                          ['Employee ID', account.employeeId],
+                          ['Department', account.department],
+                        ].map(([title, value]) => (
+                          <label
+                            key={title}
+                            className="block text-[11px] font-medium text-muted-strong"
+                          >
+                            {title}
+                            <div className="relative">
+                              <input
+                                className={`${field} !pr-8`}
+                                value={value}
+                                disabled
+                              />
+                              <LockKeyhole
+                                size={14}
+                                className="absolute right-3 top-4 text-muted"
+                              />
+                            </div>
+                          </label>
+                        ))}
+                        <label className="block text-[11px] font-medium text-muted-strong">
+                          Preferred language
+                          <select
+                            className={field}
+                            aria-label="Preferred language"
+                            value={draft.language}
+                            onChange={(event) =>
+                              update('language', event.target.value)
+                            }
+                          >
+                            {[
+                              ...new Set([...profileLanguages, draft.language]),
+                            ].map((language) => (
+                              <option key={language}>{language}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="block text-[11px] font-medium text-muted-strong">
+                          Time zone
+                          <select
+                            className={field}
+                            aria-label="Time zone"
+                            value={draft.timezone}
+                            onChange={(event) =>
+                              update('timezone', event.target.value)
+                            }
+                          >
+                            {[
+                              ...new Set([...profileTimezones, draft.timezone]),
+                            ].map((timezone) => (
+                              <option key={timezone}>{timezone}</option>
+                            ))}
+                          </select>
+                        </label>
+                      </div>
+                      <p className="mt-4 text-[10px] leading-relaxed text-muted">
+                        Name, phone, language and time zone are stored in your
+                        account. Email, employee ID, role and department remain
+                        administrator-managed.
                       </p>
-                    )}
-                  </div>
-                  <div className="flex justify-end gap-2 bg-soft px-6 py-4">
-                    <Button
-                      variant="secondary"
-                      type="button"
-                      className="disabled:opacity-40"
-                      disabled={!dirty}
-                      onClick={cancelProfile}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="primary"
-                      type="submit"
-                      className="disabled:opacity-40"
-                      disabled={!dirty}
-                    >
-                      Save Changes
-                    </Button>
-                  </div>
+                      {profileError && (
+                        <p className="mt-3 text-xs text-error" role="alert">
+                          {profileError}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex justify-end gap-2 bg-soft px-6 py-4">
+                      <Button
+                        variant="secondary"
+                        type="button"
+                        className="disabled:opacity-40"
+                        disabled={!dirty || saving}
+                        onClick={cancelProfile}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        className="disabled:opacity-40"
+                        disabled={!dirty || saving}
+                      >
+                        {saving ? 'Saving…' : 'Save Changes'}
+                      </Button>
+                    </div>
+                  </fieldset>
                 </form>
               </section>
             )}
@@ -463,10 +545,22 @@ export default function ProfilePage() {
                 </p>
                 <dl className="mt-5 space-y-2">
                   {[
-                    ['Last Login Time', 'Backend not connected'],
-                    ['Last Login Device & IP', 'Unavailable in preview'],
-                    ['Account Created', 'Unavailable in preview'],
-                    ['Assigned Role', `${account.role} · Preview`],
+                    [
+                      'Last Login Time',
+                      history.data.history?.items?.[0]?.created_at
+                        ? new Date(
+                            history.data.history.items[0].created_at,
+                          ).toLocaleString()
+                        : 'Unavailable',
+                    ],
+                    ['Last Login Device & IP', 'Not available'],
+                    [
+                      'Account Created',
+                      account.createdAt
+                        ? new Date(account.createdAt).toLocaleString()
+                        : 'Unavailable',
+                    ],
+                    ['Assigned Role', account.role || 'Not available'],
                   ].map(([title, value]) => (
                     <div
                       key={title}
@@ -484,27 +578,15 @@ export default function ProfilePage() {
                     <h3 className="font-semibold tracking-wide text-muted">
                       ROLE CAPABILITIES
                     </h3>
-                    <span className="text-primary">UI preview</span>
+                    <span className="text-primary">Backend roles</span>
                   </div>
-                  <ul className="mt-3 space-y-2">
-                    {[
-                      'Review telemetry and activity reports',
-                      'Manage departments and employees',
-                      'Configure monitoring preferences',
-                      'Export sample productivity reports',
-                    ].map((text) => (
-                      <li
-                        key={text}
-                        className="flex items-start gap-2 text-xs leading-relaxed text-ink"
-                      >
-                        <CheckCircle2
-                          size={15}
-                          className="mt-0.5 shrink-0 text-green-800"
-                        />
-                        {text}
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="mt-3 text-xs text-muted">
+                    {(
+                      history.data.roles?.data?.find(
+                        (row) => row.name === account.role,
+                      )?.permissions || []
+                    ).join(', ') || 'Permissions are enforced by the backend.'}
+                  </p>
                   <p className="mt-3 text-[10px] leading-relaxed text-muted">
                     Backend authorization must enforce actual permissions. This
                     profile does not grant access rights.
@@ -519,8 +601,8 @@ export default function ProfilePage() {
                 <div className="p-6">
                   <h2 className="text-sm font-semibold">Change Password</h2>
                   <p className="mt-1 text-[11px] text-muted">
-                    Use a secure and unique password. Backend authentication is
-                    not connected.
+                    Use a unique password of at least 12 characters. Changing it
+                    revokes existing sessions and requires sign-in again.
                   </p>
                   <div className="mt-6 grid items-start gap-6 lg:grid-cols-3">
                     <div>
@@ -604,7 +686,7 @@ export default function ProfilePage() {
                     </h3>
                     <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       {[
-                        'At least 8 characters',
+                        'At least 12 characters',
                         'One uppercase letter',
                         'One number',
                         'One special character',
@@ -698,19 +780,19 @@ export default function ProfilePage() {
                   ))}
                 </div>
                 <p className="mt-3 text-[10px] leading-relaxed text-muted">
-                  Preferences are stored locally. No emails or live
-                  notifications are sent.
+                  Preferences are stored in your account. Saving preferences
+                  does not send a notification.
                 </p>
                 <Button
                   type="button"
                   variant="primary"
                   className="mt-4 disabled:opacity-40"
-                  disabled={!notificationsDirty}
-                  onClick={() => {
-                    const error = saveProfile({ ...profile, notifications })
+                  disabled={!notificationsDirty || saving}
+                  onClick={async () => {
+                    const error = await savePreferences(notifications)
                     setNotice(
                       error ||
-                        'Notification preferences saved in this browser only.',
+                        'Notification preferences saved to your account.',
                     )
                   }}
                 >
@@ -726,7 +808,7 @@ export default function ProfilePage() {
                     Recent Login Activity
                   </h2>
                   <span className="rounded-full bg-soft px-2 py-1 text-[9px] text-muted">
-                    Not connected
+                    {history.loading ? 'Loading…' : 'Database sessions'}
                   </span>
                 </div>
                 <p className="mt-1 text-[11px] leading-relaxed text-muted">
@@ -736,25 +818,53 @@ export default function ProfilePage() {
                   <table className="w-full min-w-96 text-left text-[10px]">
                     <thead className="bg-slate-50 uppercase tracking-wide text-muted">
                       <tr>
-                        {[
-                          'Date & Time',
-                          'Device & Browser',
-                          'IP & Location',
-                        ].map((title) => (
-                          <th className="px-3 py-3 font-medium" key={title}>
-                            {title}
-                          </th>
-                        ))}
+                        {['Date & Time', 'Device', 'Session status'].map(
+                          (title) => (
+                            <th className="px-3 py-3 font-medium" key={title}>
+                              {title}
+                            </th>
+                          ),
+                        )}
                       </tr>
                     </thead>
+                    <tbody>
+                      {(history.data.history?.items || []).map((row) => (
+                        <tr key={row.id} className="border-b border-line">
+                          <td className="px-3 py-3">
+                            {new Date(row.created_at).toLocaleString()}
+                          </td>
+                          <td className="px-3 py-3">
+                            {row.device_id || 'Web/employee session'}
+                          </td>
+                          <td className="px-3 py-3">
+                            {row.revoked_at
+                              ? 'Revoked'
+                              : Date.parse(row.expires_at) <=
+                                  history.loadedAt?.getTime()
+                                ? 'Expired'
+                                : 'Active'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
-                  <div className="flex flex-col items-center gap-3 py-12 text-center">
-                    <Monitor size={26} className="text-muted" />
-                    <p className="max-w-xs text-xs leading-relaxed text-muted">
-                      No authentication sessions are available. Login history
-                      will appear when backend authentication is connected.
+                  {Object.entries(history.errors).map(([name, error]) => (
+                    <p
+                      key={name}
+                      role="alert"
+                      className="my-3 text-xs text-error"
+                    >
+                      {error}
                     </p>
-                  </div>
+                  ))}
+                  {history.data.history?.items?.length === 0 && (
+                    <div className="flex flex-col items-center gap-3 py-12 text-center">
+                      <Monitor size={26} className="text-muted" />
+                      <p className="max-w-xs text-xs leading-relaxed text-muted">
+                        No authentication sessions are available.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </section>
             )}
@@ -776,11 +886,18 @@ export default function ProfilePage() {
               </div>
               <button
                 className="flex items-center gap-2 rounded-lg bg-red-100 px-4 py-3 text-xs font-medium text-error hover:bg-red-200"
-                onClick={() =>
-                  setNotice(
-                    'Signing out all devices is unavailable until backend authentication and session revocation are connected. No sessions were changed.',
-                  )
-                }
+                onClick={async () => {
+                  try {
+                    await apiRequest(
+                      session.accessToken,
+                      '/profile/logout-all',
+                      { method: 'POST' },
+                    )
+                    logout()
+                  } catch (error) {
+                    setNotice(error.message)
+                  }
+                }}
               >
                 <LogOut size={16} />
                 Sign out from all devices
@@ -789,7 +906,8 @@ export default function ProfilePage() {
           )}
           <p className="mt-5 flex items-center justify-center gap-1 text-[10px] text-muted">
             <ShieldCheck size={13} />
-            Profile preview · Passwords are never saved to browser storage
+            Personal information is stored in your account · Passwords are never
+            saved to browser storage
           </p>
         </main>
       </div>

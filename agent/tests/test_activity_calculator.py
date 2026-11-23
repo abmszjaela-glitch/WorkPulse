@@ -77,6 +77,16 @@ class ActivityCalculatorTests(unittest.TestCase):
         self.assertEqual(sum(summary["counts"].values()), 0)
         self.assertEqual(summary["active_seconds"] + summary["idle_seconds"], 60)
 
+    def test_stop_freezes_interval_and_application_clock_before_slow_listener_cleanup(self):
+        self.now = 20
+        self.state.freeze()
+        active = self.idle.get_active_elapsed()
+        self.now = 75
+        summary = self.calculator.stop()
+        self.assertEqual(summary["interval_seconds"], 20)
+        self.assertEqual(summary["active_seconds"], active)
+        self.assertEqual(self.idle.get_active_elapsed(), active)
+
     def test_completely_idle_interval(self):
         self.calculator.stop()
         self.now = 400

@@ -115,7 +115,7 @@ class ActivityCalculator:
                or not isfinite(value) or value < 0 for name, value in apps.items()):
             raise ValueError("Application usage must contain names and finite durations only.")
         active_elapsed = self._idle.get_active_elapsed()
-        timestamp = monotonic()
+        timestamp = self._idle.activity_state.clamp_timestamp(monotonic())
         status = self._idle.get_status()
         if (not isfinite(timestamp) or not isfinite(active_elapsed)
                 or active_elapsed < 0 or status not in ("ACTIVE", "IDLE")):

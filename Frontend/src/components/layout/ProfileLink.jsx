@@ -13,7 +13,8 @@ export default function ProfileLink() {
       {profile.photo ? (
         <img src={profile.photo} alt="" className="size-full object-cover" />
       ) : (
-        `${profile.firstName[0]}${profile.lastName[0]}`.toUpperCase()
+        `${profile.firstName[0] || ''}${profile.lastName[0] || ''}`.toUpperCase() ||
+        '?'
       )}
     </Link>
   )

@@ -100,13 +100,13 @@ class DesktopApplication:
             tk.Label(card, textvariable=variable, bg="white", fg="#172554", font=("Segoe UI", 13 if key == "active_app" else 22, "bold"), wraplength=215, justify="left").pack(anchor="w", pady=(6, 0))
         sync = tk.Frame(body, bg="white", padx=18, pady=12)
         sync.pack(fill="x", pady=(5, 0))
-        self.sync_var = tk.StringVar(value="Synchronization unavailable — backend integration pending")
+        self.sync_var = tk.StringVar(value="Sign in and connect this device")
         self.last_sync_var = tk.StringVar(value="Last successful synchronization: Never")
         for var in (self.sync_var, self.last_sync_var):
             tk.Label(sync, textvariable=var, bg="white", fg="#475569", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
         actions = tk.Frame(body, bg="#EFF6FF")
         actions.pack(fill="x", pady=(14, 0))
-        self.start_button = ttk.Button(actions, text="Start / Resume local tracking", style="Primary.TButton", command=self.start_tracking)
+        self.start_button = ttk.Button(actions, text="Start / Resume local tracking", style="Primary.TButton", command=self.start_tracking, state="disabled")
         self.start_button.pack(side="left")
         ttk.Button(actions, text="Pause", style="Action.TButton", command=self.pause).pack(side="left", padx=8)
         ttk.Button(actions, text="Open dashboard", style="Action.TButton", command=lambda: self.controller.request("dashboard")).pack(side="right")
@@ -114,7 +114,7 @@ class DesktopApplication:
         tk.Label(body, textvariable=self.policy_var, bg="#EFF6FF", fg="#475569", font=("Segoe UI", 9)).pack(anchor="w", pady=(12, 4))
         self.feedback = tk.StringVar(value="Tracking is paused. No input is being collected.")
         tk.Label(body, textvariable=self.feedback, bg="#EFF6FF", fg="#172554", font=("Segoe UI", 9), wraplength=900, justify="left").pack(anchor="w")
-        tk.Label(body, text="Only aggregate counts and application names/durations. No key contents, screenshots or window titles.\nCounts refer to the current local session; restarting begins a new session. Closing stops tracking and exits.", bg="#EFF6FF", fg="#64748B", font=("Segoe UI", 9), justify="left", wraplength=900).pack(anchor="w", pady=(12, 0))
+        tk.Label(body, text="Only aggregate counts and application names/durations. No key contents, screenshots or window titles.\nPause/resume preserves this employee's session totals and excludes paused time. Signing out or closing ends the session.", bg="#EFF6FF", fg="#64748B", font=("Segoe UI", 9), justify="left", wraplength=900).pack(anchor="w", pady=(12, 0))
 
     def _tray_run(self):
         try:
@@ -128,7 +128,16 @@ class DesktopApplication:
     def start_tracking(self):
         if self._closing or self._error_message:
             return
-        if messagebox.askyesno("Authorize local tracking", "You are not signed in to a backend employee session.\n\nAuthorize this local session to count mouse/key events and application usage during configured working hours?\n\nNo typed text, screenshots or window titles are collected. You can pause or stop at any time.", parent=self.root):
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if not auth.get("signed_in"):
+            self.feedback.set("Sign in with a valid employee account before starting tracking.")
+            return
+        sync = self.controller.desktop_snapshot().get("synchronization", {})
+        if not sync.get("ready") or not sync.get("consent_accepted"):
+            self.feedback.set(sync.get("message", "Connect your device and accept the current privacy policy first."))
+            return
+        identity = "You are signed in to your employee account."
+        if messagebox.askyesno("Authorize local tracking", identity + "\n\nAuthorize this local session to count mouse/key events and application usage during configured working hours?\n\nNo typed text, screenshots or window titles are collected. You can pause or stop at any time. Aggregated intervals will be encrypted locally and uploaded using your activated device.", parent=self.root):
             self.feedback.set("Local session explicitly authorized; checking working-hours policy.")
             self.controller.request("start")
 
@@ -180,8 +189,13 @@ class DesktopApplication:
             variable.set(duration_text(value) if key.endswith("seconds") else str(value))
         self.sync_var.set(view["sync"])
         self.last_sync_var.set("Last successful synchronization: " + view["last_sync"])
-        self.start_button.configure(state="disabled" if self._closing or not view["policy_open"] or view["tracking"] == "Tracking ON" or self._error_message else "normal")
-        if not self._closing and not self._error_message and not view["policy_open"]:
+        signed_in = view.get("auth", {}).get("signed_in", False)
+        sync = view.get("synchronization", {})
+        ready = sync.get("ready") and sync.get("consent_accepted")
+        self.start_button.configure(state="disabled" if self._closing or not signed_in or not ready or not view["policy_open"] or view["tracking"] == "Tracking ON" or self._error_message else "normal")
+        if not self._closing and not self._error_message and not signed_in:
+            self.feedback.set("Sign in with a valid employee account before starting tracking.")
+        elif not self._closing and not self._error_message and not view["policy_open"]:
             self.feedback.set("Outside configured working hours. No local tracking can be started.")
         if self._error_message:
             self.feedback.set(self._error_message)
@@ -222,6 +236,8 @@ class DesktopApplication:
         get_logger().info("desktop_started")
         self._thread = Thread(target=self._tray_run, name="WorkPulse visible tray")
         self._thread.start()
+        if not self.diagnostic and hasattr(self.controller, "request_auth"):
+            self.controller.request_auth("restore")
         previous_thread_hook = threading.excepthook
         def worker_error(_args):
             from ..desktop_bootstrap import record_failure
@@ -243,7 +259,7 @@ class DesktopApplication:
         return {"window_title": f"{APP_NAME} {APP_VERSION}", "window_was_visible": self._was_visible,
                 "tray_was_visible": self._tray_ready, "tracking_never_started": self.controller._agent is None and not self.controller._requested,
                 "callback_error_seen": self._callback_error_seen, "tracking": self._last_view["tracking"],
-                "employee_status": "Not signed in; backend authentication unavailable"}
+                "employee_status": self.controller.desktop_snapshot().get("auth", {}).get("state", "signed_out")}
 
 
 def run_desktop(*, diagnostic=False, exercise_error=False, diagnostics_file=None):

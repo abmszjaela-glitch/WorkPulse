@@ -1,0 +1,894 @@
+TAP version 13
+# Subtest: all 19 endpoints authenticate, enforce every denied role and return real integration results
+ok 1 - all 19 endpoints authenticate, enforce every denied role and return real integration results
+  ---
+  duration_ms: 13316.5244
+  type: 'test'
+  ...
+# Subtest: date/department filters, accurate summary values and empty results
+ok 2 - date/department filters, accurate summary values and empty results
+  ---
+  duration_ms: 250.2476
+  type: 'test'
+  ...
+# Subtest: Manager scope and own endpoints prevent cross-employee access
+ok 3 - Manager scope and own endpoints prevent cross-employee access
+  ---
+  duration_ms: 273.8714
+  type: 'test'
+  ...
+# Subtest: category percentages use all recorded application time including unclassified
+ok 4 - category percentages use all recorded application time including unclassified
+  ---
+  duration_ms: 247.624
+  type: 'test'
+  ...
+# Subtest: pagination, seven-day zero-fill and DST-aware hourly timelines
+ok 5 - pagination, seven-day zero-fill and DST-aware hourly timelines
+  ---
+  duration_ms: 246.5689
+  type: 'test'
+  ...
+# Subtest: dashboard counts derive from employee/device rows and preserve paused/unknown buckets
+ok 6 - dashboard counts derive from employee/device rows and preserve paused/unknown buckets
+  ---
+  duration_ms: 215.0075
+  type: 'test'
+  ...
+# Subtest: invalid dates, fields, excessive ranges and UUIDs fail safely
+ok 7 - invalid dates, fields, excessive ranges and UUIDs fail safely
+  ---
+  duration_ms: 52.4809
+  type: 'test'
+  ...
+# Subtest: hourly totals and DST fall-back preserve actual duration rather than fixed chart values
+ok 8 - hourly totals and DST fall-back preserve actual duration rather than fixed chart values
+  ---
+  duration_ms: 147.3903
+  type: 'test'
+  ...
+# Subtest: database failures return safe availability errors without diagnostics
+ok 9 - database failures return safe availability errors without diagnostics
+  ---
+  duration_ms: 1.9798
+  type: 'test'
+  ...
+# Subtest: operator bootstrap succeeds only on an empty database
+ok 10 - operator bootstrap succeeds only on an empty database
+  ---
+  duration_ms: 9341.0586
+  type: 'test'
+  ...
+# Subtest: valid login returns safe user, JWT and hashed refresh token
+ok 11 - valid login returns safe user, JWT and hashed refresh token
+  ---
+  duration_ms: 736.2447
+  type: 'test'
+  ...
+# Subtest: invalid login and unknown account have the same safe response
+ok 12 - invalid login and unknown account have the same safe response
+  ---
+  duration_ms: 303.3994
+  type: 'test'
+  ...
+# Subtest: missing credentials and wrong field types are rejected
+ok 13 - missing credentials and wrong field types are rejected
+  ---
+  duration_ms: 225.1097
+  type: 'test'
+  ...
+# Subtest: registration is admin-only, duplicate-safe and returns no password hash
+ok 14 - registration is admin-only, duplicate-safe and returns no password hash
+  ---
+  duration_ms: 817.7051
+  type: 'test'
+  ...
+# Subtest: password validation rejects weak passwords and bcrypt truncation
+ok 15 - password validation rejects weak passwords and bcrypt truncation
+  ---
+  duration_ms: 2.7237
+  type: 'test'
+  ...
+# Subtest: expired, tampered, wrong audience, wrong issuer and wrong algorithm JWTs are rejected
+ok 16 - expired, tampered, wrong audience, wrong issuer and wrong algorithm JWTs are rejected
+  ---
+  duration_ms: 132.611
+  type: 'test'
+  ...
+# Subtest: unauthenticated access fails; admin, manager and employee permissions are enforced
+ok 17 - unauthenticated access fails; admin, manager and employee permissions are enforced
+  ---
+  duration_ms: 526.1838
+  type: 'test'
+  ...
+# Subtest: employee is self-only and manager is limited to explicit assignments
+ok 18 - employee is self-only and manager is limited to explicit assignments
+  ---
+  duration_ms: 324.5186
+  type: 'test'
+  ...
+# Subtest: refresh rotates once; replay revokes the entire session including access tokens
+ok 19 - refresh rotates once; replay revokes the entire session including access tokens
+  ---
+  duration_ms: 168.7716
+  type: 'test'
+  ...
+# Subtest: concurrent refresh does not produce two usable descendants
+ok 20 - concurrent refresh does not produce two usable descendants
+  ---
+  duration_ms: 195.9609
+  type: 'test'
+  ...
+# Subtest: logout immediately invalidates access and refresh tokens
+ok 21 - logout immediately invalidates access and refresh tokens
+  ---
+  duration_ms: 158.8457
+  type: 'test'
+  ...
+# Subtest: device credential is required for agent access and disabled devices fail immediately
+ok 22 - device credential is required for agent access and disabled devices fail immediately
+  ---
+  duration_ms: 346.221
+  type: 'test'
+  ...
+# Subtest: deactivation rejects access and refresh immediately
+ok 23 - deactivation rejects access and refresh immediately
+  ---
+  duration_ms: 182.8322
+  type: 'test'
+  ...
+# Subtest: forgot-password is generic, reset tokens are hashed, single-use and revoke sessions
+ok 24 - forgot-password is generic, reset tokens are hashed, single-use and revoke sessions
+  ---
+  duration_ms: 547.8242
+  type: 'test'
+  ...
+# Subtest: password change checks current password and invalidates all sessions
+ok 25 - password change checks current password and invalidates all sessions
+  ---
+  duration_ms: 652.9947
+  type: 'test'
+  ...
+# Subtest: temporary password restricts permissions until changed and expires
+ok 26 - temporary password restricts permissions until changed and expires
+  ---
+  duration_ms: 489.3382
+  type: 'test'
+  ...
+# Subtest: expired refresh and reset tokens fail safely
+ok 27 - expired refresh and reset tokens fail safely
+  ---
+  duration_ms: 201.9024
+  type: 'test'
+  ...
+# Subtest: SQL permissions deny anon/authenticated access to auth storage and mutation RPCs
+ok 28 - SQL permissions deny anon/authenticated access to auth storage and mutation RPCs
+  ---
+  duration_ms: 13.5005
+  type: 'test'
+  ...
+# Subtest: refresh and password-reset HTTP routes enforce their contracts
+ok 29 - refresh and password-reset HTTP routes enforce their contracts
+  ---
+  duration_ms: 326.8771
+  type: 'test'
+  ...
+# Subtest: explicit RLS deny policies still block browsers even if table grants are accidentally added
+ok 30 - explicit RLS deny policies still block browsers even if table grants are accidentally added
+  ---
+  duration_ms: 10.9526
+  type: 'test'
+  ...
+# Subtest: migration refuses duplicate objects without altering existing account data
+ok 31 - migration refuses duplicate objects without altering existing account data
+  ---
+  duration_ms: 11.4456
+  type: 'test'
+  ...
+# Subtest: missing schema fails closed with a safe storage error
+ok 32 - missing schema fails closed with a safe storage error
+  ---
+  duration_ms: 0.9416
+  type: 'test'
+  ...
+# Subtest: credential rate limiter returns safe 429 JSON
+ok 33 - credential rate limiter returns safe 429 JSON
+  ---
+  duration_ms: 102.278
+  type: 'test'
+  ...
+# Subtest: JWT configuration accepts the existing alias and canonical name
+ok 34 - JWT configuration accepts the existing alias and canonical name
+  ---
+  duration_ms: 2.7165
+  type: 'test'
+  ...
+# Subtest: missing, weak and conflicting JWT configuration fails without exposing values
+ok 35 - missing, weak and conflicting JWT configuration fails without exposing values
+  ---
+  duration_ms: 1.1069
+  type: 'test'
+  ...
+# Subtest: backend never falls back to a publishable Supabase credential
+ok 36 - backend never falls back to a publishable Supabase credential
+  ---
+  duration_ms: 0.7867
+  type: 'test'
+  ...
+# Subtest: server key guard supports both Supabase server credential formats
+ok 37 - server key guard supports both Supabase server credential formats
+  ---
+  duration_ms: 0.2904
+  type: 'test'
+  ...
+# Subtest: invalid startup exits before listening and reports only the missing variable
+ok 38 - invalid startup exits before listening and reports only the missing variable
+  ---
+  duration_ms: 1760.3247
+  type: 'test'
+  ...
+# Subtest: all 37 documented management endpoints require authentication
+ok 39 - all 37 documented management endpoints require authentication
+  ---
+  duration_ms: 11195.3884
+  type: 'test'
+  ...
+# Subtest: role permissions reject employee management, manager writes, device/profile misuse
+ok 40 - role permissions reject employee management, manager writes, device/profile misuse
+  ---
+  duration_ms: 155.5064
+  type: 'test'
+  ...
+# Subtest: employee create/get/list/update support search, filters and pagination without credential leakage
+ok 41 - employee create/get/list/update support search, filters and pagination without credential leakage
+  ---
+  duration_ms: 332.8605
+  type: 'test'
+  ...
+# Subtest: duplicate email and employee codes are rejected atomically
+ok 42 - duplicate email and employee codes are rejected atomically
+  ---
+  duration_ms: 477.3114
+  type: 'test'
+  ...
+# Subtest: manager can read only assigned employees/departments and scoped CSV
+ok 43 - manager can read only assigned employees/departments and scoped CSV
+  ---
+  duration_ms: 107.9559
+  type: 'test'
+  ...
+# Subtest: activate/deactivate revoke sessions; soft deletion retains records
+ok 44 - activate/deactivate revoke sessions; soft deletion retains records
+  ---
+  duration_ms: 356.4612
+  type: 'test'
+  ...
+# Subtest: department assignment, bulk deactivation and missing-member rollback
+ok 45 - department assignment, bulk deactivation and missing-member rollback
+  ---
+  duration_ms: 348.242
+  type: 'test'
+  ...
+# Subtest: temporary password generation revokes access and enforces first-login password change
+ok 46 - temporary password generation revokes access and enforces first-login password change
+  ---
+  duration_ms: 561.0895
+  type: 'test'
+  ...
+# Subtest: employee summary and CSV return actual scoped counts and escape formulas
+ok 47 - employee summary and CSV return actual scoped counts and escape formulas
+  ---
+  duration_ms: 199.1875
+  type: 'test'
+  ...
+# Subtest: departments list/get/update/employees return real membership statistics
+ok 48 - departments list/get/update/employees return real membership statistics
+  ---
+  duration_ms: 162.5597
+  type: 'test'
+  ...
+# Subtest: department deletion requires atomic reassignment and preserves soft-deleted history
+ok 49 - department deletion requires atomic reassignment and preserves soft-deleted history
+  ---
+  duration_ms: 202.4589
+  type: 'test'
+  ...
+# Subtest: duplicate department names, invalid managers and missing records fail
+ok 50 - duplicate department names, invalid managers and missing records fail
+  ---
+  duration_ms: 92.5406
+  type: 'test'
+  ...
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:10.098Z","errorType":"Error"}
+# Subtest: productivity endpoint refuses fabricated statistics without approved telemetry
+ok 51 - productivity endpoint refuses fabricated statistics without approved telemetry
+  ---
+  duration_ms: 50.9628
+  type: 'test'
+  ...
+# Subtest: device registration rotates credentials, keeps ownership, and invalidates older tokens
+ok 52 - device registration rotates credentials, keeps ownership, and invalidates older tokens
+  ---
+  duration_ms: 103.714
+  type: 'test'
+  ...
+# Subtest: heartbeat and agent policy report actual device state and configured working hours
+ok 53 - heartbeat and agent policy report actual device state and configured working hours
+  ---
+  duration_ms: 35.2515
+  type: 'test'
+  ...
+# Subtest: device list/detail are scoped and never expose credential hashes
+ok 54 - device list/detail are scoped and never expose credential hashes
+  ---
+  duration_ms: 50.1499
+  type: 'test'
+  ...
+# Subtest: device disable/enable/remove safely invalidate sessions and preserve data
+ok 55 - device disable/enable/remove safely invalidate sessions and preserve data
+  ---
+  duration_ms: 58.4887
+  type: 'test'
+  ...
+# Subtest: own profile updates cannot change identity, role or another employee
+ok 56 - own profile updates cannot change identity, role or another employee
+  ---
+  duration_ms: 65.5355
+  type: 'test'
+  ...
+# Subtest: avatar endpoint sanitizes real images and rejects invalid content
+ok 57 - avatar endpoint sanitizes real images and rejects invalid content
+  ---
+  duration_ms: 51.6207
+  type: 'test'
+  ...
+# Subtest: profile login history and notification preferences are own-only
+ok 58 - profile login history and notification preferences are own-only
+  ---
+  duration_ms: 23.4248
+  type: 'test'
+  ...
+# Subtest: privacy policy versions and consent are owned, immutable and require the current version
+ok 59 - privacy policy versions and consent are owned, immutable and require the current version
+  ---
+  duration_ms: 139.8153
+  type: 'test'
+  ...
+# Subtest: profile logout-all invalidates every human/device session
+ok 60 - profile logout-all invalidates every human/device session
+  ---
+  duration_ms: 264.099
+  type: 'test'
+  ...
+# Subtest: validation rejects bad pagination, UUIDs, empty updates, SQL-like input and unknown fields
+ok 61 - validation rejects bad pagination, UUIDs, empty updates, SQL-like input and unknown fields
+  ---
+  duration_ms: 50.2069
+  type: 'test'
+  ...
+# Subtest: database outages return safe errors and RLS denies direct browser access
+ok 62 - database outages return safe errors and RLS denies direct browser access
+  ---
+  duration_ms: 8.298
+  type: 'test'
+  ...
+# Subtest: every documented endpoint rejects all unauthorized role classes
+ok 63 - every documented endpoint rejects all unauthorized role classes
+  ---
+  duration_ms: 683.5579
+  type: 'test'
+  ...
+# Subtest: missing mutation targets and department subresources return 404
+ok 64 - missing mutation targets and department subresources return 404
+  ---
+  duration_ms: 245.5421
+  type: 'test'
+  ...
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:11.935Z","errorType":"Error"}
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:11.944Z","errorType":"Error"}
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:11.953Z","errorType":"Error"}
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:11.959Z","errorType":"Error"}
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:11.965Z","errorType":"Error"}
+# Subtest: database failures are sanitized through actual HTTP routes for every management module
+ok 65 - database failures are sanitized through actual HTTP routes for every management module
+  ---
+  duration_ms: 50.5181
+  type: 'test'
+  ...
+# Subtest: management migration refuses duplicate columns and leaves existing records intact
+ok 66 - management migration refuses duplicate columns and leaves existing records intact
+  ---
+  duration_ms: 13.353
+  type: 'test'
+  ...
+# Subtest: every documented endpoint has an integration result (productivity explicitly unavailable)
+ok 67 - every documented endpoint has an integration result (productivity explicitly unavailable)
+  ---
+  duration_ms: 0.6036
+  type: 'test'
+  ...
+# Subtest: Resend SMTP settings are secure and reset link targets the registered email
+ok 68 - Resend SMTP settings are secure and reset link targets the registered email
+  ---
+  duration_ms: 6.4675
+  type: 'test'
+  ...
+# Subtest: SMTP provider is configurable and STARTTLS cannot silently downgrade
+ok 69 - SMTP provider is configurable and STARTTLS cannot silently downgrade
+  ---
+  duration_ms: 1.0575
+  type: 'test'
+  ...
+# Subtest: missing credentials or HTTPS reset URL fails without sending email
+ok 70 - missing credentials or HTTPS reset URL fails without sending email
+  ---
+  duration_ms: 3.4639
+  type: 'test'
+  ...
+# Subtest: account notifications contain no session tokens
+ok 71 - account notifications contain no session tokens
+  ---
+  duration_ms: 1.1225
+  type: 'test'
+  ...
+# Subtest: SMTP failures never expose raw provider errors or secrets
+ok 72 - SMTP failures never expose raw provider errors or secrets
+  ---
+  duration_ms: 0.8621
+  type: 'test'
+  ...
+# Subtest: all 99 document method/path pairs exist exactly once in actual routers
+ok 73 - all 99 document method/path pairs exist exactly once in actual routers
+  ---
+  duration_ms: 39.7474
+  type: 'test'
+  ...
+# Subtest: actual agent serializer fixture is accepted and microsecond timestamps are preserved
+ok 74 - actual agent serializer fixture is accepted and microsecond timestamps are preserved
+  ---
+  duration_ms: 10310.6684
+  type: 'test'
+  ...
+# Subtest: timezone offset normalization retains microseconds and rejects invalid dates
+ok 75 - timezone offset normalization retains microseconds and rejects invalid dates
+  ---
+  duration_ms: 1.3873
+  type: 'test'
+  ...
+# Subtest: Unicode process-name lengths match the existing Python agent contract
+ok 76 - Unicode process-name lengths match the existing Python agent contract
+  ---
+  duration_ms: 54.224
+  type: 'test'
+  ...
+# Subtest: duplicate activity and app-usage retries acknowledge once without double counting
+ok 77 - duplicate activity and app-usage retries acknowledge once without double counting
+  ---
+  duration_ms: 402.0556
+  type: 'test'
+  ...
+# Subtest: single and batch app usage use the actual queue mapping and interval timestamps
+ok 78 - single and batch app usage use the actual queue mapping and interval timestamps
+  ---
+  duration_ms: 105.8715
+  type: 'test'
+  ...
+# Subtest: activity batch reports every accepted, invalid, duplicate and conflicting item
+ok 79 - activity batch reports every accepted, invalid, duplicate and conflicting item
+  ---
+  duration_ms: 56.681
+  type: 'test'
+  ...
+# Subtest: empty and oversized batches fail; configured maximum batch synchronizes successfully
+ok 80 - empty and oversized batches fail; configured maximum batch synchronizes successfully
+  ---
+  duration_ms: 373.7182
+  type: 'test'
+  ...
+# Subtest: unauthenticated, human JWTs and invalid device credentials are rejected on all monitoring paths
+ok 81 - unauthenticated, human JWTs and invalid device credentials are rejected on all monitoring paths
+  ---
+  duration_ms: 170.0993
+  type: 'test'
+  ...
+# Subtest: pre-provisioned but unregistered devices cannot submit records or status
+ok 82 - pre-provisioned but unregistered devices cannot submit records or status
+  ---
+  duration_ms: 104.1198
+  type: 'test'
+  ...
+# Subtest: employee association is trusted; approved employee code aliases remain compatible
+ok 83 - employee association is trusted; approved employee code aliases remain compatible
+  ---
+  duration_ms: 37.8145
+  type: 'test'
+  ...
+# Subtest: invalid, incomplete and privacy-sensitive payloads never persist
+ok 84 - invalid, incomplete and privacy-sensitive payloads never persist
+  ---
+  duration_ms: 249.413
+  type: 'test'
+  ...
+# Subtest: old records, future records and overlapping intervals are rejected without overwrite
+ok 85 - old records, future records and overlapping intervals are rejected without overwrite
+  ---
+  duration_ms: 111.4402
+  type: 'test'
+  ...
+# Subtest: offline synchronization retries only server-confirmed IDs after a lost response
+ok 86 - offline synchronization retries only server-confirmed IDs after a lost response
+  ---
+  duration_ms: 54.6
+  type: 'test'
+  ...
+# Subtest: status events distinguish ACTIVE, IDLE, PAUSED and OFFLINE with retry protection
+ok 87 - status events distinguish ACTIVE, IDLE, PAUSED and OFFLINE with retry protection
+  ---
+  duration_ms: 178.2583
+  type: 'test'
+  ...
+# Subtest: heartbeat timeout derives OFFLINE and recovers PAUSED without inventing IDLE
+ok 88 - heartbeat timeout derives OFFLINE and recovers PAUSED without inventing IDLE
+  ---
+  duration_ms: 164.3152
+  type: 'test'
+  ...
+# Subtest: disabled, removed and missing device sessions cannot upload or heartbeat
+ok 89 - disabled, removed and missing device sessions cannot upload or heartbeat
+  ---
+  duration_ms: 115.7603
+  type: 'test'
+  ...
+# Subtest: new records need collection-time consent while pause/offline remain permitted without consent
+ok 90 - new records need collection-time consent while pause/offline remain permitted without consent
+  ---
+  duration_ms: 258.7132
+  type: 'test'
+  ...
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:08.651Z","errorType":"Error"}
+# Subtest: unexpected database failures roll back the whole persistence transaction and acknowledge nothing
+ok 91 - unexpected database failures roll back the whole persistence transaction and acknowledge nothing
+  ---
+  duration_ms: 60.6539
+  type: 'test'
+  ...
+# Subtest: RLS and permissions block direct browser access to monitoring data and RPCs
+ok 92 - RLS and permissions block direct browser access to monitoring data and RPCs
+  ---
+  duration_ms: 12.3377
+  type: 'test'
+  ...
+# Subtest: calculation metadata and cumulative usage are accepted but never double-counted
+ok 93 - calculation metadata and cumulative usage are accepted but never double-counted
+  ---
+  duration_ms: 24.6817
+  type: 'test'
+  ...
+# Subtest: monitoring rate limiter returns retryable 429 without acknowledging data
+ok 94 - monitoring rate limiter returns retryable 429 without acknowledging data
+  ---
+  duration_ms: 57.387
+  type: 'test'
+  ...
+# Subtest: already accepted records remain acknowledgeable after a stricter upload-age policy
+ok 95 - already accepted records remain acknowledgeable after a stricter upload-age policy
+  ---
+  duration_ms: 76.3649
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate uploads persist one record and return reliable acknowledgments
+ok 96 - concurrent duplicate uploads persist one record and return reliable acknowledgments
+  ---
+  duration_ms: 32.4267
+  type: 'test'
+  ...
+# Subtest: offline records honor the policy at collection and new-policy data requires renewed consent
+ok 97 - offline records honor the policy at collection and new-policy data requires renewed consent
+  ---
+  duration_ms: 57.7338
+  type: 'test'
+  ...
+# Subtest: Postman covers all documented requests without embedding credentials
+ok 98 - Postman covers all documented requests without embedding credentials
+  ---
+  duration_ms: 15.2383
+  type: 'test'
+  ...
+# Subtest: all category endpoints authenticate and enforce Admin/Manager/Agent permissions
+ok 99 - all category endpoints authenticate and enforce Admin/Manager/Agent permissions
+  ---
+  duration_ms: 10682.5628
+  type: 'test'
+  ...
+# Subtest: category create/list/update/delete normalize names and prevent duplicate live rules
+ok 100 - category create/list/update/delete normalize names and prevent duplicate live rules
+  ---
+  duration_ms: 349.9516
+  type: 'test'
+  ...
+# Subtest: department-specific overrides apply only to the registered employee and Manager scope
+ok 101 - department-specific overrides apply only to the registered employee and Manager scope
+  ---
+  duration_ms: 123.8731
+  type: 'test'
+  ...
+# Subtest: invalid category data, missing values and unknown fields are rejected
+ok 102 - invalid category data, missing values and unknown fields are rejected
+  ---
+  duration_ms: 113.0662
+  type: 'test'
+  ...
+# Subtest: daily summaries calculate classified durations without inventing a productivity score
+ok 103 - daily summaries calculate classified durations without inventing a productivity score
+  ---
+  duration_ms: 226.7884
+  type: 'test'
+  ...
+# Subtest: empty activity days return actual zeros and unavailable scores, not zero productivity
+ok 104 - empty activity days return actual zeros and unavailable scores, not zero productivity
+  ---
+  duration_ms: 180.5219
+  type: 'test'
+  ...
+# Subtest: closed local days use DST-aware boundaries including 23-hour and 25-hour days
+ok 105 - closed local days use DST-aware boundaries including 23-hour and 25-hour days
+  ---
+  duration_ms: 321.2207
+  type: 'test'
+  ...
+# Subtest: cross-midnight intervals are explicitly prorated and preserve the total across days
+ok 106 - cross-midnight intervals are explicitly prorated and preserve the total across days
+  ---
+  duration_ms: 490.1958
+  type: 'test'
+  ...
+# Subtest: multiple employee summaries do not leak or combine time between employees
+ok 107 - multiple employee summaries do not leak or combine time between employees
+  ---
+  duration_ms: 483.8463
+  type: 'test'
+  ...
+# Subtest: bounded reported pause transitions are separate from unavailable exact paused duration
+ok 108 - bounded reported pause transitions are separate from unavailable exact paused duration
+  ---
+  duration_ms: 107.7976
+  type: 'test'
+  ...
+# Subtest: manual recalculation is idempotent and does not rewrite an unchanged summary
+ok 109 - manual recalculation is idempotent and does not rewrite an unchanged summary
+  ---
+  duration_ms: 205.1685
+  type: 'test'
+  ...
+# Subtest: scheduled processing persists its cursor and repeated runs skip completed jobs
+ok 110 - scheduled processing persists its cursor and repeated runs skip completed jobs
+  ---
+  duration_ms: 1083.6084
+  type: 'test'
+  ...
+# Subtest: late uploads invalidate completed jobs and are included on the next scheduled run
+ok 111 - late uploads invalidate completed jobs and are included on the next scheduled run
+  ---
+  duration_ms: 234.8932
+  type: 'test'
+  ...
+# Subtest: category changes invalidate history and reclassify totals without changing source data
+ok 112 - category changes invalidate history and reclassify totals without changing source data
+  ---
+  duration_ms: 1248.3967
+  type: 'test'
+  ...
+# Subtest: summary failures remain durable and retry after a corrected error
+ok 113 - summary failures remain durable and retry after a corrected error
+  ---
+  duration_ms: 161.3636
+  type: 'test'
+  ...
+# Subtest: invalid dates and future days fail without creating a fabricated summary
+ok 114 - invalid dates and future days fail without creating a fabricated summary
+  ---
+  duration_ms: 85.6909
+  type: 'test'
+  ...
+# Subtest: processing RLS blocks direct browser access and score constraints enforce unavailability
+ok 115 - processing RLS blocks direct browser access and score constraints enforce unavailability
+  ---
+  duration_ms: 6.35
+  type: 'test'
+  ...
+# Subtest: worker coalesces concurrent runs, stops cleanly and does not expose raw errors
+ok 116 - worker coalesces concurrent runs, stops cleanly and does not expose raw errors
+  ---
+  duration_ms: 0.8348
+  type: 'test'
+  ...
+# Subtest: all ten endpoints require Admin/Manager and return valid scoped report/export responses
+ok 117 - all ten endpoints require Admin/Manager and return valid scoped report/export responses
+  ---
+  duration_ms: 12888.8256
+  type: 'test'
+  ...
+# Subtest: daily/weekly/monthly periods and report types use actual totals and unavailable business metrics
+ok 118 - daily/weekly/monthly periods and report types use actual totals and unavailable business metrics
+  ---
+  duration_ms: 292.7361
+  type: 'test'
+  ...
+# Subtest: date, department, employee and pagination filters cannot escape Manager scope
+ok 119 - date, department, employee and pagination filters cannot escape Manager scope
+  ---
+  duration_ms: 236.9207
+  type: 'test'
+  ...
+# Subtest: CSV escapes formulas, commas and quotes using actual stored employee names
+ok 120 - CSV escapes formulas, commas and quotes using actual stored employee names
+  ---
+  duration_ms: 91.6959
+  type: 'test'
+  ...
+# Subtest: export history is owner-only and revalidates current scope
+ok 121 - export history is owner-only and revalidates current scope
+  ---
+  duration_ms: 115.308
+  type: 'test'
+  ...
+# Subtest: empty application reports export valid empty CSV/PDF without invented data
+ok 122 - empty application reports export valid empty CSV/PDF without invented data
+  ---
+  duration_ms: 120.0089
+  type: 'test'
+  ...
+# Subtest: invalid filters, missing records and excessive export limits fail safely
+ok 123 - invalid filters, missing records and excessive export limits fail safely
+  ---
+  duration_ms: 85.7201
+  type: 'test'
+  ...
+# Subtest: large reports generate multipage PDFs and bounded CSV without truncation
+ok 124 - large reports generate multipage PDFs and bounded CSV without truncation
+  ---
+  duration_ms: 491.982
+  type: 'test'
+  ...
+# Subtest: database and history failures never claim successful exports
+ok 125 - database and history failures never claim successful exports
+  ---
+  duration_ms: 4.5518
+  type: 'test'
+  ...
+# Subtest: settings enforce Admin roles, validate fields and persist without allowing consent bypass
+ok 126 - settings enforce Admin roles, validate fields and persist without allowing consent bypass
+  ---
+  duration_ms: 10285.0173
+  type: 'test'
+  ...
+# Subtest: working-hours require explicit IANA timezone and weekly schedule; registered Agent can read only
+ok 127 - working-hours require explicit IANA timezone and weekly schedule; registered Agent can read only
+  ---
+  duration_ms: 118.0577
+  type: 'test'
+  ...
+# Subtest: notifications enforce owner scope, read/read-all and soft deletion
+ok 128 - notifications enforce owner scope, read/read-all and soft deletion
+  ---
+  duration_ms: 78.6876
+  type: 'test'
+  ...
+# Subtest: audit is Admin-only, records actor/resource without credentials, supports CSV and filters
+ok 129 - audit is Admin-only, records actor/resource without credentials, supports CSV and filters
+  ---
+  duration_ms: 86.828
+  type: 'test'
+  ...
+# {"level":"ERROR","event":"api.request.failed","time":"2026-11-22T08:10:11.514Z","errorType":"Error"}
+# Subtest: health/version are public; release metadata is fail-closed and Agent-only
+ok 130 - health/version are public; release metadata is fail-closed and Agent-only
+  ---
+  duration_ms: 38.6979
+  type: 'test'
+  ...
+# Subtest: socket handshake rejects invalid tokens and unauthorized Origins
+ok 131 - socket handshake rejects invalid tokens and unauthorized Origins
+  ---
+  duration_ms: 47.9487
+  type: 'test'
+  ...
+# Subtest: valid human and device sockets connect; raw device credentials reuse device login
+ok 132 - valid human and device sockets connect; raw device credentials reuse device login
+  ---
+  duration_ms: 56.1242
+  type: 'test'
+  ...
+# Subtest: committed activity/status events and actual scoped dashboard stats reach authorized dashboards only
+ok 133 - committed activity/status events and actual scoped dashboard stats reach authorized dashboards only
+  ---
+  duration_ms: 448.849
+  type: 'test'
+  ...
+# Subtest: settings notifications target owner; settings events target valid registered Agents
+ok 134 - settings notifications target owner; settings events target valid registered Agents
+  ---
+  duration_ms: 141.8636
+  type: 'test'
+  ...
+# Subtest: rolled back writes and no-op settings produce no live events or notifications
+ok 135 - rolled back writes and no-op settings produce no live events or notifications
+  ---
+  duration_ms: 18.5333
+  type: 'test'
+  ...
+# Subtest: administrative RPCs record actor and affected resource transactionally
+ok 136 - administrative RPCs record actor and affected resource transactionally
+  ---
+  duration_ms: 11.0122
+  type: 'test'
+  ...
+# Subtest: storage failures fail closed and logs never serialize exception text or credentials
+ok 137 - storage failures fail closed and logs never serialize exception text or credentials
+  ---
+  duration_ms: 1.3858
+  type: 'test'
+  ...
+# Subtest: core HTTP CRUD remains functional with all seven migrations composed
+ok 138 - core HTTP CRUD remains functional with all seven migrations composed
+  ---
+  duration_ms: 223.2014
+  type: 'test'
+  ...
+# Subtest: heartbeat expiry emits offline then renewed presence emits online without marking pause idle
+ok 139 - heartbeat expiry emits offline then renewed presence emits online without marking pause idle
+  ---
+  duration_ms: 1409.2166
+  type: 'test'
+  ...
+# Subtest: revoked sessions and disabled devices disconnect and cannot reconnect
+ok 140 - revoked sessions and disabled devices disconnect and cannot reconnect
+  ---
+  duration_ms: 196.9767
+  type: 'test'
+  ...
+# Subtest: new tables deny browser roles and no secrets are copied into outbox/audit
+ok 141 - new tables deny browser roles and no secrets are copied into outbox/audit
+  ---
+  duration_ms: 5.9015
+  type: 'test'
+  ...
+# Subtest: socket authentication attempts are rate-limited before credential verification
+ok 142 - socket authentication attempts are rate-limited before credential verification
+  ---
+  duration_ms: 19.2328
+  type: 'test'
+  ...
+# Subtest: settings validators accept real section fields and reject incorrect types/ranges/extra fields
+ok 143 - settings validators accept real section fields and reject incorrect types/ranges/extra fields
+  ---
+  duration_ms: 6.8113
+  type: 'test'
+  ...
+# Subtest: report filters reject incorrect dates, IDs and reversed ranges
+ok 144 - report filters reject incorrect dates, IDs and reversed ranges
+  ---
+  duration_ms: 2.3028
+  type: 'test'
+  ...
+# Subtest: employee/device validators enforce required fields and sanitize appropriate strings
+ok 145 - employee/device validators enforce required fields and sanitize appropriate strings
+  ---
+  duration_ms: 0.9811
+  type: 'test'
+  ...
+# Subtest: working-hours validation supports overnight shifts and rejects malformed schedules
+ok 146 - working-hours validation supports overnight shifts and rejects malformed schedules
+  ---
+  duration_ms: 1.8461
+  type: 'test'
+  ...
+1..146
+# tests 146
+# suites 0
+# pass 146
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 19479.2939

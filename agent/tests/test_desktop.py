@@ -20,7 +20,12 @@ class FakeController:
         self._requested = False
         self.stop = Event()
         self.view = dict(tracking="Tracking PAUSED", sync="Unavailable", last_sync="Never", startup="Not registered", closed=False, tray_visible=True, policy_open=True,
-                         mouse_movements=12, mouse_clicks=3, key_presses=7, active_app="synthetic.exe", active_seconds=65, idle_seconds=5)
+                         mouse_movements=12, mouse_clicks=3, key_presses=7, active_app="synthetic.exe", active_seconds=65, idle_seconds=5,
+                         synchronization={"ready": True, "consent_accepted": True},
+                         auth={"state": "signed_in", "signed_in": True, "user_id": "synthetic-employee"})
+
+    def accept_consent(self):
+        self.view["synchronization"]["consent_accepted"] = True
 
     def desktop_snapshot(self):
         return dict(self.view)
@@ -74,6 +79,16 @@ class DesktopTests(unittest.TestCase):
         self.app.pause()
         self.app.emergency_stop()
         self.assertEqual(self.controller.commands, ["start", "pause", "emergency"])
+
+    def test_unsigned_user_cannot_start_even_when_confirmation_would_allow_it(self):
+        self.controller.view["auth"] = {"state": "signed_out", "signed_in": False}
+        with patch("agent.ui.desktop.messagebox.askyesno", return_value=True) as confirm:
+            self.app.start_tracking()
+        confirm.assert_not_called()
+        self.assertEqual(self.controller.commands, [])
+        with patch("agent.ui.desktop.logging_available", return_value=True):
+            self.app._poll()
+        self.assertEqual(str(self.app.start_button.cget("state")), "disabled")
 
     def test_policy_and_logging_errors_disable_resume(self):
         self.controller.view["policy_open"] = False

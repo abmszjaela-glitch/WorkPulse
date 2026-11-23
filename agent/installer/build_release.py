@@ -17,8 +17,10 @@ def main():
     agent = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser()
     parser.add_argument("--compiler", type=Path, default=Path(os.environ["LOCALAPPDATA"]) / "Programs/Inno Setup 7/ISCC.exe")
+    parser.add_argument("--bundle", type=Path, default=agent / "dist/gui/WorkPulseAgent",
+                        help="Validated onedir GUI bundle; permits isolated builds while an older app is open")
     options = parser.parse_args()
-    executable = agent / "dist/gui/WorkPulseAgent/WorkPulseAgent.exe"
+    executable = options.bundle.resolve() / "WorkPulseAgent.exe"
     internal = executable.parent / "_internal"
     if not executable.is_file() or not internal.is_dir():
         raise SystemExit("The GUI bundle is missing; build packaging/WorkPulseAgent-gui.spec and verify it first.")
@@ -43,7 +45,7 @@ def main():
             raise SystemExit("Unexpected development/private data in runtime bundle; compilation refused.")
     build = agent / "build"
     build.mkdir(exist_ok=True)
-    command = [str(options.compiler), str(agent / "WorkPulseAgent.iss")]
+    command = [str(options.compiler), "/DAgentBundleDir=" + str(executable.parent), str(agent / "WorkPulseAgent.iss")]
     compiled = subprocess.run(command, cwd=agent, capture_output=True)
     (build / "release-compile.log").write_bytes(compiled.stdout + compiled.stderr)
     if compiled.returncode:

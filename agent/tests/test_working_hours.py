@@ -69,7 +69,7 @@ class WorkingHoursTests(unittest.TestCase):
 
     def test_console_agent_outside_hours_never_starts_listeners(self):
         messages = []
-        agent = ActivityAgent(policy=Mock(allows=Mock(return_value=False), describe=Mock(return_value="closed")), output=messages.append)
+        agent = ActivityAgent(policy=Mock(allows=Mock(return_value=False), describe=Mock(return_value="closed")), output=messages.append, authorization=lambda: True)
         with patch.object(agent.mouse_tracker, "start") as mouse, patch.object(agent.keyboard_tracker, "start") as keyboard:
             self.assertEqual(agent.run(), 0)
         mouse.assert_not_called()

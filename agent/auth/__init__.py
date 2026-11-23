@@ -1,1 +1,1 @@
-"""Authentication support; a backend contract is required before login is enabled."""
+"""Employee authentication using the existing custom-JWT WorkPulse API."""

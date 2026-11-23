@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, CalendarDays, Menu, Search, X } from 'lucide-react'
 import ProfileLink from './ProfileLink.jsx'
+import useAuth from '../../hooks/useAuth.js'
+import useApiData from '../../hooks/useApiData.js'
+import { apiRequest } from '../../services/api.js'
 
 export default function PageHeader({
   title,
@@ -11,6 +14,29 @@ export default function PageHeader({
   onMenuOpen,
 }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const { session } = useAuth()
+  const notificationData = useApiData(
+    { notifications: '/notifications?pageSize=20' },
+    { enabled: notificationsOpen, refreshMs: 15000 },
+  )
+  const [notificationMessage, setNotificationMessage] = useState('')
+  const [notificationBusy, setNotificationBusy] = useState(false)
+  const markRead = async (id) => {
+    setNotificationBusy(true)
+    try {
+      await apiRequest(
+        session.accessToken,
+        id ? `/notifications/${id}/read` : '/notifications/read-all',
+        { method: 'PATCH' },
+      )
+      notificationData.reload()
+      setNotificationMessage('Notifications updated.')
+    } catch (error) {
+      setNotificationMessage(error.message)
+    } finally {
+      setNotificationBusy(false)
+    }
+  }
   const notifications = useRef(null)
   const trigger = useRef(null)
   useEffect(() => {
@@ -94,12 +120,55 @@ export default function PageHeader({
                   <X size={16} />
                 </button>
               </div>
-              <p className="my-4 text-xs leading-relaxed text-muted">
-                No live notification service is connected. You can save your
-                preferred alerts in Settings.
-              </p>
+              {notificationData.loading && (
+                <p className="my-4 text-xs text-muted">
+                  Loading notifications…
+                </p>
+              )}
+              {Object.values(notificationData.errors).map((error) => (
+                <p key={error} role="alert" className="my-3 text-xs text-error">
+                  {error}
+                </p>
+              ))}
+              {(notificationData.data.notifications?.data || []).map((item) => (
+                <div
+                  key={item.id}
+                  className="my-3 border-b border-line pb-3 text-xs"
+                >
+                  <p>{item.message}</p>
+                  <small className="text-muted">
+                    {new Date(item.created_at).toLocaleString()}
+                  </small>
+                  {!item.read_at && (
+                    <button
+                      type="button"
+                      disabled={notificationBusy}
+                      className="mt-2 block text-primary"
+                      onClick={() => markRead(item.id)}
+                    >
+                      Mark read
+                    </button>
+                  )}
+                </div>
+              ))}
+              {notificationData.data.notifications?.data?.length === 0 && (
+                <p className="my-4 text-xs text-muted">No notifications.</p>
+              )}
+              <button
+                type="button"
+                disabled={notificationBusy}
+                className="mb-3 text-xs text-primary"
+                onClick={() => markRead()}
+              >
+                Mark all read
+              </button>
+              {notificationMessage && (
+                <p role="status" className="mb-3 text-xs">
+                  {notificationMessage}
+                </p>
+              )}
               <Link
-                to="/settings#settings-notifications"
+                to="/settings"
                 onClick={() => setNotificationsOpen(false)}
                 className="text-xs font-medium text-primary"
               >

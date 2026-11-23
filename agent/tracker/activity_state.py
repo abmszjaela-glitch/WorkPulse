@@ -18,6 +18,7 @@ class ActivityState:
         self._active_threshold: float | None = None
         self._active_total = 0.0
         self._active_anchor = self._last_activity
+        self._frozen_at = None
         # Agent supplies a privacy gate; standalone tracker behavior is unchanged.
         self.recording_allowed = lambda: True
 
@@ -30,6 +31,8 @@ class ActivityState:
     def touch(self) -> None:
         """Record activity without retaining any associated input data."""
         with self._lock:
+            if self._frozen_at is not None:
+                return
             now = monotonic()
             if self._active_threshold is not None:
                 self._active_total += self._active_projection(now)
@@ -43,7 +46,18 @@ class ActivityState:
         an activity update cannot interleave with the duration calculation.
         """
         with self._lock:
-            return max(0.0, monotonic() - self._last_activity)
+            now = self._frozen_at if self._frozen_at is not None else monotonic()
+            return max(0.0, now - self._last_activity)
+
+    def freeze(self):
+        """Freeze this one-run clock at Stop; listener cleanup is not work time."""
+        with self._lock:
+            if self._frozen_at is None:
+                self._frozen_at = monotonic()
+
+    def clamp_timestamp(self, now):
+        with self._lock:
+            return min(now, self._frozen_at) if self._frozen_at is not None else now
 
     def _active_projection(self, now: float) -> float:
         """Called only under _lock, after the active clock is configured."""
@@ -60,7 +74,7 @@ class ActivityState:
         if not isfinite(idle_threshold) or idle_threshold <= 0:
             raise ValueError("Idle threshold must be finite and positive.")
         with self._lock:
-            now = monotonic()
+            now = self._frozen_at if self._frozen_at is not None else monotonic()
             if self._active_threshold is None:
                 self._active_threshold = idle_threshold
                 self._active_anchor = now

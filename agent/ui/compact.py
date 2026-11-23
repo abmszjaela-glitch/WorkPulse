@@ -1,10 +1,8 @@
 """Compact reference-style screens over the existing desktop controller.
 
-No fake employee identity, sign-in success, offline persistence or upload status.
-Backend authentication is unavailable; signing in remains explicitly disabled.
+Employee identity is verified by the existing backend, never fabricated locally.
+Sign-in alone does not authorize tracking or enable device synchronization.
 """
-from datetime import datetime, timezone
-from time import monotonic
 import tkinter as tk
 from tkinter import messagebox
 
@@ -13,6 +11,7 @@ from PIL import Image, ImageDraw, ImageTk
 
 from ..version import APP_NAME, APP_VERSION
 from .desktop import DesktopApplication
+from .login import validate_login_fields
 
 NAVY, BLUE, MUTED = "#172554", "#2563EB", "#64748B"
 
@@ -33,8 +32,9 @@ class CompactDesktop(DesktopApplication):
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.root.report_callback_exception = self._callback_error
         self._consent_accepted = False
-        self._schedule_checked = -60.0
+        self._consent_owner = None
         self._compact_vars = []
+        self._auth_marker = None
         self._page = "summary"
         self._pages = {}
         icon = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
@@ -50,12 +50,14 @@ class CompactDesktop(DesktopApplication):
         self.feedback = self._var("No input is being collected.")
         self._host = ctk.CTkFrame(self.root, fg_color="white", corner_radius=0)
         self._host.pack(fill="both", expand=True)
-        for name in ("summary", "signin", "consent"):
+        for name in ("summary", "signin", "password", "consent", "device"):
             page = ctk.CTkScrollableFrame(self._host, fg_color="white", corner_radius=0, scrollbar_button_color="#E2E8F0", scrollbar_button_hover_color="#CBD5E1")
             self._pages[name] = page
         self._build_summary(self._pages["summary"])
         self._build_signin(self._pages["signin"])
+        self._build_password_change(self._pages["password"])
         self._build_consent(self._pages["consent"])
+        self._build_device(self._pages["device"])
         self.show_summary()
 
     def _var(self, value):
@@ -98,12 +100,14 @@ class CompactDesktop(DesktopApplication):
         box = ctk.CTkFrame(content, corner_radius=8, fg_color="#F8FAFC", border_width=1, border_color="#E2E8F0")
         box.pack(fill="x", pady=(0, 12))
         self._text(box, variable=self._policy_note, size=12, color="#475569", wrap=310).pack(padx=14, pady=12, anchor="w")
-        self._sync_heading = self._var("Not signed in")
-        self._sync_note = self._var("Backend sign-in and synchronization are not connected. No upload is claimed.")
-        self._connection_card = ctk.CTkFrame(content, corner_radius=8, fg_color="#FFFBEB", border_width=1, border_color="#FEF3C7")
+        self._account_heading = self._var("Not signed in")
+        self._account_note = self._var("Sign in with your registered employee account.")
+        self._connection_card = ctk.CTkFrame(content, corner_radius=8, fg_color="#F8FAFC", border_width=1, border_color="#E2E8F0")
         self._connection_card.pack(fill="x", pady=(0, 17))
-        self._text(self._connection_card, variable=self._sync_heading, size=12, bold=True, color="#B45309").pack(anchor="w", padx=14, pady=(10, 0))
-        self._text(self._connection_card, variable=self._sync_note, size=12, color="#B45309", wrap=310).pack(anchor="w", padx=14, pady=(2, 12))
+        self._account_heading_label = self._text(self._connection_card, variable=self._account_heading, size=13, bold=True, color=NAVY)
+        self._account_heading_label.pack(anchor="w", padx=14, pady=(10, 0))
+        self._account_note_label = self._text(self._connection_card, variable=self._account_note, size=12, color=MUTED, wrap=310)
+        self._account_note_label.pack(anchor="w", padx=14, pady=(2, 12))
         self._heading = self._var("Session paused")
         self._text(content, variable=self._heading, size=18, bold=True).pack(anchor="w")
         self._text(content, "Summary of this local session.", size=12, color=MUTED).pack(anchor="w", pady=(0, 12))
@@ -126,26 +130,18 @@ class CompactDesktop(DesktopApplication):
             row.grid_columnconfigure(1, weight=1)
             self._text(row, title, size=12, color=MUTED, wrap=155).grid(row=0, column=0, sticky="w", padx=(0, 10))
             self._text(row, variable=self.values[key], size=12, bold=True, wrap=165).grid(row=0, column=1, sticky="e")
-        rows = ctk.CTkFrame(content, corner_radius=8, fg_color="#FAFCFF", border_width=1, border_color="#EAF2FF")
-        rows.pack(fill="x", pady=(0, 12))
-        self._next_window = self._var("See working-hours policy")
-        self._buffer = self._var("Not connected")
-        for title, variable in (("Next work window", self._next_window), ("Local cached buffer", self._buffer)):
-            row = ctk.CTkFrame(rows, fg_color="transparent")
-            row.pack(fill="x", padx=12, pady=6)
-            self._text(row, title, size=12, color=MUTED, wrap=155).pack(side="left")
-            self._text(row, variable=variable, size=12, wrap=175).pack(side="right")
         controls = ctk.CTkFrame(content, fg_color="transparent")
         controls.pack(fill="x", pady=(0, 8))
-        self.start_button = self._button(controls, "Start / resume", self.start_tracking, width=130)
+        self.start_button = self._button(controls, "Start / resume", self.start_tracking, width=130, state="disabled")
         self.start_button.pack(side="left")
         self._button(controls, "Pause", self.pause, secondary=True, width=62).pack(side="left", padx=6)
         self._button(controls, "Emergency stop", self.emergency_stop, secondary=True, danger=True, width=125).pack(side="right")
         self._button(content, "Sign out", self._sign_out, secondary=True, danger=True).pack(fill="x", pady=(0, 4))
         links = ctk.CTkFrame(content, fg_color="transparent")
         links.pack(fill="x")
-        ctk.CTkButton(links, text="Sign in", command=lambda: self._show_page("signin"), fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=80, height=25).pack(side="left")
+        ctk.CTkButton(links, text="Sign in", command=self._open_signin, fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=80, height=25).pack(side="left")
         ctk.CTkButton(links, text="Details", command=self._show_details, fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=80, height=25).pack(side="left")
+        ctk.CTkButton(links, text="Connect device", command=lambda: self._show_page("device"), fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=100, height=25).pack(side="left")
         ctk.CTkButton(links, text="Privacy notice", command=lambda: self._show_page("consent"), fg_color="transparent", text_color=BLUE, hover_color="#EFF6FF", width=120, height=25).pack(side="right")
 
     def _build_signin(self, page):
@@ -162,16 +158,115 @@ class CompactDesktop(DesktopApplication):
         self._text(content, "Password", size=12, bold=True).pack(anchor="w")
         self.password_entry = ctk.CTkEntry(content, textvariable=self._password, show="●", height=38, corner_radius=7, fg_color="white", border_color="#DBEAFE", text_color=NAVY)
         self.password_entry.pack(fill="x", pady=(5, 8))
-        self._text(content, "Sign-in unavailable: backend authentication is not configured.", size=11, color="#B45309", wrap=330).pack(anchor="w", pady=(0, 12))
-        self.signin_button = self._button(content, "Sign In", lambda: None, state="disabled")
+        self._auth_message = self._var("Sign in with your registered employee account.")
+        self._text(content, variable=self._auth_message, size=12, color="#B45309", wrap=330).pack(anchor="w", pady=(0, 12))
+        self.signin_button = self._button(content, "Sign In", self._submit_login)
         self.signin_button.pack(fill="x", pady=(0, 15))
-        self.email_entry.configure(state="disabled")
-        self.password_entry.configure(state="disabled")
+        self.password_entry.bind("<Return>", self._submit_login)
         self._text(content, "Forgot password? Contact your administrator", size=12, color=BLUE, wrap=330).pack(pady=(0, 18))
         note = ctk.CTkFrame(content, corner_radius=8, fg_color="#EFF6FF", border_width=1, border_color="#DBEAFE")
         note.pack(fill="x")
         self._text(note, "Tracking requires explicit consent and applicable authorization. This screen never starts tracking.", size=12, color="#1D4ED8", wrap=310).pack(padx=12, pady=12)
         self._button(content, "Back to session", self.show_summary, secondary=True).pack(fill="x", pady=(16, 0))
+
+    def _build_password_change(self, page):
+        content = ctk.CTkFrame(page, fg_color="white")
+        content.pack(fill="both", expand=True, padx=14, pady=20)
+        brand = ctk.CTkFrame(content, fg_color="transparent")
+        brand.pack(fill="x", pady=(0, 18))
+        self._brand(brand)
+        self._text(content, "Change temporary password", size=19, bold=True).pack(anchor="w")
+        self._text(content, "Your administrator created this account with a temporary password. Choose your own password before continuing.", color=MUTED).pack(anchor="w", pady=(6, 18))
+        self._current_password, self._new_password, self._confirm_password = self._var(""), self._var(""), self._var("")
+        self._password_entries = []
+        for label, variable in (("Current temporary password", self._current_password), ("New password", self._new_password), ("Confirm new password", self._confirm_password)):
+            self._text(content, label, size=12, bold=True).pack(anchor="w")
+            entry = ctk.CTkEntry(content, textvariable=variable, show="●", height=38, corner_radius=7, fg_color="white", border_color="#DBEAFE", text_color=NAVY)
+            entry.pack(fill="x", pady=(5, 14))
+            self._password_entries.append(entry)
+        self._password_entries[-1].bind("<Return>", self._submit_password_change)
+        self._text(content, "At least 12 characters; uppercase, lowercase, a number and a symbol. Maximum 72 UTF-8 bytes.", size=12, color=MUTED).pack(anchor="w", pady=(0, 12))
+        self._change_message = self._var("")
+        self._text(content, variable=self._change_message, size=12, color="#B45309").pack(anchor="w", pady=(0, 12))
+        self.change_password_button = self._button(content, "Update password", self._submit_password_change)
+        self.change_password_button.pack(fill="x")
+        self._button(content, "Sign out", self._sign_out, secondary=True).pack(fill="x", pady=(12, 0))
+
+    def _open_signin(self):
+        self.pause()
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        self._show_page("password" if auth.get("state") == "password_required" else "signin")
+
+    def _submit_login(self, _event=None):
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if auth.get("state") in ("signing_in", "checking_session", "changing_password", "signed_in"):
+            return
+        email, password = self._email.get().strip(), self._password.get()
+        error = validate_login_fields(email, password)
+        if error:
+            self._auth_message.set(error)
+            return
+        self._password.set("")
+        try:
+            self.controller.request_auth("login", email, password)
+            self.signin_button.configure(state="disabled")
+            self._auth_message.set("Signing in…")
+        finally:
+            del password
+
+    def _submit_password_change(self, _event=None):
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if auth.get("state") != "password_required":
+            return
+        current, new, confirm = self._current_password.get(), self._new_password.get(), self._confirm_password.get()
+        if not current:
+            self._change_message.set("Enter your current temporary password.")
+            return
+        if new != confirm:
+            self._change_message.set("New passwords do not match.")
+            return
+        if (len(new) < 12 or len(new.encode("utf-8")) > 72 or not any(c.isupper() for c in new)
+                or not any(c.islower() for c in new) or not any(c.isdigit() for c in new)
+                or not any(not c.isalnum() for c in new) or new == current):
+            self._change_message.set("Choose a different password meeting all the requirements above.")
+            return
+        self._clear_password_fields()
+        self.controller.request_auth("change_password", current, new)
+        self.change_password_button.configure(state="disabled")
+        self._change_message.set("Updating password…")
+        del current, new, confirm
+
+    def _clear_password_fields(self):
+        for name in ("_password", "_current_password", "_new_password", "_confirm_password", "_activation_code"):
+            variable = getattr(self, name, None)
+            if variable is not None:
+                variable.set("")
+
+    def _render_auth(self, auth):
+        if self._consent_owner != auth.get("user_id"):
+            self._consent_accepted = False
+        marker = (auth.get("revision"), auth.get("state"), auth.get("message"))
+        if marker == self._auth_marker:
+            return
+        self._auth_marker = marker
+        state = auth.get("state", "signed_out")
+        busy = state in ("signing_in", "checking_session", "changing_password")
+        enabled = not busy and state == "signed_out"
+        self.signin_button.configure(state="normal" if enabled else "disabled", text="Signing in…" if busy else "Sign In")
+        self.email_entry.configure(state="normal" if enabled else "disabled")
+        self.password_entry.configure(state="normal" if enabled else "disabled")
+        self.change_password_button.configure(state="normal" if state == "password_required" else "disabled")
+        for entry in self._password_entries:
+            entry.configure(state="disabled" if busy else "normal")
+        message = auth.get("message", "Sign in with your registered employee account.")
+        self._auth_message.set(message)
+        self._change_message.set(message)
+        if state == "password_required":
+            self._show_page("password")
+        elif state == "signed_in" and self._page in ("signin", "password"):
+            self.show_summary()
+        elif state == "signed_out" and self._page == "password":
+            self._show_page("signin")
 
     def _build_consent(self, page):
         content = ctk.CTkFrame(page, fg_color="white")
@@ -179,6 +274,8 @@ class CompactDesktop(DesktopApplication):
         brand = ctk.CTkFrame(content, fg_color="transparent")
         brand.pack(fill="x", pady=(0, 16))
         self._brand(brand)
+        self._server_policy = self._var("Connect this device to load the current organization privacy policy.")
+        self._text(content, variable=self._server_policy, size=12, color=MUTED, wrap=335).pack(anchor="w", pady=(0, 12))
         self._text(content, "Before we start", size=19, bold=True).pack(anchor="w")
         self._text(content, "Understand exactly what WorkPulse records before authorizing a local session.", color=MUTED, wrap=335).pack(anchor="w", pady=(3, 18))
         for heading, rows, background, color, border in (
@@ -195,24 +292,66 @@ class CompactDesktop(DesktopApplication):
         self._text(content, f"WorkPulse Agent {APP_VERSION} · Transparent activity tracking", size=10, color=MUTED, wrap=335).pack(pady=(16, 0))
         self._text(content, "Consent alone does not start tracking or sign you in.", size=11, color=MUTED, wrap=335).pack()
 
+    def _build_device(self, page):
+        content = ctk.CTkFrame(page, fg_color="white")
+        content.pack(fill="both", expand=True, padx=14, pady=20)
+        self._text(content, "Connect this device", size=19, bold=True).pack(anchor="w")
+        self._text(content, "Ask your administrator to generate an Agent activation code for your employee account in Employees. Paste it here once. Connecting does not start tracking.", color=MUTED).pack(anchor="w", pady=(8, 18))
+        self._activation_code = self._var("")
+        self._device_message = self._var("")
+        self._text(content, "Activation code", size=12, bold=True).pack(anchor="w")
+        ctk.CTkEntry(content, textvariable=self._activation_code, show="●", height=38).pack(fill="x", pady=(6, 14))
+        self._button(content, "Connect device", self._activate_device).pack(fill="x")
+        self._text(content, variable=self._device_message, color=MUTED).pack(anchor="w", pady=14)
+        self._button(content, "Back to session", self.show_summary, secondary=True).pack(fill="x")
+
+    def _activate_device(self):
+        if not self.controller.desktop_snapshot().get("auth", {}).get("signed_in"):
+            self._show_page("signin")
+            return
+        code = self._activation_code.get()
+        self._activation_code.set("")
+        try:
+            self.controller.activate_device(code)
+            self._device_message.set("Connecting securely…")
+        except (ValueError, RuntimeError):
+            self._device_message.set("Enter a valid activation code from your administrator.")
+        finally:
+            del code
+
     def _show_page(self, page):
-        if hasattr(self, "_password"):
-            self._password.set("")
+        self._clear_password_fields()
         for frame in self._pages.values():
             frame.pack_forget()
         self._pages[page].pack(fill="both", expand=True)
         self._page = page
-        self.root.title(f"{APP_NAME} {APP_VERSION} — " + {"summary": "Paused", "signin": "Sign In", "consent": "Setup"}[page])
+        self.root.title(f"{APP_NAME} {APP_VERSION} — " + {"summary": "Paused", "signin": "Sign In", "password": "Change Password", "consent": "Setup", "device": "Connect Device"}[page])
 
     def show_summary(self):
         self._show_page("summary")
 
     def _accept_consent(self):
-        self._consent_accepted = True
-        self.show_summary()
-        self.feedback.set("Privacy notice accepted. Start the session explicitly when authorized.")
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if not auth.get("signed_in"):
+            self._show_page("signin")
+            return
+        self.controller.accept_consent()
+        self.feedback.set("Recording your consent with the server. Start explicitly after confirmation.")
 
     def start_tracking(self):
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if auth.get("state") in ("password_required", "changing_password"):
+            self._show_page("password")
+            return
+        if not auth.get("signed_in"):
+            self.feedback.set("Sign in with a valid employee account before starting tracking.")
+            self._show_page("signin")
+            return
+        if not self.controller.desktop_snapshot().get("synchronization", {}).get("ready"):
+            self._show_page("device")
+            return
+        if self._consent_owner != auth.get("user_id"):
+            self._consent_accepted = False
         if not self._consent_accepted:
             self._show_page("consent")
             return
@@ -221,21 +360,46 @@ class CompactDesktop(DesktopApplication):
     def _sign_out(self):
         self.controller.request("logout")
         self._consent_accepted = False
+        self._consent_owner = None
         self._email.set("")
         self._show_page("signin")
 
     def show_privacy(self):
-        messagebox.showinfo("WorkPulse privacy policy", "Recorded: aggregate mouse/key activity counts, active/idle time, application names and durations.\n\nNever recorded: key contents, passwords, screenshots, window titles, document names or browsing content.\n\nTracking requires explicit authorization and working-hours policy checks. Manual stop disables automatic restart.\n\nBackend authentication and uploads are not connected. No offline saving/upload promise is made by this UI. Uninstall retains local employee data.", parent=self.root)
+        messagebox.showinfo("WorkPulse privacy policy", "Recorded: aggregate mouse/key activity counts, active/idle time, application names and durations.\n\nNever recorded: key contents, passwords, screenshots, window titles, document names or browsing content.\n\nTracking requires explicit authorization and working-hours policy checks. Manual stop disables automatic restart.\n\nSign-in uses the WorkPulse backend. Access tokens are kept in Windows Credential Manager; passwords are never saved. Device activation and server-recorded consent are required. Authorized aggregate intervals are encrypted locally and uploaded with device authentication. Uninstall retains local employee data.", parent=self.root)
 
     def _show_details(self):
         view = self._last_view
-        messagebox.showinfo("Activity details", f"Mouse movement events: {view['mouse_movements']}\nMouse clicks: {view['mouse_clicks']}\nAnonymous key presses: {view['key_presses']}\nForeground application: {view['active_app']}\n\nLast successful synchronization: {view['last_sync']}\n\n{self.controller.policy.describe()}", parent=self.root)
+        messagebox.showinfo("Activity details", f"Mouse movement events: {view['mouse_movements']}\nMouse clicks: {view['mouse_clicks']}\nAnonymous key presses: {view['key_presses']}\nForeground application: {view['active_app']}\n\nSynchronization: {view['sync']}\nLast successful synchronization: {view['last_sync']}\n\nEmployee sign-in and device synchronization are separate. Device activation and current policy consent are required before collecting or uploading aggregate intervals.\n\n{self.controller.policy.describe()}", parent=self.root)
+
+    def _render_account(self, auth):
+        """Login success is independent of device connectivity/acknowledgement."""
+        if auth.get("signed_in"):
+            self._account_heading.set("Signed in successfully")
+            self._account_note.set(auth["email"])
+            background, border, color = "#F0FDF4", "#BBF7D0", "#15803D"
+        elif auth.get("state") in ("password_required", "changing_password"):
+            self._account_heading.set("Password change required")
+            self._account_note.set(auth.get("message", ""))
+            background, border, color = "#FFFBEB", "#FDE68A", "#B45309"
+        elif auth.get("state") in ("checking_session", "signing_in"):
+            self._account_heading.set("Verifying employee account…")
+            self._account_note.set(auth.get("message", ""))
+            background, border, color = "#EFF6FF", "#DBEAFE", "#1D4ED8"
+        else:
+            self._account_heading.set("Not signed in")
+            self._account_note.set(auth.get("message", "Sign in with your registered employee account."))
+            background, border, color = "#F8FAFC", "#E2E8F0", MUTED
+        self._connection_card.configure(fg_color=background, border_color=border)
+        self._account_heading_label.configure(text_color=color)
+        self._account_note_label.configure(text_color=color)
 
     def _poll(self):
         super()._poll()
         if self._closing:
             return
         view = self._last_view
+        auth = view.get("auth", {})
+        self._render_auth(auth)
         active = view["tracking"] == "Tracking ON" and not self._error_message
         idle = active and view.get("activity_status") == "IDLE"
         state = "Idle" if idle else ("Tracking ON" if active else "Paused")
@@ -245,25 +409,29 @@ class CompactDesktop(DesktopApplication):
         self._duration_vars["total"].set(short_duration(view["active_seconds"] + view["idle_seconds"]))
         self._duration_vars["active"].set(short_duration(view["active_seconds"]))
         self._duration_vars["idle"].set(short_duration(view["idle_seconds"]))
-        if view["sync"].startswith("Offline"):
-            self._sync_heading.set("Offline Mode")
-            self._sync_note.set("The synchronization controller reported an offline state. Upload is not confirmed.")
-        else:
-            self._sync_heading.set("Not signed in")
-            self._sync_note.set("Backend sign-in and synchronization are not connected. No upload is claimed.")
+        self._render_account(auth)
+        sync = view.get("synchronization", {})
+        self._server_policy.set(sync.get("policy_content") or "Connect this device to load the current organization privacy policy.")
+        self._device_message.set(sync.get("message", ""))
+        if sync.get("ready") and sync.get("consent_accepted") and auth.get("signed_in"):
+            self._consent_accepted = True
+            self._consent_owner = auth.get("user_id")
+            if self._page in ("consent", "device"):
+                self.show_summary()
         self._policy_note.set("Tracking is paused outside your working hours. " + ("Your authorized session resumes automatically." if view.get("automatic_resume") else "Start explicitly during working hours.") if not view["policy_open"] else ("Tracking is active under your authorization. You can stop at any time." if active else "Tracking is paused. Starting requires your authorization."))
+        if auth.get("signed_in") and not sync.get("ready"):
+            self._policy_note.set(sync.get("message", "Connect this device before starting tracking."))
+        elif auth.get("signed_in") and sync.get("ready") and not sync.get("consent_accepted"):
+            self._consent_accepted = False
+            self._policy_note.set("Accept the current organization privacy policy before starting tracking.")
+            self.start_button.configure(state="normal")
         if self._error_message:
             self._policy_note.set(self._error_message)
-        if monotonic() - self._schedule_checked >= 60:
-            self._schedule_checked = monotonic()
-            opening = self.controller.policy.next_start()
-            self._next_window.set("Available now" if view["policy_open"] else (opening.strftime("%a, %I:%M %p") if opening else "See working-hours policy"))
-        self._buffer.set("Not connected")
         if self._page == "summary":
             self.root.title(f"{APP_NAME} {APP_VERSION} — {state}")
 
     def dispose(self):
-        self._password.set("")
+        self._clear_password_fields()
         self._compact_vars.clear()
         super().dispose()
         self._duration_vars.clear()

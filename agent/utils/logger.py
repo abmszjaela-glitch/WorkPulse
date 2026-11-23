@@ -44,6 +44,11 @@ EVENTS = {
     "desktop_callback_error": "Desktop callback failed; emergency stop requested.",
     "desktop_thread_error": "Desktop background worker failed; emergency stop requested.",
     "desktop_started": "Desktop window opened with tracking paused.",
+    "auth_signed_in": "Employee session verified; sign-in does not authorize tracking.",
+    "auth_signed_out": "Employee signed out locally; server revocation attempted.",
+    "auth_failed": "Employee authentication could not be completed.",
+    "auth_storage_error": "Secure employee credential storage is unavailable.",
+    "auth_password_changed": "Employee password changed; sign-in required again.",
 }
 _THROTTLED = frozenset({"tracking_error", "ui_error", "sync_succeeded", "sync_offline", "sync_failed", "sync_auth_expired", "startup_error", "desktop_callback_error", "desktop_thread_error"})
 _lock = Lock()

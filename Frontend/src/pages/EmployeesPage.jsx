@@ -17,19 +17,28 @@ import {
   TriangleAlert,
   UsersRound,
   UserRoundX,
+  KeyRound,
+  Activity,
 } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar.jsx'
 import EmployeeDialog from '../components/employees/EmployeeDialog.jsx'
+import DeviceActivationDialog from '../components/employees/DeviceActivationDialog.jsx'
+import { employeeRoles } from '../data/employees.js'
+import useAuth from '../hooks/useAuth.js'
+import useEmployeeDirectory from '../hooks/useEmployeeDirectory.js'
 import {
-  employeeCsv,
-  employeeDepartments,
-  employeeRoles,
-  filterEmployees,
-  managementEmployees,
-} from '../data/employees.js'
+  createEmployee,
+  updateEmployee,
+  deactivateEmployees,
+  assignDepartment,
+  exportEmployees,
+  setEmployeeStatus,
+} from '../services/employees.js'
+import { employeePayload } from '../utils/employees.js'
 
 export default function EmployeesPage() {
-  const [rows, setRows] = useState(managementEmployees)
+  const { session } = useAuth()
+  const token = session.accessToken
   const [search, setSearch] = useState('')
   const [department, setDepartment] = useState('')
   const [role, setRole] = useState('')
@@ -38,16 +47,28 @@ export default function EmployeesPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(8)
   const [modal, setModal] = useState(null)
+  const [deviceEmployee, setDeviceEmployee] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [notice, setNotice] = useState('')
   const selectAll = useRef(null)
-  const filtered = filterEmployees(rows, search, department, role, status)
-  const pages = Math.max(1, Math.ceil(filtered.length / pageSize))
-  const currentPage = Math.min(page, pages)
-  const visible = filtered.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
+  const {
+    rows,
+    total,
+    summary,
+    departments,
+    loading,
+    error,
+    metadataError,
+    reload,
+  } = useEmployeeDirectory(
+    token,
+    { search, departmentId: department, role, status, page, pageSize },
+    setPage,
   )
+  const filtered = rows
+  const pages = Math.max(1, Math.ceil(total / pageSize))
+  const currentPage = Math.min(page, pages)
+  const visible = rows
   const allChecked =
     visible.length > 0 && visible.every((row) => selected.includes(row.id))
   const someChecked = visible.some((row) => selected.includes(row.id))
@@ -74,76 +95,106 @@ export default function EmployeesPage() {
     setPage(1)
     setSelected([])
   }
-  const saveEmployee = (data, originalId) => {
-    const next = Object.fromEntries(
-      Object.entries(data).map(([key, value]) => [key, value.trim()]),
-    )
-    if (!next.name || !next.id || !next.email)
-      return { message: 'Name, email and employee ID are required.' }
+  const saveEmployee = async (data, originalId) => {
     if (
-      rows.some(
-        (row) =>
-          row.id !== originalId &&
-          row.email.toLowerCase() === next.email.toLowerCase(),
+      !data.firstName?.trim() ||
+      !data.lastName?.trim() ||
+      !data.employeeCode?.trim() ||
+      !data.email?.trim()
+    )
+      return {
+        message: 'First name, last name, email and employee ID are required.',
+      }
+    try {
+      const original = originalId
+        ? modal?.employee || rows.find((row) => row.id === originalId)
+        : null
+      const payload = employeePayload(data, original)
+      if (originalId && !Object.keys(payload).length) return null
+      const saved = originalId
+        ? await updateEmployee(token, originalId, payload)
+        : await createEmployee(token, payload)
+      setSelected([])
+      setPage(1)
+      if (!originalId) {
+        setSearch(saved.employee_code)
+        setDepartment('')
+        setRole('')
+        setStatus('')
+      }
+      reload()
+      setNotice(
+        originalId
+          ? 'Employee changes saved to the database.'
+          : 'Employee created in the database. Showing the saved employee.',
       )
-    )
-      return { field: 'email', message: 'Email already exists.' }
-    if (
-      rows.some(
-        (row) =>
-          row.id !== originalId &&
-          row.id.toLowerCase() === next.id.toLowerCase(),
+      return null
+    } catch (failure) {
+      return { message: failure.message }
+    }
+  }
+  const bulkUpdate = async (newDepartment) => {
+    const ids = modal.targets?.map((row) => row.id) || selected
+    if (!ids.length) return { message: 'Select an employee first.' }
+    try {
+      if (modal.type === 'department') {
+        const failed = []
+        for (const id of ids) {
+          try {
+            await assignDepartment(token, id, newDepartment)
+          } catch {
+            failed.push(id)
+          }
+        }
+        reload()
+        setPage(1)
+        setSelected(failed)
+        if (failed.length)
+          return {
+            message:
+              ids.length -
+              failed.length +
+              ' updated; ' +
+              failed.length +
+              ' could not be reassigned. Reload and retry the remaining employees.',
+          }
+      } else {
+        await deactivateEmployees(token, ids)
+        reload()
+        setPage(1)
+        setSelected([])
+      }
+      setNotice(ids.length + ' employee account(s) updated in the database.')
+      return null
+    } catch (failure) {
+      return { message: failure.message }
+    }
+  }
+  const exportCsv = async () => {
+    try {
+      downloadCsv(
+        await exportEmployees(token, {
+          search,
+          departmentId: department,
+          role,
+          status,
+        }),
+        'workpulse-employees.csv',
       )
-    )
-      return { field: 'id', message: 'Employee ID already exists.' }
-    setRows((previous) =>
-      originalId
-        ? previous.map((row) =>
-            row.id === originalId ? { ...row, ...next } : row,
-          )
-        : [
-            ...previous,
-            { ...next, agent: 'Not installed', lastActive: 'Never' },
-          ],
-    )
-    setSelected([])
-    setNotice(
-      originalId
-        ? 'Employee updated in this preview.'
-        : 'Employee added to this preview.',
-    )
-    return null
+      setNotice('Employee CSV downloaded from the database.')
+    } catch (failure) {
+      setNotice(failure.message)
+    }
   }
-  const bulkUpdate = (newDepartment) => {
-    setRows((previous) =>
-      previous.map((row) =>
-        (
-          modal.targets
-            ? modal.targets.some((target) => target.id === row.id)
-            : selected.includes(row.id)
-        )
-          ? {
-              ...row,
-              ...(modal.type === 'department'
-                ? { department: newDepartment }
-                : {
-                    status: 'Deactivated',
-                    agent: row.agent === 'Connected' ? 'Offline' : row.agent,
-                  }),
-            }
-          : row,
-      ),
-    )
-    setNotice(
-      `${modal.targets?.length || selected.length} employee account${(modal.targets?.length || selected.length) === 1 ? '' : 's'} updated in this preview.`,
-    )
-    setSelected([])
+  const activate = async (employee) => {
+    try {
+      await setEmployeeStatus(token, employee.id, true)
+      reload()
+      setNotice('Employee account activated.')
+    } catch (failure) {
+      setNotice(failure.message)
+    }
   }
-  const exportCsv = () => {
-    downloadCsv(employeeCsv(filtered), 'workpulse-employees.csv')
-    setNotice(`Exported ${filtered.length} employee records.`)
-  }
-  const active = rows.filter((row) => row.status === 'Active').length
   return (
     <div className="dashboard-shell employee-management">
       <Sidebar
@@ -192,6 +243,7 @@ export default function EmployeesPage() {
               <Button
                 type="button"
                 variant="primary"
+                disabled={loading || !!error || !!metadataError || !summary}
                 onClick={() => setModal({ type: 'add' })}
               >
                 <Plus size={17} />
@@ -200,10 +252,26 @@ export default function EmployeesPage() {
             </div>
           </div>
           <p className="em-preview-label">
-            Preview data · Changes are temporary and reset when this page
-            reloads.
+            Employee records are loaded from the database. Changes require
+            server confirmation.
           </p>
           <Notice onDismiss={() => setNotice('')}>{notice}</Notice>
+          {(error || metadataError) && (
+            <div
+              role="alert"
+              className="rounded-xl border border-error/20 bg-red-50 p-4 text-sm text-error"
+            >
+              {error || metadataError}
+              <button type="button" className="ml-3 underline" onClick={reload}>
+                Retry loading employees
+              </button>
+            </div>
+          )}
+          {loading && (
+            <p role="status" className="my-4 text-sm text-muted">
+              Loading employees…
+            </p>
+          )}
           <section
             className="management-stats"
             aria-label="Employee account summary"
@@ -211,29 +279,32 @@ export default function EmployeesPage() {
             {[
               {
                 label: 'Total Employees',
-                count: rows.length,
-                detail: 'Employees in this preview',
+                count: summary?.totalEmployees ?? '—',
+                detail: 'Registered accounts',
                 Icon: UsersRound,
                 tone: 'blue',
               },
               {
                 label: 'Active Accounts',
-                count: active,
-                detail: `${Math.round((active / Math.max(1, rows.length)) * 100)}% active rate`,
+                count: summary?.activeAccounts ?? '—',
+                detail: summary?.totalEmployees
+                  ? Math.round(
+                      (summary.activeAccounts / summary.totalEmployees) * 100,
+                    ) + '% active rate'
+                  : 'No registered accounts',
                 Icon: ShieldCheck,
                 tone: 'green',
               },
               {
                 label: 'Deactivated',
-                count: rows.length - active,
+                count: summary?.deactivated ?? '—',
                 detail: 'Accounts disabled',
                 Icon: UserRoundX,
                 tone: 'red',
               },
               {
                 label: 'Agent Not Installed',
-                count: rows.filter((row) => row.agent === 'Not installed')
-                  .length,
+                count: summary?.agentNotInstalled ?? '—',
                 detail: 'Pending consent / setup',
                 Icon: TriangleAlert,
                 tone: 'muted',
@@ -265,7 +336,7 @@ export default function EmployeesPage() {
               />
             </label>
             {[
-              ['Department', department, setDepartment, employeeDepartments],
+              ['Department', department, setDepartment, departments],
               ['Role', role, setRole, employeeRoles],
               ['Status', status, setStatus, ['Active', 'Deactivated']],
             ].map(([label, value, setter, choices]) => (
@@ -274,7 +345,12 @@ export default function EmployeesPage() {
                 <select value={value} onChange={changeFilter(setter)}>
                   <option value="">{label}: All</option>
                   {choices.map((choice) => (
-                    <option key={choice}>{choice}</option>
+                    <option
+                      key={typeof choice === 'string' ? choice : choice.id}
+                      value={typeof choice === 'string' ? choice : choice.id}
+                    >
+                      {typeof choice === 'string' ? choice : choice.name}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -395,7 +471,7 @@ export default function EmployeesPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="employee-id">{employee.id}</td>
+                      <td className="employee-id">{employee.employeeCode}</td>
                       <td>{employee.department}</td>
                       <td>
                         <span
@@ -423,6 +499,20 @@ export default function EmployeesPage() {
                       </td>
                       <td>
                         <div className="row-actions">
+                          <Link
+                            aria-label={`Activity for ${employee.name}`}
+                            to={'/activity-details?employeeId=' + employee.id}
+                          >
+                            <Activity size={16} />
+                          </Link>
+                          {employee.status === 'Active' && (
+                            <button
+                              aria-label={`Connect Agent for ${employee.name}`}
+                              onClick={() => setDeviceEmployee(employee)}
+                            >
+                              <KeyRound size={16} />
+                            </button>
+                          )}
                           <button
                             aria-label={`View ${employee.name}`}
                             onClick={() => setModal({ type: 'view', employee })}
@@ -435,6 +525,14 @@ export default function EmployeesPage() {
                           >
                             <Pencil size={16} />
                           </button>
+                          {employee.status === 'Deactivated' && (
+                            <button
+                              aria-label={'Activate ' + employee.name}
+                              onClick={() => activate(employee)}
+                            >
+                              <ShieldCheck size={16} />
+                            </button>
+                          )}
                           {employee.status === 'Active' && (
                             <button
                               aria-label={`Deactivate ${employee.name}`}
@@ -454,7 +552,7 @@ export default function EmployeesPage() {
                   ))}
                 </tbody>
               </table>
-              {filtered.length === 0 && (
+              {!loading && !error && filtered.length === 0 && (
                 <div className="empty-state">
                   <UsersRound size={28} />
                   <h2>No employees found</h2>
@@ -468,14 +566,9 @@ export default function EmployeesPage() {
             <div className="management-pagination">
               <p>
                 Showing{' '}
-                <strong>
-                  {filtered.length ? (currentPage - 1) * pageSize + 1 : 0}
-                </strong>{' '}
-                to{' '}
-                <strong>
-                  {Math.min(currentPage * pageSize, filtered.length)}
-                </strong>{' '}
-                of <strong>{filtered.length}</strong> employees
+                <strong>{total ? (currentPage - 1) * pageSize + 1 : 0}</strong>{' '}
+                to <strong>{Math.min(currentPage * pageSize, total)}</strong> of{' '}
+                <strong>{total}</strong> employees
               </p>
               <div>
                 <label>
@@ -484,6 +577,7 @@ export default function EmployeesPage() {
                     aria-label="Rows per page"
                     value={pageSize}
                     onChange={(event) => {
+                      setSelected([])
                       setPageSize(Number(event.target.value))
                       setPage(1)
                     }}
@@ -497,7 +591,10 @@ export default function EmployeesPage() {
                   <button
                     disabled={currentPage === 1}
                     aria-label="Previous page"
-                    onClick={() => setPage(currentPage - 1)}
+                    onClick={() => {
+                      setPage(currentPage - 1)
+                      setSelected([])
+                    }}
                   >
                     <ChevronLeft size={16} />
                   </button>
@@ -508,7 +605,10 @@ export default function EmployeesPage() {
                         currentPage === index + 1 ? 'page' : undefined
                       }
                       key={index}
-                      onClick={() => setPage(index + 1)}
+                      onClick={() => {
+                        setPage(index + 1)
+                        setSelected([])
+                      }}
                     >
                       {index + 1}
                     </button>
@@ -516,7 +616,10 @@ export default function EmployeesPage() {
                   <button
                     disabled={currentPage === pages}
                     aria-label="Next page"
-                    onClick={() => setPage(currentPage + 1)}
+                    onClick={() => {
+                      setPage(currentPage + 1)
+                      setSelected([])
+                    }}
                   >
                     <ChevronRight size={16} />
                   </button>
@@ -528,11 +631,17 @@ export default function EmployeesPage() {
       </div>
       {modal && (
         <EmployeeDialog
-          employees={rows}
+          departments={departments}
           modal={modal}
           onClose={() => setModal(null)}
           onSave={saveEmployee}
           onBulk={bulkUpdate}
+        />
+      )}
+      {deviceEmployee && (
+        <DeviceActivationDialog
+          employee={deviceEmployee}
+          onClose={() => setDeviceEmployee(null)}
         />
       )}
     </div>
