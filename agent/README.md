@@ -1,20 +1,24 @@
 # Foreground activity agent
 
-From the repository root, start the agent explicitly in a visible terminal:
+From the repository root, open the desktop, sign in and explicitly start tracking:
 
 ```powershell
-.\agent\venv\Scripts\python.exe -m agent.core.agent
+.\agent\venv\Scripts\python.exe agent/start_agent.py
 ```
 
-Alternatively, from the `agent` directory, use `python -m core.agent` with the
-virtual environment activated. Importing the module does not start tracking.
+Importing a module does not start tracking. The low-level `ActivityAgent` requires
+an explicit authorization callback; without one it stays paused and starts no
+listeners. The desktop supplies a callback bound to the verified employee and
+checks expiry on every input/foreground privacy gate. A cached token or a visible
+Start button is never sufficient authorization.
 
 The agent announces when tracking starts, prints cumulative mouse movement,
 mouse click and anonymous key press counts with `ACTIVE`/`IDLE` status and the
 current foreground process name, and prints a final summary on normal shutdown.
 It stores no window titles, document names, URLs, coordinates, individual keys,
-typed text or screenshots. Data stays in memory; no API requests, persistent
-files, services or autostart entries are created.
+typed text or screenshots. Tracking totals stay in memory; authentication uses
+the backend, while activity uploads remain unconnected. No persistent tracking
+files, services or autostart entries are created by starting a session.
 
 Set `TRACKING_INTERVAL`, `IDLE_THRESHOLD`, and `ACTIVE_WINDOW_INTERVAL` environment
 variables (seconds) before launch to override the defaults in `config/config.py`.
@@ -214,6 +218,8 @@ Manager through `auth/token_store.py`. There is no plaintext fallback. Passwords
 refresh tokens and employee profiles are not persisted. Cached tokens are verified
 on normal GUI launch without starting tracking. Expiration pauses tracking and
 requires sign-in again; this release does not rotate refresh tokens automatically.
+Signed-out, expired and temporary-password sessions cannot start from either the
+window or tray. The core also refuses collection without valid authorization.
 
 Temporary-password accounts open a change-password screen using the existing
 PUT `/auth/change-password` contract. They are not cached or authorized to start
@@ -256,8 +262,11 @@ and is never enabled automatically; see the startup section below.
 
 Set `DASHBOARD_URL` to the actual web dashboard URL. No frontend route is guessed.
 Lifecycle commands execute on a worker, separate from the tray and input callbacks.
-Pause stops the listeners; starting again creates a fresh in-memory tracking
-session, so previous console session totals are not carried forward.
+Pause stops every listener and freezes the employee's accumulated counts and
+active/idle/application-duration totals. Resume uses new listener instances and
+adds their run totals to completed totals, without re-adding a polled value or
+counting any paused wall time. Totals remain in memory for the same employee until
+sign-out or application exit. A different employee starts with zero totals.
 
 Monitoring remains local; employee authentication uses the backend. Logout
 stops tracking, removes the server-scoped cached token and attempts revocation. No data
@@ -276,7 +285,7 @@ $env:WORKING_TIMEZONE = 'Asia/Colombo'
 $env:WORKING_START = '09:00'
 $env:WORKING_END = '17:30'
 $env:WORKING_DAYS = '0,1,2,3,4'
-.\agent\venv\Scripts\python.exe -m agent.ui.tray
+.\agent\venv\Scripts\python.exe agent/start_agent.py
 ```
 
 Days use Monday=0 through Sunday=6. Times use 24-hour `HH:MM`; start is included,
@@ -285,8 +294,9 @@ Equal start/end is rejected, rather than silently enabling all-day tracking.
 Invalid settings or an unavailable IANA timezone prevent startup. Install the
 requirements, including `tzdata` on Windows. No backend policy endpoint is assumed.
 
-The tray always starts paused. An explicit **Start / restart local tracking**
-during allowed hours enables the current session and its scheduled resumption.
+The tray always starts paused. After verified employee sign-in, an explicit
+**Start / resume tracking** during allowed hours enables the current session and
+its scheduled resumption.
 At closing time, listeners stop and status says **Tracking PAUSED: outside working
 hours**. If the tray remains open, an automatically paused session resumes at the
 next allowed window with a visible **Tracking ON** notification. Start outside
@@ -299,11 +309,12 @@ cleanup runs on the worker so the tray menu remains responsive. A listener failu
 also disables automatic resumption. Windows may put the icon in its overflow
 area; pin WorkPulse to keep its status visible. The console remains visible too.
 
-The console entry point (`python -m agent.core.agent`) applies the same policy,
-prints the schedule/status, and stops its session when hours close; it does not
-automatically restart. Ctrl+C is its always-available emergency stop. Starting
-that command again is an explicit restart. Tray pause/resume creates a fresh
-in-memory agent session and does not combine previous session totals.
+The low-level console entry (`python -m agent.core.agent`) cannot authenticate an
+employee and therefore stays paused. Launch the desktop to sign in. Embedded
+callers must supply an authorization callback; a listener run still applies the
+working-hours and authentication gates and never automatically restarts itself.
+The tray preserves totals across these runs for the same employee; no interval
+payload is changed into a cumulative upload payload.
 
 Input events check the policy before updating counters or the activity timestamp.
 Foreground sampling checks it before querying and publishing process names.

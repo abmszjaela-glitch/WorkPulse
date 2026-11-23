@@ -13,6 +13,16 @@ A manual stop requires an explicit restart. Closing the window shuts down the
 listeners and exits. Normal minimize keeps a taskbar window; the application
 does not hide itself in an overflow-only tray. The tray can reopen the window.
 
+START AND RESUME VALIDATION
+Sign in with a valid employee account before starting. Signed-out, expired and
+temporary-password accounts cannot start tracking from the window or tray.
+Tracking also checks authentication while collecting, so logout/expiry stops
+further input counts. Privacy acceptance and working-hours checks still apply.
+Pause/resume keeps this employee's mouse, click, anonymous key and application
+duration totals, plus active/idle durations. Paused time is excluded. Emergency
+Stop keeps totals but requires an explicit authorized restart. Sign-out clears
+the in-memory totals; application exit starts a new session on the next launch.
+
 PRIVACY
 Read PRIVACY.txt before use. Counts are anonymous input-event totals, not key
 contents or text. No screenshots, window titles, URLs or document names are

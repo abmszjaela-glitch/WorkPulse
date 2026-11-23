@@ -106,7 +106,7 @@ class DesktopApplication:
             tk.Label(sync, textvariable=var, bg="white", fg="#475569", font=("Segoe UI", 10)).pack(anchor="w", pady=2)
         actions = tk.Frame(body, bg="#EFF6FF")
         actions.pack(fill="x", pady=(14, 0))
-        self.start_button = ttk.Button(actions, text="Start / Resume local tracking", style="Primary.TButton", command=self.start_tracking)
+        self.start_button = ttk.Button(actions, text="Start / Resume local tracking", style="Primary.TButton", command=self.start_tracking, state="disabled")
         self.start_button.pack(side="left")
         ttk.Button(actions, text="Pause", style="Action.TButton", command=self.pause).pack(side="left", padx=8)
         ttk.Button(actions, text="Open dashboard", style="Action.TButton", command=lambda: self.controller.request("dashboard")).pack(side="right")
@@ -114,7 +114,7 @@ class DesktopApplication:
         tk.Label(body, textvariable=self.policy_var, bg="#EFF6FF", fg="#475569", font=("Segoe UI", 9)).pack(anchor="w", pady=(12, 4))
         self.feedback = tk.StringVar(value="Tracking is paused. No input is being collected.")
         tk.Label(body, textvariable=self.feedback, bg="#EFF6FF", fg="#172554", font=("Segoe UI", 9), wraplength=900, justify="left").pack(anchor="w")
-        tk.Label(body, text="Only aggregate counts and application names/durations. No key contents, screenshots or window titles.\nCounts refer to the current local session; restarting begins a new session. Closing stops tracking and exits.", bg="#EFF6FF", fg="#64748B", font=("Segoe UI", 9), justify="left", wraplength=900).pack(anchor="w", pady=(12, 0))
+        tk.Label(body, text="Only aggregate counts and application names/durations. No key contents, screenshots or window titles.\nPause/resume preserves this employee's session totals and excludes paused time. Signing out or closing ends the session.", bg="#EFF6FF", fg="#64748B", font=("Segoe UI", 9), justify="left", wraplength=900).pack(anchor="w", pady=(12, 0))
 
     def _tray_run(self):
         try:
@@ -129,10 +129,10 @@ class DesktopApplication:
         if self._closing or self._error_message:
             return
         auth = self.controller.desktop_snapshot().get("auth", {})
-        if auth.get("state") in ("password_required", "changing_password", "signing_in", "checking_session"):
-            self.feedback.set("Complete employee authentication before authorizing tracking.")
+        if not auth.get("signed_in"):
+            self.feedback.set("Sign in with a valid employee account before starting tracking.")
             return
-        identity = "You are signed in to your employee account." if auth.get("signed_in") else "You are not signed in to a backend employee session."
+        identity = "You are signed in to your employee account."
         if messagebox.askyesno("Authorize local tracking", identity + "\n\nAuthorize this local session to count mouse/key events and application usage during configured working hours?\n\nNo typed text, screenshots or window titles are collected. You can pause or stop at any time. Device synchronization is not enabled by sign-in.", parent=self.root):
             self.feedback.set("Local session explicitly authorized; checking working-hours policy.")
             self.controller.request("start")
@@ -185,8 +185,11 @@ class DesktopApplication:
             variable.set(duration_text(value) if key.endswith("seconds") else str(value))
         self.sync_var.set(view["sync"])
         self.last_sync_var.set("Last successful synchronization: " + view["last_sync"])
-        self.start_button.configure(state="disabled" if self._closing or not view["policy_open"] or view["tracking"] == "Tracking ON" or self._error_message else "normal")
-        if not self._closing and not self._error_message and not view["policy_open"]:
+        signed_in = view.get("auth", {}).get("signed_in", False)
+        self.start_button.configure(state="disabled" if self._closing or not signed_in or not view["policy_open"] or view["tracking"] == "Tracking ON" or self._error_message else "normal")
+        if not self._closing and not self._error_message and not signed_in:
+            self.feedback.set("Sign in with a valid employee account before starting tracking.")
+        elif not self._closing and not self._error_message and not view["policy_open"]:
             self.feedback.set("Outside configured working hours. No local tracking can be started.")
         if self._error_message:
             self.feedback.set(self._error_message)

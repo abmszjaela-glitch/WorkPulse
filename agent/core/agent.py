@@ -80,6 +80,7 @@ class ActivityAgent:
         *,
         output: Callable[[str], None] = _console_output,
         policy=None,
+        authorization: Callable[[], bool] | None = None,
     ) -> None:
         self.activity_state = (
             activity_state if activity_state is not None else ActivityState()
@@ -106,6 +107,7 @@ class ActivityAgent:
         self._run_lock = Lock()
         self._tracking_event = Event()
         self.policy = WorkingHoursPolicy() if policy is None else policy
+        self._authorization = authorization
         self.pause_reason = None
         self.activity_state.recording_allowed = self._recording_allowed
         self.active_window_tracker.recording_allowed = self._recording_allowed
@@ -116,15 +118,24 @@ class ActivityAgent:
 
     def _recording_allowed(self):
         try:
-            return not self._stop_event.is_set() and self.policy.allows()
+            return not self._stop_event.is_set() and self._authorized() and self.policy.allows()
         except Exception:
             return False  # Policy errors never permit collection.
+
+    def _authorized(self):
+        try:
+            return self._authorization is not None and self._authorization() is True
+        except Exception:
+            return False
+
+    def _blocked_reason(self):
+        return "authentication" if not self._authorized() else "working_hours"
 
     def _watch_policy(self, done):
         while not done.wait(config.WORKING_POLICY_CHECK_SECONDS):
             if not self._recording_allowed():
                 if not self._stop_event.is_set():
-                    self.pause_reason = "working_hours"
+                    self.pause_reason = self._blocked_reason()
                 self.stop()
                 return
 
@@ -228,9 +239,9 @@ class ActivityAgent:
         policy_worker = None
         try:
             if not self._recording_allowed() and not self._stop_event.is_set():
-                self.pause_reason = "working_hours"
-                get_logger().info("tracking_policy_paused")
-                self._output("Tracking PAUSED: outside working hours. " + self.policy.describe())
+                self.pause_reason = self._blocked_reason()
+                self._output("Tracking PAUSED: sign in through the WorkPulse desktop before starting."
+                             if self.pause_reason == "authentication" else "Tracking PAUSED: outside working hours. " + self.policy.describe())
                 self.stop()
             if not self._stop_event.is_set():
                 get_logger().info("tracking_starting")
@@ -250,7 +261,7 @@ class ActivityAgent:
                     if self._stop_event.is_set():
                         break
                     if not self._recording_allowed():
-                        self.pause_reason = "working_hours"
+                        self.pause_reason = self._blocked_reason()
                         self.stop()
                         break
                     tracker.start()

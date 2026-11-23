@@ -32,6 +32,7 @@ class CompactDesktop(DesktopApplication):
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.root.report_callback_exception = self._callback_error
         self._consent_accepted = False
+        self._consent_owner = None
         self._compact_vars = []
         self._auth_marker = None
         self._page = "summary"
@@ -130,7 +131,7 @@ class CompactDesktop(DesktopApplication):
             self._text(row, variable=self.values[key], size=12, bold=True, wrap=165).grid(row=0, column=1, sticky="e")
         controls = ctk.CTkFrame(content, fg_color="transparent")
         controls.pack(fill="x", pady=(0, 8))
-        self.start_button = self._button(controls, "Start / resume", self.start_tracking, width=130)
+        self.start_button = self._button(controls, "Start / resume", self.start_tracking, width=130, state="disabled")
         self.start_button.pack(side="left")
         self._button(controls, "Pause", self.pause, secondary=True, width=62).pack(side="left", padx=6)
         self._button(controls, "Emergency stop", self.emergency_stop, secondary=True, danger=True, width=125).pack(side="right")
@@ -240,6 +241,8 @@ class CompactDesktop(DesktopApplication):
                 variable.set("")
 
     def _render_auth(self, auth):
+        if self._consent_owner != auth.get("user_id"):
+            self._consent_accepted = False
         marker = (auth.get("revision"), auth.get("state"), auth.get("message"))
         if marker == self._auth_marker:
             return
@@ -297,14 +300,26 @@ class CompactDesktop(DesktopApplication):
         self._show_page("summary")
 
     def _accept_consent(self):
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if not auth.get("signed_in"):
+            self._show_page("signin")
+            return
         self._consent_accepted = True
+        self._consent_owner = auth.get("user_id")
         self.show_summary()
         self.feedback.set("Privacy notice accepted. Start the session explicitly when authorized.")
 
     def start_tracking(self):
-        if self.controller.desktop_snapshot().get("auth", {}).get("state") in ("password_required", "changing_password"):
+        auth = self.controller.desktop_snapshot().get("auth", {})
+        if auth.get("state") in ("password_required", "changing_password"):
             self._show_page("password")
             return
+        if not auth.get("signed_in"):
+            self.feedback.set("Sign in with a valid employee account before starting tracking.")
+            self._show_page("signin")
+            return
+        if self._consent_owner != auth.get("user_id"):
+            self._consent_accepted = False
         if not self._consent_accepted:
             self._show_page("consent")
             return
@@ -313,6 +328,7 @@ class CompactDesktop(DesktopApplication):
     def _sign_out(self):
         self.controller.request("logout")
         self._consent_accepted = False
+        self._consent_owner = None
         self._email.set("")
         self._show_page("signin")
 

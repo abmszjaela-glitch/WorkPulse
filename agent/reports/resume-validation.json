@@ -1,0 +1,40 @@
+{
+  "tested_at_utc": "2026-11-23T06:39:25.5593027Z",
+  "regression_tests": {
+    "passed": 210,
+    "failed": 0
+  },
+  "final_focused_checks": {
+    "desktop": 8,
+    "core_agent": 20,
+    "failed": 0
+  },
+  "checks": {
+    "logout_and_employee_isolation": "PASS",
+    "expired_and_temporary_session_start": "PASS",
+    "input_gate_after_auth_loss": "PASS",
+    "repeated_poll_no_double_count": "PASS",
+    "pause_resume_counts": "PASS",
+    "paused_time_excluded": "PASS",
+    "emergency_requires_explicit_restart": "PASS",
+    "signed_out_start": "PASS"
+  },
+  "packaged_gui": {
+    "window_title": "WorkPulse Agent 1.0.0",
+    "window_was_visible": true,
+    "tray_was_visible": true,
+    "tracking_never_started": true,
+    "callback_error_seen": false,
+    "tracking": "Tracking PAUSED",
+    "employee_status": "signed_out"
+  },
+  "source_hashes": {
+    "core": "4207D4096C957D54264CAE47DCD5DB75127564EE3645037378B3EFCD38D14AF9",
+    "desktop": "985FAA0AC8544F2DE98C02C6414F690A9F1B414A511BBF838EC9C2CA1C8CEF51",
+    "tray": "844A149B273752F216FD85A9BB2B55686E83E188AE2AB5314E2E00F699018282"
+  },
+  "persistence": "Same employee in memory across pause/resume only; logout/application exit starts new totals",
+  "live_employee_activity": "NOT TESTED - synthetic authentication/listeners only",
+  "installed_upgrade": "NOT TESTED",
+  "windows_10": "NOT TESTED"
+}

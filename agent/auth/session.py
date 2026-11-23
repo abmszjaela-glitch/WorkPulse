@@ -35,8 +35,22 @@ class AgentAuthentication:
         with self._lock:
             return {"state": self._state, "message": self._message,
                     "email": self._session.email if self._session else "",
-                    "signed_in": self._state == "signed_in",
+                    "user_id": self._session.user_id if self._session else None,
+                    "signed_in": self._tracking_identity() is not None,
                     "revision": self._generation}
+
+    def _tracking_identity(self):
+        """Caller holds _lock. An expired or restricted session grants nothing."""
+        if (self._state == "signed_in" and self._session is not None
+                and not self._session.must_change_password
+                and self._clock() < self._session.expires_at):
+            return self._session.user_id
+        return None
+
+    def tracking_identity(self):
+        """Return a verified, currently valid employee ID, never a cached claim."""
+        with self._lock:
+            return self._tracking_identity()
 
     def begin(self, action, *values):
         with self._lock:

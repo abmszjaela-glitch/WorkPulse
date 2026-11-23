@@ -34,6 +34,7 @@ class CompactTests(unittest.TestCase):
         self.assertEqual(self.root.minsize(), (400, 590))
 
     def test_consent_navigation_does_not_authorize_or_start_tracking(self):
+        self.controller.view["auth"].update(state="signed_in", signed_in=True, user_id="synthetic-employee")
         self.app.start_tracking()
         self.assertEqual(self.app._page, "consent")
         self.app._accept_consent()
@@ -42,6 +43,20 @@ class CompactTests(unittest.TestCase):
         with patch("agent.ui.desktop.messagebox.askyesno", return_value=True):
             self.app.start_tracking()
         self.assertEqual(self.controller.commands, ["start"])
+
+    def test_signed_out_start_opens_login_without_consent_or_tracking(self):
+        self.app.start_tracking()
+        self.assertEqual(self.app._page, "signin")
+        self.assertFalse(self.app._consent_accepted)
+        self.assertEqual(self.controller.commands, [])
+
+    def test_employee_switch_requires_new_consent(self):
+        self.controller.view["auth"].update(state="signed_in", signed_in=True, user_id="employee-one")
+        self.app._accept_consent()
+        self.controller.view["auth"]["user_id"] = "employee-two"
+        self.app.start_tracking()
+        self.assertEqual(self.app._page, "consent")
+        self.assertEqual(self.controller.commands, [])
 
     def test_login_is_enabled_submits_to_controller_and_clears_password(self):
         self.app._show_page("signin")

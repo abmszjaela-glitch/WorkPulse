@@ -12,6 +12,7 @@ import pystray
 from PIL import Image, ImageDraw
 
 from ..core.agent import ActivityAgent
+from ..core.session_totals import SessionTotals
 from ..config import config
 from ..auth.token_store import WindowsTokenStore
 from ..auth.session import AgentAuthentication, AuthJob
@@ -82,6 +83,8 @@ class WorkPulseTray:
         self._control_lock = Lock()
         self._generation = 0
         self._agent = self._runner = self._worker = None
+        self._completed = SessionTotals()
+        self._metrics_owner = None
         self._open_window = open_window
         self._view_lock = Lock()
         self._view = {"mouse_movements": 0, "mouse_clicks": 0, "key_presses": 0,
@@ -100,7 +103,7 @@ class WorkPulseTray:
                 item("View tracking status", self._show_status, default=open_window is None),
                 item("Open dashboard", command("dashboard")),
                 pystray.Menu.SEPARATOR,
-                item("Start / restart local tracking", command("start")),
+                item("Start / resume tracking", command("start"), enabled=lambda _: self.authentication.tracking_identity() is not None),
                 item("Pause tracking", command("pause")),
                 item("EMERGENCY STOP", command("emergency")),
                 item(lambda _: self.state.snapshot()[1], None, enabled=False),
@@ -140,11 +143,17 @@ class WorkPulseTray:
         if self._agent is None:
             return
         summary = self._agent.get_summary()
-        values = {"mouse_movements": summary.mouse_movements, "mouse_clicks": summary.mouse_clicks,
-                  "key_presses": summary.key_presses, "active_app": summary.active_app or "Unavailable", "activity_status": summary.status}
-        values.update(self._agent.get_session_durations())
+        totals = self._completed.plus_run(summary, self._agent.get_session_durations())
+        values = {**totals.as_dict(), "active_app": summary.active_app or "Unavailable", "activity_status": summary.status}
         with self._view_lock:
             self._view.update(values)
+        return totals
+
+    def _reset_totals(self, owner=None):
+        self._completed = SessionTotals()
+        self._metrics_owner = owner
+        with self._view_lock:
+            self._view = {**self._completed.as_dict(), "active_app": "Not tracking", "activity_status": "PAUSED"}
 
     def _show_about(self, *_):
         self.icon.notify(f"{APP_NAME} {APP_VERSION}\n{APP_DESCRIPTION}\nPublisher display name: {PUBLISHER_DISPLAY_NAME}\nUnsigned; publisher identity is not verified.", "About WorkPulse Agent")
@@ -199,14 +208,19 @@ class WorkPulseTray:
             self._runner.join()  # Worker only; never blocks the tray loop.
             if self._agent.listeners_running:
                 raise RuntimeError("Listener shutdown unconfirmed.")
-            if self._open_window is not None:
-                self._cache_metrics()
+            self._completed = self._cache_metrics()
         self._agent = self._runner = None
+        with self._view_lock:
+            self._view.update(active_app="Paused", activity_status="PAUSED")
         self.state.set_tracking("Tracking PAUSED")
 
     def _handle(self, command):
         if isinstance(command, AuthJob):
             self.authentication.perform(command)
+            owner = self.authentication.tracking_identity()
+            if owner is not None and owner != self._metrics_owner:
+                self._pause()
+                self._reset_totals(owner)
             return
         generation = None
         if isinstance(command, tuple):
@@ -231,13 +245,19 @@ class WorkPulseTray:
                 self.icon.notify(str(error), "WorkPulse startup settings")
             self.icon.update_menu()
         elif command == "start" and self._agent is None:
-            if self.authentication.snapshot()["state"] in ("password_required", "changing_password", "signing_in", "checking_session"):
-                self.icon.notify("Complete employee authentication/password change before starting a session.", "WorkPulse")
+            owner = self.authentication.tracking_identity()
+            if owner is None:
+                self._requested = False
+                self._manual_stop.set()
+                self.state.set_tracking("Tracking PAUSED: sign in required")
+                self.icon.notify("Sign in with a valid employee account before starting tracking.", "WorkPulse")
                 return
             # Serialize this short local-only startup against an emergency veto.
             # Never perform network/storage calls while holding this lock.
             with self._control_lock:
                 if generation is not None and generation != self._generation:
+                    return
+                if self.authentication.tracking_identity() != owner:
                     return
                 # Scheduled starts have no generation: manual stop takes priority.
                 if generation is None and self._manual_stop.is_set() and self._requested:
@@ -248,13 +268,14 @@ class WorkPulseTray:
                     return
                 self._manual_stop.clear()
                 self._requested = True
+                if owner != self._metrics_owner:
+                    self._reset_totals(owner)
                 self.state.set_tracking("Tracking starting")
-                self._agent = self._factory(policy=self.policy)
+                self._agent = self._factory(policy=self.policy, authorization=lambda: self.authentication.tracking_identity() == owner)
                 self._runner = Thread(target=self._agent.run, name="WorkPulse tracking")
                 self._runner.start()
                 with self._view_lock:
-                    self._view = {"mouse_movements": 0, "mouse_clicks": 0, "key_presses": 0,
-                                  "active_app": "Starting", "active_seconds": 0.0, "idle_seconds": 0.0}
+                    self._view.update(active_app="Starting", activity_status="ACTIVE")
         elif command in ("pause", "emergency", "logout", "exit"):
             self._manual_stop.set()
             self._requested = False
@@ -262,6 +283,7 @@ class WorkPulseTray:
             if command == "emergency":
                 self.state.set_tracking("Tracking STOPPED: explicit restart required")
             if command == "logout":
+                self._reset_totals()
                 self.authentication.logout()
                 self.icon.notify(self.authentication.snapshot()["message"], "WorkPulse sign out")
             elif command == "exit":
@@ -274,6 +296,10 @@ class WorkPulseTray:
                 self.icon.notify("Set DASHBOARD_URL to your WorkPulse web dashboard address.", "Dashboard not configured")
 
     def _schedule(self):
+        if self.authentication.tracking_identity() is None:
+            if self._agent is not None or self._requested:
+                self._handle("pause")
+            return
         if self._manual_stop.is_set() or not self._requested:
             return
         if not self.policy.allows():
@@ -341,4 +367,5 @@ class WorkPulseTray:
 
 
 if __name__ == "__main__":
-    WorkPulseTray().run()
+    from .desktop import run_desktop
+    raise SystemExit(run_desktop())
