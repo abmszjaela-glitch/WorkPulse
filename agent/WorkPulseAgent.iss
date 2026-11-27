@@ -7,18 +7,6 @@
   #define AgentBundleDir "..\dist\gui\WorkPulseAgent"
 #endif
 ; Compile this release entry point directly, or use installer/build_release.py.
-#ifndef AgentName
-  #error AgentName must be supplied by build_installer.py
-#endif
-#ifndef AgentVersion
-  #error AgentVersion must be supplied by build_installer.py
-#endif
-#ifndef PublisherDisplayName
-  #error PublisherDisplayName must be supplied by build_installer.py
-#endif
-#ifndef AgentDescription
-  #error AgentDescription must be supplied by build_installer.py
-#endif
 
 [Setup]
 SourceDir=installer

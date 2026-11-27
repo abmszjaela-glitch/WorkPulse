@@ -1,2 +1,6 @@
 node_modules
 .env
+# Generated verification output; retain the API manifest and Postman examples.
+reports/*
+!reports/api-document-manifest.json
+!reports/phase6-http-examples.json

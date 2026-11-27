@@ -1,6 +1,6 @@
 """Validate the existing UI bundle and compile agent/release/WorkPulseAgentSetup.exe.
 
-Preserves all existing application sources, specs and legacy installer scripts.
+Packages the verified windowed GUI bundle using the release installer script.
 """
 import argparse
 from datetime import datetime, timezone

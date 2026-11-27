@@ -1,4 +1,3 @@
-export const PROFILE_KEY = 'workpulse.profile.draft.v2'
 export const profileLanguages = [
   'English (United States)',
   'English (United Kingdom)',
@@ -21,12 +20,6 @@ export const defaultProfile = {
   timezone: 'Asia/Colombo',
   photo: '',
   notifications: { daily: false, idle: false, weekly: false },
-}
-export const profileAccount = {
-  email: '',
-  employeeId: '',
-  department: '',
-  role: '',
 }
 export const copyProfile = (profile = defaultProfile) =>
   JSON.parse(JSON.stringify(profile))
@@ -76,21 +69,6 @@ export function validateProfile(profile) {
   )
     return 'Invalid notification preferences.'
   return null
-}
-export function loadProfile(storage) {
-  try {
-    const raw = storage.getItem(PROFILE_KEY)
-    if (!raw) return { profile: copyProfile(), error: '' }
-    const profile = JSON.parse(raw)
-    if (validateProfile(profile)) throw new Error('Invalid profile')
-    return { profile: copyProfile(profile), error: '' }
-  } catch {
-    return {
-      profile: copyProfile(),
-      error:
-        'Saved preview profile could not be loaded. Default details are shown.',
-    }
-  }
 }
 export function passwordRequirements(password) {
   return [

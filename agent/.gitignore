@@ -12,3 +12,5 @@ build/
 dist/
 .packaging-smoke-*/
 .installer-test-*/
+# Generated diagnostics from build, compatibility and performance checks.
+reports/

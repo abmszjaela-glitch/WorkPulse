@@ -580,7 +580,7 @@ About entry, executable version resources and installer use these same values.
 The publisher display name is configurable and is not a verified legal identity.
 No digital signing is configured or claimed.
 
-`installer/WorkPulseAgent.iss` packages the existing versioned PyInstaller onedir
+`WorkPulseAgent.iss` packages the existing versioned PyInstaller onedir
 output. It defaults to Program Files, adds Start Menu shortcuts, displays the
 installation/privacy notice, and offers unchecked current-user startup. It never
 starts tracking on installation and preserves all employee data on uninstall.
