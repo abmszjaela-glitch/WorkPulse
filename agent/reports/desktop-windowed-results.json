@@ -1,7 +1,7 @@
 {
-  "executed_at_utc": "2026-11-23T09:30:22.820119+00:00",
+  "executed_at_utc": "2026-11-23T11:24:25.138654+00:00",
   "windows_build": 26200,
-  "target": "agent\\dist\\integration-ui\\WorkPulseAgent\\WorkPulseAgent.exe",
+  "target": "agent\\dist\\start-fix\\WorkPulseAgent\\WorkPulseAgent.exe",
   "checks": {
     "windows_gui_subsystem_no_console": "PASS",
     "normal_desktop_visible_paused": "PASS",

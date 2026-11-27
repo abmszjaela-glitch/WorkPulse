@@ -1,0 +1,86 @@
+{
+  "issue": "Start failed before listeners initialized",
+  "cause": "Duplicate output keyword in desktop factory and tray",
+  "reproducedBeforeFix": true,
+  "regressionTest": "tests/test_desktop_wiring.py",
+  "sourceFiles": [
+    "ui/desktop.py",
+    "tests/test_desktop_wiring.py"
+  ],
+  "tests": {
+    "passed": 226,
+    "failed": 0,
+    "realEmployeeTracking": "NOT TESTED"
+  },
+  "gui": {
+    "executed_at_utc": "2026-11-23T11:24:25.138654+00:00",
+    "windows_build": 26200,
+    "target": "agent\\dist\\start-fix\\WorkPulseAgent\\WorkPulseAgent.exe",
+    "checks": {
+      "windows_gui_subsystem_no_console": "PASS",
+      "normal_desktop_visible_paused": "PASS",
+      "callback_error_desktop_visible_paused": "PASS",
+      "callback_error_logged_without_private_details": "PASS",
+      "early_configuration_error_logged": "PASS"
+    },
+    "normal": {
+      "window_title": "WorkPulse Agent 1.0.0",
+      "window_was_visible": true,
+      "tray_was_visible": true,
+      "tracking_never_started": true,
+      "callback_error_seen": false,
+      "tracking": "Tracking PAUSED",
+      "employee_status": "signed_out"
+    },
+    "callback_error": {
+      "window_title": "WorkPulse Agent 1.0.0",
+      "window_was_visible": true,
+      "tray_was_visible": true,
+      "tracking_never_started": true,
+      "callback_error_seen": true,
+      "tracking": "Tracking PAUSED",
+      "employee_status": "signed_out"
+    },
+    "status": "PASS"
+  },
+  "installer": {
+    "compiled_at_utc": "2026-11-23T11:25:30.461513+00:00",
+    "compiler": "C:\\Users\\DELL\\AppData\\Local\\Programs\\Inno Setup 7\\ISCC.exe",
+    "output": "C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\release\\WorkPulseAgentSetup.exe",
+    "bytes": 22379230,
+    "sha256": "65b3ff7d3ff8cd277bd9191f3b411039342c42ac60929e8de10a3c7cdf351c9c",
+    "source_executable": "C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\dist\\start-fix\\WorkPulseAgent\\WorkPulseAgent.exe",
+    "version": "1.0.0",
+    "publisher_display_name": "WorkPulse (provisional)",
+    "compilation": "PASS",
+    "signing": "Not configured",
+    "errors": [],
+    "target_os": [
+      "Windows 10 x64",
+      "Windows 11 x64"
+    ],
+    "windows_10_execution": "NOT TESTED"
+  },
+  "configurationChanged": false,
+  "databaseChanged": false,
+  "installerVerification": {
+    "status": "PASS",
+    "mode": "Isolated per-user installation; elevated Program Files path not tested",
+    "checks": {
+      "install": "PASS",
+      "start_menu": "PASS",
+      "desktop_shortcut_opt_in": "PASS",
+      "runtime_payload": "PASS",
+      "privacy_and_user_guide": "PASS",
+      "no_development_guides": "PASS",
+      "installed_paused_native_smoke": "PASS",
+      "desktop_link_target": "PASS",
+      "installed_desktop_shortcut_opens_paused_gui": "PASS",
+      "uninstall": "PASS",
+      "app_and_start_menu_removed": "PASS",
+      "desktop_removed": "PASS",
+      "synthetic_data_retained": "PASS"
+    },
+    "windows10": "NOT TESTED"
+  }
+}

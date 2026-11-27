@@ -1,0 +1,128 @@
+337 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.10
+338 INFO: Python: 3.15.2
+400 INFO: Platform: Windows-11-10.0.26200-SP0
+400 INFO: Python environment: C:\Users\DELL\Documents\GitHub\WorkPulse\agent\venv
+644 INFO: Module search paths (PYTHONPATH):
+['C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\packaging',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse',
+ 'C:\\Users\\DELL\\AppData\\Local\\Python\\pythoncore-3.15-64\\python315.zip',
+ 'C:\\Users\\DELL\\AppData\\Local\\Python\\pythoncore-3.15-64\\DLLs',
+ 'C:\\Users\\DELL\\AppData\\Local\\Python\\pythoncore-3.15-64\\Lib',
+ 'C:\\Users\\DELL\\AppData\\Local\\Python\\pythoncore-3.15-64',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\win32',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\win32\\lib',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\pythonwin',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent',
+ 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse']
+1168 INFO: Appending 'datas' from .spec
+1196 INFO: checking Analysis
+1196 INFO: Building Analysis because Analysis-00.toc is non existent
+1196 INFO: Looking for Python shared library...
+1196 INFO: Using Python shared library: C:\Users\DELL\AppData\Local\Python\pythoncore-3.15-64\python315.dll
+1196 INFO: Running Analysis Analysis-00.toc
+1196 INFO: Target bytecode optimization level: 0
+1196 INFO: Initializing module dependency graph...
+1199 INFO: Initializing module graph hook caches...
+1220 INFO: Analyzing modules for base_library.zip ...
+3050 INFO: Processing standard module hook 'hook-math.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+3675 INFO: Processing standard module hook 'hook-encodings.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+8666 INFO: Processing standard module hook 'hook-difflib.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+8687 INFO: Processing standard module hook 'hook-heapq.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+8943 INFO: Processing standard module hook 'hook-pickle.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+11083 INFO: Caching module dependency graph...
+11117 INFO: Analyzing C:\Users\DELL\Documents\GitHub\WorkPulse\agent\start_agent.py
+12032 INFO: Processing standard module hook 'hook-zoneinfo.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+12099 INFO: Processing standard module hook 'hook-sysconfig.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+12340 INFO: Processing standard module hook 'hook-platform.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+12395 INFO: Processing standard module hook 'hook-_ctypes.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+12407 INFO: Processing standard module hook 'hook-sqlite3.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+12983 INFO: Processing standard module hook 'hook-certifi.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+13000 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+13003 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+13600 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+13694 INFO: Processing standard module hook 'hook-webbrowser.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+13746 INFO: Processing standard module hook 'hook-xml.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+13781 INFO: Processing standard module hook 'hook-pystray.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+14301 INFO: Processing pre-safe-import-module hook 'hook-six.moves.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+14423 INFO: Processing pre-safe-import-module hook 'hook-gi.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+C:\Users\DELL\Documents\GitHub\WorkPulse\agent\venv\Lib\site-packages\pystray\_util\gtk.py:53: SyntaxWarning: 'return' in a 'finally' block
+  return False
+14457 INFO: Processing standard module hook 'hook-PIL.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+14741 INFO: Processing standard module hook 'hook-PIL.Image.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+15680 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+16167 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+17254 INFO: Processing standard module hook 'hook-psutil.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+17395 INFO: Processing standard module hook 'hook-pywintypes.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+17637 INFO: Processing standard module hook 'hook-pynput.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+18487 INFO: Processing standard module hook 'hook-urllib3.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+18735 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+18739 INFO: SetuptoolsInfo: initializing cached setuptools info...
+19955 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+19972 INFO: Processing standard module hook 'hook-setuptools.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+19994 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+20038 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+20039 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+20054 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+20055 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+20246 INFO: Processing standard module hook 'hook-_osx_support.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+20253 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+20271 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+20661 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+20664 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+21407 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+21408 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+22297 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+22299 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+22958 INFO: Processing standard module hook 'hook-charset_normalizer.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+23504 INFO: Processing standard module hook 'hook-customtkinter.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+24317 INFO: Analyzing hidden import 'pynput.mouse._win32'
+24358 INFO: Analyzing hidden import 'pynput.keyboard._win32'
+24393 INFO: Analyzing hidden import 'PIL._tkinter_finder'
+24395 INFO: Processing module hooks (post-graph stage)...
+25051 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+26143 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+26720 INFO: Processing standard module hook 'hook-_tkinter.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks'
+26721 INFO: Processing standard module hook 'hook-tzdata.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+27383 INFO: Performing binary vs. data reclassification (620 entries)
+27549 INFO: Looking for ctypes DLLs
+27590 WARNING: Ignoring AppKit.framework/AppKit imported from C:\Users\DELL\Documents\GitHub\WorkPulse\agent\venv\Lib\site-packages\darkdetect\_mac_detect.py - only basenames are supported with ctypes imports!
+27626 INFO: Analyzing run-time hooks ...
+27629 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+27634 INFO: Including run-time hook 'pyi_rth__tkinter.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+27636 INFO: Including run-time hook 'pyi_rth_setuptools.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+27638 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+27640 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+27644 INFO: Including run-time hook 'pyi_rth_pywintypes.py' from 'C:\\Users\\DELL\\Documents\\GitHub\\WorkPulse\\agent\\venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\rthooks'
+27668 INFO: Creating base_library.zip...
+27691 INFO: Looking for dynamic libraries
+28662 INFO: Extra DLL search directories (AddDllDirectory): []
+28663 INFO: Extra DLL search directories (PATH): []
+29988 INFO: Warnings written to C:\Users\DELL\Documents\GitHub\WorkPulse\agent\build\start-fix\WorkPulseAgent-gui\warn-WorkPulseAgent-gui.txt
+30112 INFO: Graph cross-reference written to C:\Users\DELL\Documents\GitHub\WorkPulse\agent\build\start-fix\WorkPulseAgent-gui\xref-WorkPulseAgent-gui.html
+30236 INFO: checking PYZ
+30236 INFO: Building PYZ because PYZ-00.toc is non existent
+30236 INFO: Building PYZ (ZlibArchive) C:\Users\DELL\Documents\GitHub\WorkPulse\agent\build\start-fix\WorkPulseAgent-gui\PYZ-00.pyz
+30932 INFO: Building PYZ (ZlibArchive) C:\Users\DELL\Documents\GitHub\WorkPulse\agent\build\start-fix\WorkPulseAgent-gui\PYZ-00.pyz completed successfully.
+30987 INFO: checking PKG
+30987 INFO: Building PKG because PKG-00.toc is non existent
+30987 INFO: Building PKG (CArchive) WorkPulseAgent.pkg
+31043 INFO: Building PKG (CArchive) WorkPulseAgent.pkg completed successfully.
+31045 INFO: Bootloader C:\Users\DELL\Documents\GitHub\WorkPulse\agent\venv\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+31045 INFO: checking EXE
+31045 INFO: Building EXE because EXE-00.toc is non existent
+31045 INFO: Building EXE from EXE-00.toc
+31046 INFO: Copying bootloader EXE to C:\Users\DELL\Documents\GitHub\WorkPulse\agent\build\start-fix\WorkPulseAgent-gui\WorkPulseAgent.exe
+31141 INFO: Copying icon to EXE
+31211 INFO: Copying version information to EXE
+31274 INFO: Copying 0 resources to EXE
+31274 INFO: Embedding manifest in EXE
+31332 INFO: Appending PKG archive to EXE
+31501 INFO: Fixing EXE headers
+31852 INFO: Building EXE from EXE-00.toc completed successfully.
+31861 INFO: checking COLLECT
+31862 INFO: Building COLLECT because COLLECT-00.toc is non existent
+31862 INFO: Building COLLECT COLLECT-00.toc
+33025 INFO: Building COLLECT COLLECT-00.toc completed successfully.
+33046 INFO: Build complete! The results are available in: C:\Users\DELL\Documents\GitHub\WorkPulse\agent\dist\start-fix

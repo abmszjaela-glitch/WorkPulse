@@ -12,8 +12,6 @@ export function readJwtSecret(env){
 export function readServerKey(env){
   const key=env.SUPABASE_SECRET_KEY?.trim();
   if(!key)throw new ConfigurationError('Missing SUPABASE_SECRET_KEY; a server-only Supabase key is required');
-  // Classification is a guard against accidentally using a public key, not
-  // cryptographic validation. Supabase validates the supplied credential itself.
   let serviceRole=false;
   if(key.split('.').length===3){
     try{serviceRole=JSON.parse(Buffer.from(key.split('.')[1],'base64url').toString()).role==='service_role';}catch{}

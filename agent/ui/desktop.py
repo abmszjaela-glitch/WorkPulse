@@ -28,7 +28,7 @@ class DesktopApplication:
         self.root = root
         self._events = Queue()
         self.controller = controller or WorkPulseTray(
-            agent_factory=lambda **kwargs: ActivityAgent(output=lambda _message: None, **kwargs),
+            agent_factory=ActivityAgent,
             open_window=lambda: self._events.put("open"),
             show_summary=lambda: self._events.put("summary"),
             privacy_policy=lambda: self._events.put("privacy"))

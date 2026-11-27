@@ -1,5 +1,5 @@
 {
-  "tested_at_utc": "2026-11-23T09:37:24.642404+00:00",
+  "tested_at_utc": "2026-11-23T11:26:49.527453+00:00",
   "windows_build": 26200,
   "mode": "Isolated per-user installation; elevated Program Files path not tested",
   "checks": {
